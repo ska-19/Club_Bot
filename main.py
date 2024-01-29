@@ -7,6 +7,7 @@ from aiogram import Bot, Dispatcher, types
 
 from bot_instance import bot
 from bot.handlers.user_handlers import user_router
+from bot.config import BotConfig
 
 
 def register_routers(dp: Dispatcher) -> None:
@@ -16,7 +17,9 @@ def register_routers(dp: Dispatcher) -> None:
 async def main() -> None:
     """Entry point of the program."""
 
+    config = BotConfig(admin_ids=[52786051], welcome_message="Welcome!")
     dp = Dispatcher()
+    dp["config"] = config
 
     register_routers(dp)
 
