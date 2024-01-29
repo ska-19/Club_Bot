@@ -1,11 +1,11 @@
-from aiogram import types, Dispatcher
+from aiogram.filters import Command
+from aiogram import Router, types
 
-from bot.keyboards.user_keyboards import get_main_keyboard
-async def start_handler(msg: types.Message) -> None:
-    reply_text = f'Hello {msg.from_user.first_name}!'
-    await msg.answer(text=reply_text, reply_markup=get_main_keyboard())
+user_router = Router()
 
 
-def register_user_handlers(dp: Dispatcher) -> None:
-    """Register user handlers."""
-    dp.register_message_handler(start_handler, commands=['start'])
+@user_router.message(Command('start'))
+async def cmd_start(msg: types.Message) -> None:
+    """Processes the `start` command"""
+
+    await msg.answer('Hello <b>World</b>!')
