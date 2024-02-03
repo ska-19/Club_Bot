@@ -82,6 +82,7 @@ async def callbacks_club_info(callback: types.CallbackQuery):
 
     await callback.answer()
 
+
 @user_router.message(Command("reply"))
 async def cmd_reply(message: types.Message):
     """The function replies to your message"""
