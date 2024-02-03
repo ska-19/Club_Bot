@@ -25,14 +25,22 @@ async def cmd_user_menu(message: types.Message):
     await message.delete()
 
 @user_router.callback_query(F.data == "user_profile")
-async def callbacks_user_profile(callback: types.CallbackQuery):
+async def callback_user_profile(callback: types.CallbackQuery):
     await callback.message.edit_text("User profile", reply_markup = get_user_profile_ikb())
 
     await callback.answer()
 
-@user_router.callback_query(F.data == "user_profile_back")
-async def callbacks_user_profile_back(callback: types.CallbackQuery):
-    await back_to_main_menu(callback.message)
+@user_router.callback_query(F.data.startswith("user_profile_"))
+async def callbacks_user_profile(callback: types.CallbackQuery):
+    action = callback.data.split("_")[-1]
+    if action == "coins":
+        await callback.message.edit_text("Coins")
+    elif action == "change":
+        await callback.message.edit_text("Редактирование")
+    elif action == "invite":
+        await callback.message.edit_text("Пригласить")
+    elif action == "back":
+        await back_to_main_menu(callback.message)
 
     await callback.answer()
 
@@ -59,7 +67,7 @@ async def callbacks_num(callback: types.CallbackQuery):
 
 
 @user_router.callback_query(F.data =="club_info")
-async def callbacks_club_info(callback: types.CallbackQuery):
+async def callback_club_info(callback: types.CallbackQuery):
     await callback.message.edit_text("Информация о клубе", reply_markup=get_club_info())
 
     await callback.answer()

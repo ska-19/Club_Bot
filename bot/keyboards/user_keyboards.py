@@ -52,7 +52,7 @@ def get_club_info() -> InlineKeyboardMarkup:
 def get_user_profile_ikb() -> InlineKeyboardMarkup:
     """Get user_profile keyboard."""
     ikb = [
-        [InlineKeyboardButton(text="Получить Coins", callback_data="user_profile_change_coins")],
+        [InlineKeyboardButton(text="Получить Coins", callback_data="user_profile_coins")],
         [InlineKeyboardButton(text="Редактировать", callback_data="user_profile_change")],
         [InlineKeyboardButton(text="Пригласить друга", callback_data="user_profile_invite")],
         [InlineKeyboardButton(text="Назад", callback_data="user_profile_back")],
