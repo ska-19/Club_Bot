@@ -1,15 +1,14 @@
 import asyncio
-import os
 import logging
 
-from aiogram import Bot, Dispatcher, types
+from aiogram import Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.fsm.strategy import FSMStrategy
 
 from bot_instance import bot
-from bot.handlers import user_handlers, user_registration
+from tg_bot.bot.handlers import user_handlers
+from tg_bot.bot.handlers import user_registration
 
-from bot.config import BotConfig
+from tg_bot.bot.config import BotConfig
 
 def register_routers(dp: Dispatcher) -> None:
     """Registers routers"""

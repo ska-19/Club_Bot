@@ -2,8 +2,8 @@ from aiogram.filters import Command
 from aiogram import Router, types
 from aiogram import F
 
-from bot.config import BotConfig
-from bot.keyboards.user_keyboards import get_main_kb, get_main_ikb, get_calc_ikb, get_user_profile_ikb, get_club_info
+from tg_bot.bot.config import BotConfig
+from tg_bot.bot.keyboards.user_keyboards import get_main_kb, get_main_ikb, get_calc_ikb, get_user_profile_ikb, get_club_info
 
 router = Router()
 user_data = {}

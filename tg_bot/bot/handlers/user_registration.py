@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, ReplyKeyboardRemove
 
-from bot.keyboards.simple_kb import make_row_keyboard, make_colum_keyboard
+from tg_bot.bot.keyboards.simple_kb import make_row_keyboard, make_colum_keyboard
 
 router = Router()
 
