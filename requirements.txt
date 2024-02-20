@@ -37,6 +37,8 @@ multidict==6.0.5
 orjson==3.9.14
 passlib==1.7.4
 pendulum==3.0.0
+psycopg2==2.9.9
+psycopg2-binary==2.9.9
 pycparser==2.21
 pydantic==2.5.3
 pydantic-extra-types==2.5.0
