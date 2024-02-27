@@ -4,7 +4,7 @@ import logging
 from aiogram import Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
-from bot_instance import bot
+from tg_bot.bot_instance import bot
 from tg_bot.bot.handlers import user_handlers
 from tg_bot.bot.handlers import user_registration
 

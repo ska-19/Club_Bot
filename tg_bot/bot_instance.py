@@ -1,4 +1,4 @@
-from aiogram import Bot, types
+from aiogram import Bot
 import os
 from dotenv import load_dotenv
 from aiogram.enums import ParseMode
