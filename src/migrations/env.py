@@ -5,8 +5,8 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from Club_Bot.src.config import DB_HOST, DB_PORT, DB_USER, DB_NAME, DB_PASS
-from Club_Bot.src.models.models import metadata
+from src.config import DB_HOST, DB_PORT, DB_USER, DB_NAME, DB_PASS
+from src.models.models import metadata
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
