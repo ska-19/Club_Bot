@@ -1,13 +1,16 @@
-from main import bot, dp
+from main import bot
+from aiogram import Router
+from aiogram import F
+from aiogram.types import Message
 from keyboards import keyboard
 from aiogram import types
-from aiogram.dispatcher.filters import Command
+from aiogram.filters import Command
 
-
-@dp.message_handler(Command('start'))
+router = Router()
+@router.message(Command("start"))
 async def start(message: types.Message):
-    await bot.send_message(message.chat.id, 'Тестируем WebApp!',
-                           reply_markup=keyboard)
+    await message.answer('Тестируем WebApp!', reply_markup=keyboard)
+
 
 
 PRICE = {
@@ -20,7 +23,7 @@ PRICE = {
 }
 
 
-@dp.message_handler(content_types='web_app_data')
+@router.message(F.web_app_data)
 async def buy_process(web_app_message):
     await bot.send_invoice(web_app_message.chat.id,
                            title='Laptop',
@@ -33,11 +36,11 @@ async def buy_process(web_app_message):
                            payload='some_invoice')
 
 
-@dp.pre_checkout_query_handler(lambda query: True)
+@router.pre_checkout_query()
 async def pre_checkout_process(pre_checkout: types.PreCheckoutQuery):
     await bot.answer_pre_checkout_query(pre_checkout.id, ok=True)
 
 
-@dp.message_handler(content_types=types.ContentType.SUCCESSFUL_PAYMENT)
+@router.message(F.successful_payment)
 async def successful_payment(message: types.Message):
-    await bot.send_message(message.chat.id, 'Платеж прошел успешно!')
+    await message.answer('Платеж прошел успешно!')

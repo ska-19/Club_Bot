@@ -1,15 +1,19 @@
 from aiogram import Bot, Dispatcher
-
 import asyncio
 
-bot = Bot(token='token')
-dp = Dispatcher(bot=bot)
+import handlers
 
+bot = Bot(token='')
+
+def register_routers(dp: Dispatcher) -> None:
+    """Registers routers"""
+    dp.include_routers(handlers.router)
 
 async def main():
-    from handlers import dp
+    dp = Dispatcher()
+    register_routers(dp)
     try:
-        await dp.start_polling()
+        await dp.start_polling(bot)
     finally:
         await bot.session.close()
 
