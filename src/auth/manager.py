@@ -35,7 +35,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         )
         password = user_dict.pop("password")
         user_dict["hashed_password"] = self.password_helper.hash(password)
-        user_dict["role_id"] = 1
+        user_dict["mentor"] = False
 
         created_user = await self.user_db.create(user_dict)
 
