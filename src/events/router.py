@@ -5,12 +5,24 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database import get_async_session
 from src.events.models import club, event
 from src.events.schemas import EventCreate, EventUpdate, EventReg
-from src.club.router import error,  error404, error409
+from src.club.router import error
 
 router = APIRouter(
     prefix="/events",
     tags=["events"]
 )
+
+error404 = {
+    "status": "error",
+    "data": "Event not found",
+    "details": None
+}
+
+error409 = {
+    "status": "error",
+    "data": "Event with the same date already exists",
+    "details": None
+}
 
 # внутренняя функция, принимает дату, возвращает true, если события в этот день нет, false иначе
 # async def check_date_conflict(
