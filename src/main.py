@@ -5,7 +5,7 @@ from src.auth.schemas import UserRead, UserCreate
 
 from src.operations.router import router as router_operation
 from src.user_profile.router import router as router_user_profile
-
+from src.pages.router import router as router_pages
 
 app = FastAPI(
     title="Trading App"
@@ -25,3 +25,4 @@ app.include_router(
 
 app.include_router(router_operation)
 app.include_router(router_user_profile)
+app.include_router(router_pages)
