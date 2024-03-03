@@ -5,6 +5,7 @@ from fastapi import FastAPI
 
 # from src.operations.router import router as router_operation
 from src.user_profile.router import router as router_user_profile
+from src.events.router import router as router_events
 
 
 app = FastAPI(
@@ -25,3 +26,4 @@ app = FastAPI(
 
 # app.include_router(router_operation)
 app.include_router(router_user_profile)
+app.include_router(router_events)
