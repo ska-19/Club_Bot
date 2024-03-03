@@ -8,7 +8,7 @@ from src.database import Base, metadata
 
 club = Table(
     'club', metadata,
-    Column('id', Integer, primary_key=True),
+    Column('id', Integer, primary_key=True, autoincrement=True),
     Column('owner', Integer, ForeignKey('user.id'), nullable=False),
     Column('name', String(255), nullable=False),
     Column('dest', Text),

@@ -23,6 +23,12 @@ error404 = {
     "details": None
 }
 
+error409 = {
+    "status": "error",
+    "data": "User already exists",
+    "details": None
+}
+
 
 async def get_user_by_id(
         user_id: int,
@@ -40,11 +46,12 @@ async def get_user_by_id(
         return None
 
 
-# принимает джейсон вида UserCreate, возвращает все поля, которые уже заполненны (комментарии что есть что в
-# schemas), возвращает 200 и все поля user если все хорошо и 500 ошибку если не получилось создать
+# принимает джейсон вида UserCreat
+# 200 + джейсон со всеми данными(которые уже заполненны (комментарии что есть что в schemas)), если все хорошо
+# 409 если юзер с таким именем уже существует
+# 500 если внутрення ошибка сервера
 # если в каком то поле возвращается string значит это поле пустое
-
-@router.post("/create")
+@router.post("/create_user")
 async def create_user(
         new_user: UserCreate,
         session: AsyncSession = Depends(get_async_session)):
@@ -52,11 +59,7 @@ async def create_user(
         user_dict = new_user.dict()
         data = await get_user_by_id(user_dict['id'], session)
         if data != "User not found":
-            raise HTTPException(status_code=500, detail={
-                "status": "error",
-                "data": "User already exist",
-                "details": None
-            })
+            raise HTTPException(status_code=409, detail=error409)
 
         user_dict['is_active'] = True
         user_dict['is_superuser'] = False
@@ -87,9 +90,9 @@ async def create_user(
         raise HTTPException(status_code=500, detail=error)
 
 
-# принимает user_id, возвращает 404 если пользователь не найден, 500 если что то пошло не по плану, 200 и все
-# поля user если все хорошо
-
+# принимает user_id
+# 404 если такого юзера нет
+# 500 если внутрення ошибка сервера
 @router.get("/get_user")
 async def get_user(
         user_id: int,
@@ -100,19 +103,18 @@ async def get_user(
             raise HTTPException(status_code=500, detail=error)
         elif data == "User not found":
             raise HTTPException(status_code=500, detail=error404)
-        else:
-            return {
-                "status": "success",
-                "data": data,
-                "details": None
-            }
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
     except Exception:
-        await session.rollback()
         raise HTTPException(status_code=500, detail=error)
 
-# принимает user_id, возвращает 404 если пользователь не найден, 500 если что то пошло не по плану, 200 и конкретный
-# аттрибут user если все хорошо
 
+# принимает user_id
+# 404 если такого юзера нет
+# 500 если внутрення ошибка сервера
 @router.get("/get_attr")
 async def get_user_attr(
         user_id: int,
@@ -124,21 +126,20 @@ async def get_user_attr(
             raise HTTPException(status_code=500, detail=error)
         elif data == "User not found":
             raise HTTPException(status_code=500, detail=error404)
-        else:
-            return {
-                "status": "success",
-                "data": data[col],
-                "details": None
-            }
+        return {
+            "status": "success",
+            "data": data[col],
+            "details": None
+        }
     except Exception:
         await session.rollback()
         raise HTTPException(status_code=500, detail=error)
 
 
-# принимает user_id и джейсон вида UserUpdate, возвращает 404 если пользователь не найден, 500 если что то пошло не
-# по плану, 200 и все поля user если все хорошо
-
-@router.post("/update")
+# принимает user_id и джейсон вида UserUpdate
+# 404 если такого юзера нет
+# 500 если внутрення ошибка сервера
+@router.post("/update_user")
 async def update_profile(
         user_id: int,
         update_data: UserUpdate,
@@ -148,35 +149,33 @@ async def update_profile(
         if data is None:
             raise HTTPException(status_code=500, detail=error)
         elif data == "User not found":
-            raise HTTPException(status_code=500, detail=error404)
-        else:
-            stmt = update(user).where(user.c.id == user_id).values(
-                username=update_data.username,
-                name=update_data.name,
-                surname=update_data.surname,
-                email=update_data.email,
-                tel=update_data.tel,
-                photo=update_data.photo,
-                comfort_time=update_data.comfort_time,
-                course=update_data.course,
-                faculty=update_data.faculty,
-                links=update_data.links,
-                bio=update_data.bio
-            )
-            await session.execute(stmt)
-            await session.commit()
+            raise HTTPException(status_code=404, detail=error404)
+        stmt = update(user).where(user.c.id == user_id).values(
+            username=update_data.username,
+            name=update_data.name,
+            surname=update_data.surname,
+            email=update_data.email,
+            tel=update_data.tel,
+            photo=update_data.photo,
+            comfort_time=update_data.comfort_time,
+            course=update_data.course,
+            faculty=update_data.faculty,
+            links=update_data.links,
+            bio=update_data.bio
+        )
+        await session.execute(stmt)
+        await session.commit()
 
-            data = await get_user_by_id(user_id, session)
-            if data is None:
-                return error
-            elif data == "User not found":
-                return error404
-            else:
-                return {
-                    "status": "success",
-                    "data": data,
-                    "details": None
-                }
+        data = await get_user_by_id(user_id, session)
+        if data is None:
+            raise HTTPException(status_code=500, detail=error)
+        elif data == "User not found":
+            raise HTTPException(status_code=404, detail=error404)
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
     except Exception:
         await session.rollback()
         raise HTTPException(status_code=500, detail=error)

@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class ClubCreate(BaseModel):
-    owner: str
+    owner: int
     name: str
     dest: str
     photo: str
@@ -18,4 +18,9 @@ class ClubRead(BaseModel):
 
 
 class ClubUpdate(BaseModel):
-    pass
+    name: str
+    dest: str
+    photo: str
+    bio: str
+    links: str
+    comfort_time: str
