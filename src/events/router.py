@@ -13,21 +13,21 @@ router = APIRouter(
 )
 
 # внутренняя функция, принимает дату, возвращает true, если события в этот день нет, false иначе
-async def check_date_conflict(
-        date: str,
-        session: AsyncSession = Depends(get_async_session)
-):
-    try:
-        query = select(event).where(event.c.date == date)
-        result = await session.execute(query)
-        data = result.mappings().first()
-
-        if not data:
-            return True
-        else:
-            return False
-    except Exception:
-        return False
+# async def check_date_conflict(
+#         date: str,
+#         session: AsyncSession = Depends(get_async_session)
+# ):
+#     try:
+#         query = select(event).where(event.c.date == date)
+#         result = await session.execute(query)
+#         data = result.mappings().first()
+#
+#         if not data:
+#             return True
+#         else:
+#             return False
+#     except Exception:
+#         return False
 
 # принимает json вида EventCreate
 # 200 - успешно создано, возвращает json со всеми данными
@@ -39,12 +39,12 @@ async def create_event(
         session: AsyncSession = Depends(get_async_session)
 ):
     try:
-        if not await check_date_conflict(new_event.date):
-            raise HTTPException(status_code=409, detail=error409)
+        # if not await check_date_conflict(new_event.date):
+        #     raise HTTPException(status_code=409, detail=error409)
         query = insert(event).values(
             club_id=new_event.club_id,
             host_id=new_event.host_id,
-            date=new_event.date,
+            # date=new_event.date,
             sinopsis=new_event.sinopsis,
             contact=new_event.contact,
             speaker=new_event.speaker
@@ -100,12 +100,12 @@ async def update_event(
 
         if not data:
             raise HTTPException(status_code=404, detail=error404)
-        if not await check_date_conflict(update_data.date):
-            raise HTTPException(status_code=409, detail=error409)
+        # if not await check_date_conflict(update_data.date):
+        #     raise HTTPException(status_code=409, detail=error409)
         query = update(event).where(event.c.id == event_id).values(
             club_id=update_data.club_id,
             host_id=update_data.host_id,
-            date=update_data.date,
+            # date=update_data.date,
             sinopsis=update_data.sinopsis,
             contact=update_data.contact,
             speaker=update_data.speaker
@@ -134,7 +134,7 @@ async def event_reg(
             user_id=data.user_id,
             event_id=data.event_id,
             confirm=data.confirm,
-            reg_date=data.reg_date
+            # reg_date=data.reg_date
         )
         await session.execute(query)
         await session.commit()
