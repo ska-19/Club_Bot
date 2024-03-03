@@ -4,10 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Document</title>
+    <title></title>
 </head>
 <body>
 <div class="container">
+    <nav>
+        <div class="experience-bar">
+            <div class="experience-fill">
+                <div class="experience-level">Level 5</div>
+            </div>
+        </div>
+    </nav>
     <div class="inner">
         <div class="item">
             <img src="1.png" alt="" class="img">
@@ -18,22 +25,22 @@
             <button class="btn" id="btn2">Супер Котик на тесте</button>
         </div>
     </div>
-</div>
 
-<div class="inputbox" style=" margin-top: 50px">
-    <input required="required" type="text" id="InputUserInfo">
-    <span>UserInfo</span>
-    <i></i>
-</div>
 
-<div style=" margin-top: 50px">
-    <button onclick="saveUserInfo()" class="btn">Сохранить</button>
-</div>
+    <div class="inputbox" style=" margin-top: 50px">
+        <label for="InputUserInfo"></label><input required="required" type="text" id="InputUserInfo">
+        <span>UserInfo</span>
+        <i></i>
+    </div>
 
-<div style=" margin-top: 50px">
-    <button id="btn4" class="btn">Закрыть</button>
-</div>
+    <div style=" margin-top: 50px">
+        <button onclick="saveUserInfo()" class="btn">Сохранить</button>
+    </div>
 
+    <div style=" margin-top: 50px">
+        <button class="btn" id="btn4">Закрыть</button>
+    </div>
+</div>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="app.js"></script>
 </body>
