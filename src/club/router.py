@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select, insert, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -76,6 +78,7 @@ async def create_club(
         if not await check_leg_name(club_dict['name'], session):
             raise HTTPException(status_code=409, detail=error409)
 
+        club_dict['date_joined'] = datetime.utcnow()
         stmt = insert(club).values(**club_dict)
         await session.execute(stmt)
         await session.commit()
@@ -139,7 +142,8 @@ async def update_club(
             photo=update_data.photo,
             bio=update_data.bio,
             links=update_data.links,
-            comfort_time=update_data.comfort_time
+            comfort_time=update_data.comfort_time,
+            date_created=update_data.date_created
         )
         await session.execute(stmt)
         await session.commit()

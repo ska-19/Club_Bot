@@ -7,3 +7,14 @@ class UserJoin(BaseModel):
     club_id: int
     user_id: int
     role: str
+
+
+class UpdateRole(BaseModel):
+    club_id: int
+    user_id: int
+    role: str
+
+
+class UserDisjoin(BaseModel):
+    club_id: int
+    user_id: int
