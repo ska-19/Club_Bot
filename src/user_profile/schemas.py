@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from typing import Optional
 
 from pydantic import BaseModel
@@ -32,6 +32,7 @@ class UserUpdate(BaseModel):
     faculty: str
     links: str  # ссылки на соц сети
     bio: str  # о себе
+    dob: date
 
     class Config:
         arbitrary_types_allowed = True

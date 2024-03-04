@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
-from sqlalchemy import Table, Column, Integer, String, TIMESTAMP, ForeignKey, JSON, Boolean, Text
+from sqlalchemy import Table, Column, Integer, String, TIMESTAMP, ForeignKey, JSON, Boolean, Text, Date
 
 from src.database import Base, metadata
 
@@ -14,9 +14,9 @@ user = Table(
     # Column('password', String(255), nullable=False),
     Column('name', String(255), nullable=False),  # tg name
     Column('surname', String(255), nullable=False),  # tg surname
-    # Column('dob', TIMESTAMP),
+    Column('dob', Date),
     Column('tel', String(255)),
-    # Column('date_joined', TIMESTAMP, nullable=False, default=datetime.utcnow()),
+    Column('date_joined', TIMESTAMP, nullable=False, default=datetime.utcnow()),
     Column('photo', Text),  # ссылка на фото
     Column('comfort_time', Text),  # удобное время для встреч
     Column('course', String(255)),

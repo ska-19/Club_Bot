@@ -1,3 +1,5 @@
+from datetime import datetime, date
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select, insert, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -73,6 +75,8 @@ async def create_user(
         user_dict['faculty'] = 'string'
         user_dict['links'] = 'string'
         user_dict['bio'] = 'string'
+        user_dict['date_joined'] = datetime.utcnow()
+        user_dict['dob'] = date.today()
 
         # password = user_dict.pop("password")
         # user_dict["hashed_password"] = password  # TODO: add hash password
@@ -161,7 +165,8 @@ async def update_profile(
             course=update_data.course,
             faculty=update_data.faculty,
             links=update_data.links,
-            bio=update_data.bio
+            bio=update_data.bio,
+            dob=update_data.dob
         )
         await session.execute(stmt)
         await session.commit()
