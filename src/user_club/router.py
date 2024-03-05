@@ -6,6 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
 from src.user_club.models import club_x_user
+from src.user_profile.models import user
+from src.club.models import club
 from src.user_club.schemas import UserJoin, UpdateRole, UserDisjoin
 
 
@@ -23,6 +25,12 @@ error = {
 error404 = {
     "status": "error",
     "data": "User not found",
+    "details": None
+}
+
+error404s = {
+    "status": "error",
+    "data": "Users not found",
     "details": None
 }
 
@@ -71,6 +79,26 @@ async def check_rec(
             return True
         else:
             return False
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+
+
+# внутрення функция для получения списка юзеров по списку словарей, содержащих user_id
+# при вызове функции обязательно проверить что data является списком словарей с полем user_id и он не пуст
+async def get_users_by_dict(
+        data,
+        session: AsyncSession = Depends(get_async_session)
+):
+    try:
+        user_ids = [item['user_id'] for item in data]
+        query = select(user).where(user.c.id.in_(user_ids))
+        result = await session.execute(query)
+        data = result.mappings().all()
+
+        if not data:
+            raise HTTPException(status_code=500, detail=error)
+
+        return data
     except Exception:
         raise HTTPException(status_code=500, detail=error)
 
@@ -146,22 +174,96 @@ async def role_update(
         raise HTTPException(status_code=500, detail=error)
 
 
+# принимает club_id
+# 200 + джейсон со списком всех пользователей, если все хорошо
+# 404 если таких пользователей нет
+# 500 если внутрення ошибка сервера
 @router.get("/get_users_in_club")
 async def get_users_in_club(
-        user_id: int,  # TODO: write schema
         club_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
-    pass
+    try:
+        query = select(club_x_user).where(club_x_user.c.club_id == club_id)
+        result = await session.execute(query)
+        data = result.mappings().all()
+
+        if not data:
+            raise HTTPException(status_code=404, detail=error404s)
+
+        data = await get_users_by_dict(data, session)
+
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
 
 
+# принимает club_id и role
+# 200 + джейсон со cписком всех пользователей с этой ролью, если все хорошо
+# 404 если таких пользователей нет
+# 500 если внутрення ошибка сервера
 @router.get("/get_users_with_role")
 async def get_users_with_role(
-        user_id: int,  # TODO: write schema
         club_id: int,
         role: str,
         session: AsyncSession = Depends(get_async_session)
 ):
-    pass
+    try:
+        query = select(club_x_user).where(club_x_user.c.club_id == club_id and club_x_user.c.role == role)
+        result = await session.execute(query)
+        data = result.mappings().all()
+
+        if not data:
+            raise HTTPException(status_code=404, detail=error404s)
+
+        data = await get_users_by_dict(data, session)
+
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
 
 
+# принимает user_id
+# 200 + джейсон со cписком всех клубой, в которых состоит пользователь, если все хорошо
+# 404 если таких клубов нет
+# 500 если внутрення ошибка сервера
+@router.get("/get_clubs_by_user")
+async def get_clubs_by_user(
+        user_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    try:
+        query = select(club_x_user).where(club_x_user.c.user_id == user_id)
+        result = await session.execute(query)
+        data = result.mappings().all()
+
+        if not data:
+            raise HTTPException(status_code=404, detail={
+                "status": "error",
+                "data": "Clubs not found",
+                "details": None
+            })
+
+        clubs_ids = [item['user_id'] for item in data]
+        query = select(club).where(user.c.id.in_(clubs_ids))
+        result = await session.execute(query)
+        data = result.mappings().all()
+
+        if not data:
+            raise HTTPException(status_code=500, detail=error)
+
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
