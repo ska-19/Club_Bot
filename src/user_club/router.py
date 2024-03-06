@@ -9,7 +9,8 @@ from src.user_club.models import club_x_user
 from src.user_profile.models import user
 from src.club.models import club
 from src.user_club.schemas import UserJoin, UpdateRole, UserDisjoin
-
+from src.user_profile.router import get_user_by_id
+from src.club.router import get_club_by_id
 
 router = APIRouter(
     prefix="/join",
@@ -22,7 +23,7 @@ error = {
     "details": None
 }
 
-error404 = {
+error404u = {
     "status": "error",
     "data": "User not found",
     "details": None
@@ -31,6 +32,18 @@ error404 = {
 error404s = {
     "status": "error",
     "data": "Users not found",
+    "details": None
+}
+
+error404c = {
+    "status": "error",
+    "data": "Club not found",
+    "details": None
+}
+
+error404uc = {
+    "status": "error",
+    "data": "This user not in this club",
     "details": None
 }
 
@@ -55,7 +68,9 @@ async def get_rec_id(
         session: AsyncSession = Depends(get_async_session)
 ) -> int:
     try:
-        query = select(club_x_user).where(club_x_user.c.user_id == user_id and club_x_user.c.club_id == club_id)
+        query = select(club_x_user).where(
+            (club_x_user.c.user_id == user_id) &
+            (club_x_user.c.club_id == club_id))
         result = await session.execute(query)
         data = result.mappings().first()
 
@@ -71,7 +86,9 @@ async def check_rec(
         session: AsyncSession = Depends(get_async_session)
 ):
     try:
-        query = select(club_x_user).where(club_x_user.c.user_id == user_id and club_x_user.c.club_id == club_id)
+        query = select(club_x_user).where(
+            (club_x_user.c.user_id == user_id) &
+            (club_x_user.c.club_id == club_id))
         result = await session.execute(query)
         data = result.mappings().first()
 
@@ -96,7 +113,7 @@ async def get_users_by_dict(
         data = result.mappings().all()
 
         if not data:
-            raise HTTPException(status_code=500, detail=error)
+            raise Exception
 
         return data
     except Exception:
@@ -105,8 +122,11 @@ async def get_users_by_dict(
 
 # принимает джейсон вида UserJoin
 # 200 + success, если все хорошо
+# 404 + error404u, если пользователь не найден
+# 404 + error404c, если клуб не найден
 # 409 если такая запись уже существует
 # 500 если внутрення ошибка сервера
+# error404u и error404c имена переменных с джейсонами-ошибками
 @router.post("/join_club")
 async def join_to_the_club(
         join_data: UserJoin,
@@ -114,8 +134,14 @@ async def join_to_the_club(
 ):
     try:
         join_dict = join_data.dict()
+        if await get_user_by_id(join_dict['user_id'], session) == "User not found":
+            raise ValueError('404u')
+
+        if await get_club_by_id(join_dict['club_id'], session) == "Club not found":
+            raise ValueError('404c')
+
         if not await check_rec(join_dict['user_id'], join_dict['club_id'], session):
-            raise HTTPException(status_code=409, detail=error409)
+            raise ValueError('409')
 
         join_dict['date_joined'] = datetime.utcnow()
         stmt = insert(club_x_user).values(**join_dict)
@@ -123,14 +149,24 @@ async def join_to_the_club(
         await session.commit()
 
         return success
+    except ValueError as e:
+        if str(e) == '404u':
+            raise HTTPException(status_code=404, detail=error404u)
+        elif str(e) == '404c':
+            raise HTTPException(status_code=404, detail=error404c)
+        else:
+            raise HTTPException(status_code=409, detail=error409)
     except Exception:
-        await session.rollback()
         raise HTTPException(status_code=500, detail=error)
+    finally:
+        await session.rollback()
 
 
-# принимает джейсон вида UserJoin
+# принимает джейсон вида UserDisjoin
 # 200 + success, если все хорошо
-# 409 если такая запись уже существует
+# 404 + error404uc, если пользователь не состоит в клубе
+# 404 + error404u, если пользователь не найден
+# 404 + error404c, если клуб не найден
 # 500 если внутрення ошибка сервера
 @router.post("/disjoin_club")
 async def disjoin_club(
@@ -138,9 +174,15 @@ async def disjoin_club(
         session: AsyncSession = Depends(get_async_session)
 ):
     try:
-        data_dict = data.dic()
+        data_dict = data.dict()
+        if await get_user_by_id(data_dict['user_id '], session) == "User not found":
+            raise ValueError('404u')
+
+        if await get_club_by_id(data_dict['club_id'], session) == "Club not found":
+            raise ValueError('404c')
+
         if await check_rec(data_dict['user_id'], data_dict['club_id'], session):
-            raise HTTPException(status_code=404, detail=error404)
+            raise ValueError('404')
 
         rec_id = await get_rec_id(data_dict['user_id'], data_dict['club_id'], session)
         stmt = delete(club_x_user).where(club_x_user.c.id == rec_id)
@@ -148,35 +190,63 @@ async def disjoin_club(
         await session.commit()
 
         return success
+    except ValueError as e:
+        if str(e) == '404':
+            raise HTTPException(status_code=404, detail=error404uc)
+        elif str(e) == '404u':
+            raise HTTPException(status_code=404, detail=error404u)
+        else:
+            raise HTTPException(status_code=404, detail=error404c)
     except Exception:
-        await session.rollback()
         raise HTTPException(status_code=500, detail=error)
+    finally:
+        await session.rollback()
 
 
-@router.post("/role_upgrade")
+# принимает джейсон вида new_role
+# 404 + error404uc, если пользователь не состоит в клубе
+# 404 + error404u, если пользователь не найден
+# 404 + error404c, если клуб не найден
+# 500 если внутрення ошибка сервера
+@router.post("/role_update")
 async def role_update(
         new_role: UpdateRole,
         session: AsyncSession = Depends(get_async_session)
 ):
     try:
         new_role_dict = new_role.dict()
+        if await get_user_by_id(new_role_dict['user_id'], session) == "User not found":
+            raise ValueError('404u')
+
+        if await get_club_by_id(new_role_dict['club_id'], session) == "Club not found":
+            raise ValueError('404c')
+
         if await check_rec(new_role_dict['user_id'], new_role_dict['club_id'], session):
-            raise HTTPException(status_code=404, detail=error404)
+            raise ValueError('404uc')
 
         rec_id = await get_rec_id(new_role_dict['user_id'], new_role_dict['club_id'], session)
-        stmt = update(club_x_user).where(club_x_user.c.id == rec_id).values(role=role_update.role)
+        stmt = update(club_x_user).where(club_x_user.c.id == rec_id).values(role=new_role.role)
         await session.execute(stmt)
         await session.commit()
 
         return success
+    except ValueError as e:
+        if str(e) == '404uc':
+            raise HTTPException(status_code=404, detail=error404uc)
+        elif str(e) == '404u':
+            raise HTTPException(status_code=404, detail=error404u)
+        else:
+            raise HTTPException(status_code=404, detail=error404c)
     except Exception:
-        await session.rollback()
         raise HTTPException(status_code=500, detail=error)
+    finally:
+        await session.rollback()
 
 
 # принимает club_id
 # 200 + джейсон со списком всех пользователей, если все хорошо
-# 404 если таких пользователей нет
+# 404 + error404c, если клуб не найден
+# 404 + error404 sесли таких пользователей нет
 # 500 если внутрення ошибка сервера
 @router.get("/get_users_in_club")
 async def get_users_in_club(
@@ -184,12 +254,15 @@ async def get_users_in_club(
         session: AsyncSession = Depends(get_async_session)
 ):
     try:
+        if await get_club_by_id(club_id, session) == "Club not found":
+            raise ValueError('404c')
+
         query = select(club_x_user).where(club_x_user.c.club_id == club_id)
         result = await session.execute(query)
         data = result.mappings().all()
 
         if not data:
-            raise HTTPException(status_code=404, detail=error404s)
+            raise ValueError('404s')
 
         data = await get_users_by_dict(data, session)
 
@@ -198,13 +271,19 @@ async def get_users_in_club(
             "data": data,
             "details": None
         }
+    except ValueError as e:
+        if str(e) == '404s':
+            raise HTTPException(status_code=404, detail=error404s)
+        else:
+            raise HTTPException(status_code=404, detail=error404c)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
 
 
 # принимает club_id и role
 # 200 + джейсон со cписком всех пользователей с этой ролью, если все хорошо
-# 404 если таких пользователей нет
+# 404 + error404c, если клуб не найден
+# 404 + error404 sесли таких пользователей нет
 # 500 если внутрення ошибка сервера
 @router.get("/get_users_with_role")
 async def get_users_with_role(
@@ -213,12 +292,17 @@ async def get_users_with_role(
         session: AsyncSession = Depends(get_async_session)
 ):
     try:
-        query = select(club_x_user).where(club_x_user.c.club_id == club_id and club_x_user.c.role == role)
+        if await get_club_by_id(club_id, session) == "Club not found":
+            raise ValueError('404c')
+
+        query = select(club_x_user).where(
+            (club_x_user.c.club_id == club_id) &
+            (club_x_user.c.role == role))
         result = await session.execute(query)
         data = result.mappings().all()
 
         if not data:
-            raise HTTPException(status_code=404, detail=error404s)
+            raise ValueError('404s')
 
         data = await get_users_by_dict(data, session)
 
@@ -227,12 +311,18 @@ async def get_users_with_role(
             "data": data,
             "details": None
         }
+    except ValueError as e:
+        if str(e) == '404s':
+            raise HTTPException(status_code=404, detail=error404s)
+        else:
+            raise HTTPException(status_code=404, detail=error404c)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
 
 
 # принимает user_id
 # 200 + джейсон со cписком всех клубой, в которых состоит пользователь, если все хорошо
+# 404 + error404u, если пользователь не найден
 # 404 если таких клубов нет
 # 500 если внутрення ошибка сервера
 @router.get("/get_clubs_by_user")
@@ -241,29 +331,37 @@ async def get_clubs_by_user(
         session: AsyncSession = Depends(get_async_session)
 ):
     try:
+        if await get_user_by_id(user_id, session) == "User not found":
+            raise ValueError('404u')
+
         query = select(club_x_user).where(club_x_user.c.user_id == user_id)
         result = await session.execute(query)
         data = result.mappings().all()
 
         if not data:
-            raise HTTPException(status_code=404, detail={
-                "status": "error",
-                "data": "Clubs not found",
-                "details": None
-            })
+            raise ValueError('404s')
 
-        clubs_ids = [item['user_id'] for item in data]
-        query = select(club).where(user.c.id.in_(clubs_ids))
+        clubs_ids = [item['club_id'] for item in data]
+        query = select(club).where(club.c.id.in_(clubs_ids))
         result = await session.execute(query)
         data = result.mappings().all()
 
         if not data:
-            raise HTTPException(status_code=500, detail=error)
+            raise Exception
 
         return {
             "status": "success",
             "data": data,
             "details": None
         }
+    except ValueError as e:
+        if str(e) == '404s':
+            raise HTTPException(status_code=404, detail={
+                "status": "error",
+                "data": "Clubs not found",
+                "details": None
+            })
+        else:
+            raise HTTPException(status_code=404, detail=error404u)
     except Exception:
         raise HTTPException(status_code=500, detail=error)

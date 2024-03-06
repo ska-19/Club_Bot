@@ -21,7 +21,6 @@ class UserCreate(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    username: str
     name: str
     surname: str
     email: str

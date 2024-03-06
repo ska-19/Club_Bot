@@ -8,7 +8,7 @@ from src.database import Base, metadata
 user = Table(
     'user', metadata,
     Column('id', Integer, primary_key=True, autoincrement=False),  # tg id
-    Column('username', String(255), nullable=False),  # tg username
+    Column('username', String(255), nullable=False),  # tg username (handler)
     Column('mentor', Boolean, nullable=False, default=False),
     Column('email', String(255)),
     # Column('password', String(255), nullable=False),

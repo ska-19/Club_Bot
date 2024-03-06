@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database import get_async_session
 from src.club.models import club
 from src.club.schemas import ClubUpdate, ClubCreate
+from src.user_profile.router import get_user_by_id
 
 router = APIRouter(
     prefix="/club",
@@ -45,7 +46,7 @@ async def get_club_by_id(
 
         return data
     except Exception:
-        return None
+        raise HTTPException(status_code=500, detail=error)
 
 
 # внутренняя функция, принимает имя клуба, возвращает true, если клуба с таким именем нет, false иначе
@@ -67,6 +68,7 @@ async def check_leg_name(
 
 # принимает джейсон вида ClubCreate
 # 200 + джейсон со всеми данными, если все хорошо
+# 404 если owner (=user_id) не существует
 # 409 если клуб с таким именем уже существует
 # 500 если внутрення ошибка сервера
 @router.post("/create_club")
@@ -75,8 +77,11 @@ async def create_club(
         session: AsyncSession = Depends(get_async_session)):
     try:
         club_dict = new_club.dict()
+        if await get_user_by_id(club_dict['owner'], session) == "User not found":
+            raise ValueError('404u')
+
         if not await check_leg_name(club_dict['name'], session):
-            raise HTTPException(status_code=409, detail=error409)
+            raise ValueError('409')
 
         club_dict['date_joined'] = datetime.utcnow()
         stmt = insert(club).values(**club_dict)
@@ -88,9 +93,19 @@ async def create_club(
             "data": club_dict,  # TODO: how return ClubRead schemas
             "details": None
         }
+    except ValueError as e:
+        if str(e) == '409':
+            raise HTTPException(status_code=409, detail=error409)
+        else:
+            raise HTTPException(status_code=404, detail={
+                "status": "error",
+                "data": "User not found",
+                "details": None
+                 })
     except Exception:
-        await session.rollback()
         raise HTTPException(status_code=500, detail=error)
+    finally:
+        await session.rollback()
 
 
 # принимает club_id
@@ -103,16 +118,15 @@ async def get_club(
         session: AsyncSession = Depends(get_async_session)):
     try:
         data = await get_club_by_id(club_id, session)
-        if data is None:
-            raise HTTPException(status_code=500, detail=error)
-        elif data == "Club not found":
-            raise HTTPException(status_code=404, detail=error404)
+        if data == "Club not found":
+            raise ValueError
         return {
             "status": "success",
             "data": data,
             "details": None
         }
-
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
 
@@ -129,12 +143,10 @@ async def update_club(
         session: AsyncSession = Depends(get_async_session)):
     try:
         data = await get_club_by_id(club_id, session)
-        if data is None:
-            raise HTTPException(status_code=500, detail=error)
-        elif data == "Club not found":
-            raise HTTPException(status_code=404, detail=error404)
+        if data == "Club not found":
+            raise ValueError('404')
         if not await check_leg_name(update_data.name, session):
-            raise HTTPException(status_code=409, detail=error409)
+            raise ValueError('409')
 
         stmt = update(club).where(club.c.id == club_id).values(
             name=update_data.name,
@@ -149,15 +161,19 @@ async def update_club(
         await session.commit()
 
         data = await get_club_by_id(club_id, session)
-        if data is None:
-            raise HTTPException(status_code=500, detail=error)
-        elif data == "Club not found":
-            raise HTTPException(status_code=404, detail=error404)
+        if data == "Club not found":
+            raise ValueError('404')
         return {
             "status": "success",
             "data": data,
             "details": None
         }
+    except ValueError as e:
+        if str(e) == '404':
+            raise HTTPException(status_code=404, detail=error404)
+        else:
+            raise HTTPException(status_code=409, detail=error409)
     except Exception:
-        await session.rollback()
         raise HTTPException(status_code=500, detail=error)
+    finally:
+        await session.rollback()
