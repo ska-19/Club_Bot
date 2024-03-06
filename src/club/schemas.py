@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 
 from pydantic import BaseModel
 
@@ -11,6 +11,7 @@ class ClubCreate(BaseModel):
     bio: str
     links: str
     comfort_time: str
+    date_created: date
 
 
 class ClubRead(BaseModel):
@@ -24,3 +25,4 @@ class ClubUpdate(BaseModel):
     bio: str
     links: str
     comfort_time: str
+    date_created: date

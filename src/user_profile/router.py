@@ -45,7 +45,7 @@ async def get_user_by_id(
 
         return data
     except Exception:
-        return None
+        raise HTTPException(status_code=500, detail=error)
 
 
 # принимает джейсон вида UserCreat
@@ -61,7 +61,7 @@ async def create_user(
         user_dict = new_user.dict()
         data = await get_user_by_id(user_dict['id'], session)
         if data != "User not found":
-            raise HTTPException(status_code=409, detail=error409)
+            raise ValueError
 
         user_dict['is_active'] = True
         user_dict['is_superuser'] = False
@@ -89,9 +89,12 @@ async def create_user(
             "data": user_dict,  # TODO: how return UserRead schemas
             "details": None
         }
+    except ValueError:
+        raise HTTPException(status_code=409, detail=error409)
     except Exception:
-        await session.rollback()
         raise HTTPException(status_code=500, detail=error)
+    finally:
+        await session.rollback()
 
 
 # принимает user_id
@@ -103,15 +106,15 @@ async def get_user(
         session: AsyncSession = Depends(get_async_session)):
     try:
         data = await get_user_by_id(user_id, session)
-        if data is None:
-            raise HTTPException(status_code=500, detail=error)
-        elif data == "User not found":
-            raise HTTPException(status_code=500, detail=error404)
+        if data == "User not found":
+            raise ValueError
         return {
             "status": "success",
             "data": data,
             "details": None
         }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
 
@@ -126,18 +129,19 @@ async def get_user_attr(
         session: AsyncSession = Depends(get_async_session)):
     try:
         data = await get_user_by_id(user_id, session)
-        if data is None:
-            raise HTTPException(status_code=500, detail=error)
-        elif data == "User not found":
-            raise HTTPException(status_code=500, detail=error404)
+        if data == "User not found":
+            raise ValueError
         return {
             "status": "success",
             "data": data[col],
             "details": None
         }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404)
     except Exception:
-        await session.rollback()
         raise HTTPException(status_code=500, detail=error)
+    finally:
+        await session.rollback()
 
 
 # принимает user_id и джейсон вида UserUpdate
@@ -150,12 +154,9 @@ async def update_profile(
         session: AsyncSession = Depends(get_async_session)):
     try:
         data = await get_user_by_id(user_id, session)
-        if data is None:
-            raise HTTPException(status_code=500, detail=error)
-        elif data == "User not found":
-            raise HTTPException(status_code=404, detail=error404)
+        if data == "User not found":
+            raise ValueError
         stmt = update(user).where(user.c.id == user_id).values(
-            username=update_data.username,
             name=update_data.name,
             surname=update_data.surname,
             email=update_data.email,
@@ -172,15 +173,16 @@ async def update_profile(
         await session.commit()
 
         data = await get_user_by_id(user_id, session)
-        if data is None:
-            raise HTTPException(status_code=500, detail=error)
-        elif data == "User not found":
-            raise HTTPException(status_code=404, detail=error404)
+        if data == "User not found":
+            raise ValueError
         return {
             "status": "success",
             "data": data,
             "details": None
         }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404)
     except Exception:
-        await session.rollback()
         raise HTTPException(status_code=500, detail=error)
+    finally:
+        await session.rollback()

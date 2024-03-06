@@ -13,5 +13,5 @@ club_x_user = Table(
     Column('club_id', Integer, ForeignKey('club.id'), nullable=False),
     Column('user_id', Integer, ForeignKey('user.id'), nullable=False),
     Column('role', String(255), nullable=False),
-    # Column('date_joined', TIMESTAMP, nullable=False)
+    Column('date_joined', TIMESTAMP, nullable=False)
 )
