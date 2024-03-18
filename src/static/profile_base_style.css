@@ -39,14 +39,14 @@ nav {
 .star-icon {
     width: 40px;
     height: 40px;
-    background: url("src/images/exp.png");
+    background: url('images/exp.png');
     background-size: cover;
     display: inline-block;
 }
 
 .container {
     width: 100%;
-    height: 100%;
+    height: 810px;
     --s: 84px;
     --c1: #291544;
     --c2: #1f0b3b;
@@ -107,7 +107,7 @@ nav {
     display: inline-block;
     padding: 10px 20px;
     border: none;
-    background: #127ba9;
+    background: rgba(97, 0, 255, 0.7);
     border-radius: 10px;
     color: #fff;
     text-transform: uppercase;
@@ -117,74 +117,18 @@ nav {
 }
 
 .btn:hover {
-    background: #8e37c7;
+    background: rgba(132, 38, 209, 0.5);
 }
 
 .usercard {
     text-align: center;
 }
 
-.inputbox {
-    position: relative;
-    width: 196px;
-}
-
-.inputbox input {
-    position: relative;
-    width: 100%;
-    padding: 20px 10px 10px;
-    background: transparent;
-    outline: none;
-    box-shadow: none;
-    border: none;
-    color: #ffffff;
-    font-size: 1em;
-    letter-spacing: 0.05em;
-    transition: 0.5s;
-    z-index: 10;
-}
-
-.inputbox span {
-    position: absolute;
-    left: 0;
-    padding: 20px 10px 10px;
-    font-size: 1em;
-    color: #ffffff;
-    letter-spacing: 00.05em;
-    transition: 0.3s;
-    pointer-events: none;
-}
-
-.inputbox input:valid ~ span,
-.inputbox input:focus ~ span {
-    color: #ffffff;
-    transform: translateX(-10px) translateY(-84px);
-    font-size: 0.75em;
-}
-
-.inputbox i {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 2px;
-    background: #127ba9;
-    border-radius: 4px;
-    transition: 0.5s;
-    pointer-events: none;
-    z-index: 9;
-}
-
-.inputbox input:valid ~ i,
-.inputbox input:focus ~ i {
-    height: 44px;
-}
-
-
 #avatar-container {
     position: relative;
-    width: 150px;
-    height: 150px;
+    margin-left: 20px;
+    width: 120px;
+    height: 120px;
     overflow: hidden;
     display: inline-block;
     background-color: lightgray;
@@ -235,7 +179,7 @@ nav {
     transition: 0.5s;
     animation: gradient_301 5s ease infinite;
     border: double 4px transparent;
-    background-image: linear-gradient(#1f0025, #744bff),  linear-gradient(137.48deg, #501c9b 10%, #ffa600 45%, #8F51EA 67%, #0044ff 87%);
+    background-image: linear-gradient(#1f0025, #744bff), linear-gradient(137.48deg, #501c9b 10%, #ffa600 45%, #8F51EA 67%, #0044ff 87%);
     background-origin: border-box;
     background-clip: content-box, border-box;
 }
@@ -253,7 +197,6 @@ nav {
 
 strong {
     z-index: 2;
-    font-family: 'Avalors Personal Use';
     font-size: 18px;
     letter-spacing: 5px;
     color: #FFFFFF;
@@ -389,4 +332,173 @@ strong {
         transform: scale(0.75);
         box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
     }
+}
+
+.card {
+    position: relative;
+    width: 190px;
+    height: 160px;
+    background: rgba(97, 0, 255, 0.7);
+    background: linear-gradient(137deg, rgba(97, 0, 255, 0.7) 0%, #291544 100%);
+    transition: 0.3s ease;
+    border-radius: 30px;
+    filter: drop-shadow(0px 0px 30px rgba(132, 38, 209, 0.5));
+}
+
+.card::after {
+    content: '';
+    background-color: #181818;
+    position: absolute;
+    z-index: 1;
+    transition: 0.3s ease;
+    height: 98%;
+    width: 98%;
+    top: 1%;
+    left: 1%;
+    border-radius: 28px;
+}
+
+.card:hover {
+    filter: drop-shadow(0px 0px 30px rgb(141, 22, 164));
+}
+
+.block1 {
+    width: 45%;
+}
+
+.form-container {
+    margin-left: 10px;
+    width: 370px;
+    height: 370px;
+    background: rgba(97, 0, 255, 0.7);
+    background: linear-gradient(137deg, rgba(97, 0, 255, 0.7) 0%, #291544 100%);
+    transition: 0.3s ease;
+    border: 2px solid transparent;
+    padding: 32px 24px;
+    font-size: 11px;
+    color: #7a9a8a;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-sizing: border-box;
+    border-radius: 30px;
+    animation: gradient 5s ease infinite;
+    filter: drop-shadow(0px 0px 30px rgba(132, 38, 209, 0.5));
+}
+
+.form-container::after {
+    content: '';
+    background-color: #2a2a2a;
+    position: absolute;
+    z-index: 1;
+    transition: 0.3s ease;
+    height: 99%;
+    width: 99%;
+    top: 1%;
+    left: 1%;
+    border-radius: 28px;
+}
+
+.form-container:hover {
+    filter: drop-shadow(0px 0px 30px rgb(141, 22, 164));
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.form-container button:active {
+    scale: 0.95;
+}
+
+.form-container .form {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-container .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.form-container .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #717171;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.form-container .form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 8px;
+    color: #7a9a8a;
+    font-family: inherit;
+    background-color: transparent;
+    border: 1px solid #414141;
+}
+
+.form-container .form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 8px;
+    resize: none;
+    color: #7a9a8a;
+    height: 96px;
+    border: 1px solid #414141;
+    background-color: transparent;
+    font-family: inherit;
+}
+
+.form-container .form-group input::placeholder {
+    opacity: 0.5;
+}
+
+.form-container .form-group input:focus {
+    outline: none;
+    border-color: rgba(132, 38, 209, 0.5);
+}
+
+.form-container .form-group textarea:focus {
+    outline: none;
+    border-color: rgba(132, 38, 209, 0.5);
+}
+
+.form-container .form-submit-btn {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    align-self: flex-start;
+    font-family: inherit;
+    color: #717171;
+    font-weight: 600;
+    width: 40%;
+    background: #313131;
+    border: 1px solid #414141;
+    padding: 12px 16px;
+    font-size: inherit;
+    gap: 8px;
+    margin-top: 8px;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.form-container .form-submit-btn:hover {
+    background-color: #7a9a8a;
+    border-color: #7a9a8a;
 }

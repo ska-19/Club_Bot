@@ -1,36 +1,54 @@
 {% extends "profile_base.html" %}
 
 
-{% block Education %}
-1
+{% block level %}
+<div class="experience-level">
+</div>
 {% endblock %}
 
 
 {% block name %}
-2
+<h1 id="name" style="margin-left: 12px; font-size: 15px; color: #7a9a8a">
+    Пользователь
+</h1>
 {% endblock %}
 
 
 {% block achivements %}
-3
+<h1 id="achivements" style=" font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
+    нет пока достижений
+</h1>
 {% endblock %}
 
 
-{% block DateOfBirth %}
-4
+{% block dob %}
+<div class="form-group" style="width: 60%">
+    <label for="Date of Birth">День рождения</label>
+    <input required="" name="Date of Birth" id="Date of Birth" type="text" style="width: 115px">
+</div>
 {% endblock %}
 
 
 {% block City %}
-5
+<div class="form-group">
+    <label for="City">Город</label>
+    <input required="" name="City" id="City" type="text" style="width: 125px">
+</div>
 {% endblock %}
 
 
 {% block Education %}
-6
+<div class="form-group">
+    <label for="Education">Образование</label>
+    <input required="" name="Education" id="Education" type="text" style="width: 280px">
+</div>
 {% endblock %}
 
 
 {% block UserInfo %}
-7
+<div class="form-group">
+    <label for="textarea">О себе</label>
+    <textarea required="" cols="50" rows="10" id="textarea" name="textarea"
+              style="width: 280px; height: 80px"></textarea>
+</div>
 {% endblock %}

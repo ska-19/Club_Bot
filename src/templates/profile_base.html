@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="profile_base_style.css">
+    <link rel="stylesheet" type="text/css" href="/static/profile_base_style.css">
     <title></title>
 </head>
 <body>
@@ -15,9 +15,7 @@
         <div style="display: inline-block" class="star-icon"></div>
         <div style="margin-block: 10px;display: inline-block" class="experience-bar">
             <div class="experience-fill">
-                <div class="experience-level">
-                    {% block level %}{% endblock %}
-                </div>
+                {% block level %}{% endblock %}
             </div>
         </div>
     </nav>
@@ -35,18 +33,14 @@
                 </label>
                 <input type="file" id="avatar-input" accept="image/*"/>
             </div>
-            <h1 id="name" style="margin-left: 12px; font-size: 15px; color: #7a9a8a">
-                {% block name %}{% endblock %}
-            </h1>
+            {% block name %}{% endblock %}
         </div>
 
         <!--Достижения-->
         <div class="block2">
             <div class="card">
                 <div class="card-content" style="margin-left: 20px;padding-top: 50px">
-                    <h1 id="achivements" style=" font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
-                        {% block achivements %}{% endblock %}
-                    </h1>
+                    {% block achivements %}{% endblock %}
                 </div>
             </div>
         </div>
@@ -57,28 +51,11 @@
     <div class="form-container" style="margin-top: 30px">
         <form class="form">
             <div style="display: flex">
-                <div class="form-group" style="width: 60%">
-                    <label for="Date of Birth">День рождения</label>
-                    {% block DateOfBirth %}{% endblock %}
-                    <input required="" name="Date of Birth" id="Date of Birth" type="text" style="width: 115px">
-                </div>
-                <div class="form-group">
-                    <label for="City">Город</label>
-                    {% block City %}{% endblock %}
-                    <input required="" name="City" id="City" type="text" style="width: 125px">
-                </div>
+                {% block dob %}{% endblock %}
+                {% block City %}{% endblock %}
             </div>
-            <div class="form-group">
-                <label for="Education">Образование</label>
-                {% block Education %}{% endblock %}
-                <input required="" name="Education" id="Education" type="text" style="width: 280px">
-            </div>
-            <div class="form-group">
-                <label for="textarea">О себе</label>
-                {% block UserInfo %}{% endblock %}
-                <textarea required="" cols="50" rows="10" id="textarea" name="textarea"
-                          style="width: 280px; height: 80px"></textarea>
-            </div>
+            {% block Education %}{% endblock %}
+            {% block UserInfo %}{% endblock %}
             <button type="submit" class="btn">Изменить</button>
         </form>
     </div>
@@ -100,6 +77,6 @@
 
 </div>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="profile_base_script.js"></script>
+<script src="/static/profile_base_script.js"></script>
 </body>
 </html>
