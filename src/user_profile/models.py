@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
-from sqlalchemy import Table, Column, Integer, String, TIMESTAMP, ForeignKey, JSON, Boolean, Text, Date
+from sqlalchemy import Table, Column, Integer, String, TIMESTAMP, ForeignKey, JSON, Boolean, Text, Date, JSON
 
 from src.database import Base, metadata
 
@@ -24,7 +24,12 @@ user = Table(
     Column('links', Text),  # ссылки на соц сети
     Column('bio', Text),  # о себе
     # Column("hashed_password", String, nullable=False),
-    Column("is_active", Boolean, default=True, nullable=False),
-    Column("is_superuser", Boolean, default=False, nullable=False),
-    Column("is_verified", Boolean, default=False, nullable=False),
+    Column('is_active', Boolean, default=True, nullable=False),
+    Column('is_superuser', Boolean, default=False, nullable=False),
+    Column('is_verified', Boolean, default=False, nullable=False),
+
+    Column('xp', Integer, default=0, nullable=False),
+    Column('city', String, nullable=False),
+    Column('education', String, nullable=False),
+    Column('achievments', JSON)
 )

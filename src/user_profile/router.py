@@ -75,6 +75,10 @@ async def create_user(
         user_dict['faculty'] = 'string'
         user_dict['links'] = 'string'
         user_dict['bio'] = 'string'
+        user_dict['education'] = 'string'
+        user_dict['city'] = 'string'
+        user_dict['xp'] = 0
+        user_dict['achievments'] = {'first': 0, 'second': 0, 'third': 0}
         user_dict['date_joined'] = datetime.utcnow()
         user_dict['dob'] = date.today()
 
@@ -167,7 +171,78 @@ async def update_profile(
             faculty=update_data.faculty,
             links=update_data.links,
             bio=update_data.bio,
-            dob=update_data.dob
+            dob=update_data.dob,
+            education=update_data.education,
+            city=update_data.city
+        )
+        await session.execute(stmt)
+        await session.commit()
+
+        data = await get_user_by_id(user_id, session)
+        if data == "User not found":
+            raise ValueError
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+    finally:
+        await session.rollback()
+
+
+# принимает user_id и update_xp(то, на сколько надо изменить xp)
+# 404 если такого юзера нет
+# 500 если внутрення ошибка сервера
+@router.post("/update_user")
+async def update_xp(
+        user_id: int,
+        update_xp: int,
+        session: AsyncSession = Depends(get_async_session)):
+    try:
+        data = await get_user_by_id(user_id, session)
+        if data == "User not found":
+            raise ValueError
+        stmt = update(user).where(user.c.id == user_id).values(
+            xp=data['xp']+update_xp
+        )
+        await session.execute(stmt)
+        await session.commit()
+
+        data = await get_user_by_id(user_id, session)
+        if data == "User not found":
+            raise ValueError
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+    finally:
+        await session.rollback()
+
+
+# принимает user_id и achievment
+# 404 если такого юзера нет
+# 500 если внутрення ошибка сервера
+@router.post("/update_user")
+async def update_achievment(
+        user_id: int,
+        achievment: str,
+        session: AsyncSession = Depends(get_async_session)):
+    try:
+        data = await get_user_by_id(user_id, session)
+        if data == "User not found":
+            raise ValueError
+        data['achievment'][achievment] = 1
+        stmt = update(user).where(user.c.id == user_id).values(
+            achievment=data['achievment']
         )
         await session.execute(stmt)
         await session.commit()
