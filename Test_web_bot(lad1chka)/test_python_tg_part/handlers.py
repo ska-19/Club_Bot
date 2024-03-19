@@ -1,27 +1,13 @@
 from main import bot
-from aiogram import Router
-from aiogram import F
+from aiogram import Router, F, types
 from aiogram.types import Message
 from keyboards import keyboard
-from aiogram import types
 from aiogram.filters import Command
 
 router = Router()
 @router.message(Command("start"))
 async def start(message: types.Message):
     await message.answer('Тестируем WebApp!', reply_markup=keyboard)
-
-
-
-PRICE = {
-    '1': [types.LabeledPrice(label='Item1', amount=100000)],
-    '2': [types.LabeledPrice(label='Item2', amount=200000)],
-    '3': [types.LabeledPrice(label='Item3', amount=300000)],
-    '4': [types.LabeledPrice(label='Item4', amount=400000)],
-    '5': [types.LabeledPrice(label='Item5', amount=500000)],
-    '6': [types.LabeledPrice(label='Item6', amount=600000)]
-}
-
 
 @router.message(F.web_app_data)
 async def buy_process(web_app_message):
