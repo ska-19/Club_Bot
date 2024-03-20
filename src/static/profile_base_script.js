@@ -14,30 +14,6 @@ const userData = {
     info: ''
 };
 
-let btn1 = document.getElementById("btn1");
-let btn2 = document.getElementById("btn2");
-let btn4 = document.getElementById("btn4");
-
-btn1.addEventListener("click", function () {
-    if (tg.MainButton.isVisible) {
-        tg.MainButton.hide();
-    } else {
-        tg.MainButton.setText("Вы выбрали котика 1!");
-        item = "1";
-        tg.MainButton.show();
-    }
-});
-
-btn2.addEventListener("click", function () {
-    if (tg.MainButton.isVisible) {
-        tg.MainButton.hide();
-    } else {
-        tg.MainButton.setText("Вы выбрали супер котика 2!");
-        item = "2";
-        tg.MainButton.show();
-    }
-});
-
 function saveUserInfo() {
     userData.info = document.getElementById('InputUserInfo').value();
     if (tg.MainButton.isVisible) {
@@ -53,9 +29,6 @@ const dataToSend = {
     user_id: userData.user_id,
     message: userData.info
 }
-btn4.addEventListener("click", function () {
-    tg.collapse();
-});
 Telegram.WebApp.onEvent("mainButtonClicked", function () {
     tg.sendData(userData);
 });
@@ -118,4 +91,28 @@ function uploadAvatar() {
         avatarImage.style.display = 'none';
         chooseText.style.display = 'block';
     });
+}
+
+function editForm() {
+    var inputs = document.querySelectorAll("input, textarea");
+    inputs.forEach(function (input) {
+        input.readOnly = false;
+    });
+
+    var editBtn = document.querySelector(".editBtn");
+    editBtn.style.display = "none";
+
+    var saveBtn = document.createElement("button");
+    saveBtn.innerHTML = "Сохранить";
+    saveBtn.classList.add("editBtn"); // добавляем класс для стилизации
+
+    saveBtn.onclick = function () {
+        inputs.forEach(function (input) {
+            input.readOnly = true;
+        });
+        editBtn.style.display = "block";
+        saveBtn.parentNode.removeChild(saveBtn);
+    };
+
+    editBtn.parentNode.appendChild(saveBtn);
 }

@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/profile_base_style.css">
+    <link rel="stylesheet" type="text/css" href="/static/profile_base_style.css">
     <title></title>
 </head>
 <body>
 
 <div class="container">
-
 
     <!--Уровень User-->
     <nav>
@@ -46,36 +45,6 @@
             </div>
         </div>
     </div>
-
-
-    <!--Инфа о user в виде формочки-->
-    <div class="form-container" style="margin-top: 30px">
-        <form class="form" id="form">
-            <div style="display: flex">
-                {% block dob %}{% endblock %}
-                {% block City %}{% endblock %}
-            </div>
-            {% block Education %}{% endblock %}
-            {% block UserInfo %}{% endblock %}
-            <button type="button" class="editBtn" onclick="editForm()">Изменить</button>
-        </form>
-    </div>
-
-
-    <!-- Кнопка "На главную" -->
-    <div style="bottom: 40px">
-        <button class="btn_GoToTheClub" type="button" style="margin-top: 40px">
-            <strong>На главную</strong>
-            <div id="container-stars">
-                <div id="stars"></div>
-            </div>
-            <div id="glow">
-                <div class="circle"></div>
-                <div class="circle"></div>
-            </div>
-        </button>
-    </div>
-
 
 </div>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>

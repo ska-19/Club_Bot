@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/profile_base_style.css">
+    <link rel="stylesheet" type="text/css" href="/static/profile_base_style.css">
     <title></title>
 </head>
 <body>
 
 <div class="container">
-
 
     <!--Уровень User-->
     <nav>
@@ -50,17 +49,19 @@
 
     <!--Инфа о user в виде формочки-->
     <div class="form-container" style="margin-top: 30px">
-        <form class="form" id="form">
+        <form class="form">
             <div style="display: flex">
                 {% block dob %}{% endblock %}
                 {% block City %}{% endblock %}
             </div>
             {% block Education %}{% endblock %}
             {% block UserInfo %}{% endblock %}
-            <button type="button" class="editBtn" onclick="editForm()">Изменить</button>
+            <button type="submit" class="editBtn">Изменить</button>
+            <script>
+                /*TODO как писать кнопку изменить?*/
+            </script>
         </form>
     </div>
-
 
     <!-- Кнопка "На главную" -->
     <div style="bottom: 40px">
