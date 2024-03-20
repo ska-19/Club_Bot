@@ -3,20 +3,21 @@
 
 {% block level %}
 <div class="experience-level">
+    <!--пока заглушка--> Level 5
 </div>
 {% endblock %}
 
 
 {% block name %}
 <h1 id="name" style="margin-left: 12px; font-size: 15px; color: #7a9a8a">
-    Пользователь
+    {{ user_info.name }} {{ user_info.surname }}
 </h1>
 {% endblock %}
 
 
 {% block achivements %}
 <h1 id="achivements" style=" font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
-    нет пока достижений
+    <!--пока заглушка, TODO скрипт, подсвечивает достижения, которые есть--> Нет достижений
 </h1>
 {% endblock %}
 
@@ -24,7 +25,8 @@
 {% block dob %}
 <div class="form-group" style="width: 60%">
     <label for="Date of Birth">День рождения</label>
-    <input required="" name="Date of Birth" id="Date of Birth" type="text" style="width: 115px">
+    <input required="" name="Date of Birth" id="Date of Birth" type="text" style="width: 115px"
+           value="{{ user_info.dob }}" readonly>
 </div>
 {% endblock %}
 
@@ -32,7 +34,7 @@
 {% block City %}
 <div class="form-group">
     <label for="City">Город</label>
-    <input required="" name="City" id="City" type="text" style="width: 125px">
+    <input required="" name="City" id="City" type="text" style="width: 125px" value="{{user_info.city}}" readonly>
 </div>
 {% endblock %}
 
@@ -40,7 +42,8 @@
 {% block Education %}
 <div class="form-group">
     <label for="Education">Образование</label>
-    <input required="" name="Education" id="Education" type="text" style="width: 280px">
+    <input required="" name="Education" id="Education" type="text" style="width: 280px" value="{{user_info.city}}"
+           readonly>
 </div>
 {% endblock %}
 
@@ -48,7 +51,9 @@
 {% block UserInfo %}
 <div class="form-group">
     <label for="textarea">О себе</label>
-    <textarea required="" cols="50" rows="10" id="textarea" name="textarea"
-              style="width: 280px; height: 80px"></textarea>
+    <textarea required="" cols="50" rows="10" id="textarea" name="bio"
+              style="width: 280px; height: 80px" readonly>
+        {{ user_info.bio }}
+    </textarea>
 </div>
 {% endblock %}

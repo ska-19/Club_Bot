@@ -39,7 +39,7 @@ nav {
 .star-icon {
     width: 40px;
     height: 40px;
-    background: url('images/exp.png');
+    background: url('src/static/images/exp.png');
     background-size: cover;
     display: inline-block;
 }
@@ -103,7 +103,7 @@ nav {
     text-align: center;
 }
 
-.btn {
+.editBtn {
     display: inline-block;
     padding: 10px 20px;
     border: none;
@@ -116,7 +116,7 @@ nav {
     transition: background .2s linear;
 }
 
-.btn:hover {
+.editBtn:hover {
     background: rgba(132, 38, 209, 0.5);
 }
 
