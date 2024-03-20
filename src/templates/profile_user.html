@@ -3,7 +3,7 @@
 
 {% block level %}
 <div class="experience-level">
-    <!--пока заглушка--> Level 5
+    <!--пока заглушка--> Level {{ user_info.xp }}
 </div>
 {% endblock %}
 
@@ -18,6 +18,7 @@
 {% block achivements %}
 <h1 id="achivements" style=" font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
     <!--пока заглушка, TODO скрипт, подсвечивает достижения, которые есть--> Нет достижений
+    {{ user_info.achievments }}
 </h1>
 {% endblock %}
 
@@ -42,7 +43,7 @@
 {% block Education %}
 <div class="form-group">
     <label for="Education">Образование</label>
-    <input required="" name="Education" id="Education" type="text" style="width: 280px" value="{{user_info.city}}"
+    <input required="" name="Education" id="Education" type="text" style="width: 280px" value="{{user_info.education}}"
            readonly>
 </div>
 {% endblock %}

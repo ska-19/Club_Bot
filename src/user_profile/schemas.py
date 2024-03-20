@@ -32,6 +32,8 @@ class UserUpdate(BaseModel):
     links: str  # ссылки на соц сети
     bio: str  # о себе
     dob: date
+    city: str
+    education: str
 
     class Config:
         arbitrary_types_allowed = True
