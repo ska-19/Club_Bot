@@ -100,6 +100,29 @@ async def check_rec(
         raise HTTPException(status_code=500, detail=error)
 
 
+# внутреняя функция, принимает user_id и club_id, возвращает роль пользователя в клубе
+async def get_role( #TODO: мб сделать ее внешней
+        user_id: int,
+        club_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    if await check_rec(user_id, club_id, session):
+        return "User not in the club"
+    try:
+        query = select(club_x_user).where(
+            (club_x_user.c.user_id == user_id) &
+            (club_x_user.c.club_id == club_id))
+        result = await session.execute(query)
+        data = result.mappings().first()
+
+        if not data:
+            return "User not found"
+
+        return data['role']
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+
+
 # внутрення функция для получения списка юзеров по списку словарей, содержащих user_id
 # при вызове функции обязательно проверить что data является списком словарей с полем user_id и он не пуст
 async def get_users_by_dict(
@@ -160,7 +183,6 @@ async def join_to_the_club(
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()
-
 
 # принимает джейсон вида UserDisjoin
 # 200 + success, если все хорошо

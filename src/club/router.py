@@ -136,7 +136,7 @@ async def get_club(
 # 404 если такого клуба нет
 # 409 если клуб с таким именем уже существует
 # 500 если внутрення ошибка сервера
-@router.post("/update_club")
+@router.post("/update_club") #TODO: мб стоит еще проверять что именно овнер или админ пытается чет поменять в клубе
 async def update_club(
         club_id: int,
         update_data: ClubUpdate,
