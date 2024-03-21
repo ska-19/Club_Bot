@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 # from src.auth.base_config import auth_backend, fastapi_users
 # from src.auth.schemas import UserRead, UserCreate
-
 from src.user_profile.router import router as router_user_profile
+
 # from src.events.router import router as router_events
 # from src.achievement.router import router as router_achievement
 from src.club.router import router as router_club

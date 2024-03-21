@@ -1,0 +1,173 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-size: 18px;
+    font-family: Arial, sans-serif;
+}
+
+nav {
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+}
+
+.experience-bar { /* Шкала опыта*/
+    position: relative;
+    width: 60%;
+    height: 20px;
+    background-color: #181456;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+.experience-level { /* Текст у лвла */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+    color: #ffffff;
+}
+
+.experience-fill { /* заполенение шкалы опыта*/
+    height: 100%;
+    border-radius: 10px;
+    background-color: #3d32d2;
+    width: 70%; /* Пример: заполнено на 60% */
+}
+
+.container {
+    width: 100%;
+    height: 100%;
+    --s: 84px;
+    --c1: #533a80;
+    --c2: #301559;
+    --c3: #1e0842;
+
+    --_g: 0 120deg, #0000 0;
+    background: conic-gradient(
+            from 0deg at calc(500% / 6) calc(100% / 3),
+            var(--c3) var(--_g)
+    ),
+    conic-gradient(
+            from -120deg at calc(100% / 6) calc(100% / 3),
+            var(--c2) var(--_g)
+    ),
+    conic-gradient(
+            from 120deg at calc(100% / 3) calc(500% / 6),
+            var(--c1) var(--_g)
+    ),
+    conic-gradient(
+            from 120deg at calc(200% / 3) calc(500% / 6),
+            var(--c1) var(--_g)
+    ),
+    conic-gradient(
+            from -180deg at calc(100% / 3) 50%,
+            var(--c2) 60deg,
+            var(--c1) var(--_g)
+    ),
+    conic-gradient(
+            from 60deg at calc(200% / 3) 50%,
+            var(--c1) 60deg,
+            var(--c3) var(--_g)
+    ),
+    conic-gradient(
+            from -60deg at 50% calc(100% / 3),
+            var(--c1) 120deg,
+            var(--c2) 0 240deg,
+            var(--c3) 0
+    );
+    background-size: calc(var(--s) * 1.732) var(--s);
+    max-width: 290px;
+}
+
+.inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 200px;
+}
+
+.img {
+    width: 110px;
+}
+
+.item {
+    text-align: center;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border: none;
+    background: #127ba9;
+    border-radius: 10px;
+    color: #fff;
+    text-transform: uppercase;
+    font-weight: 700;
+
+    transition: background .2s linear;
+}
+
+.btn:hover {
+    background: #8e37c7;
+}
+
+.usercard {
+    text-align: center;
+}
+
+.inputbox {
+    position: relative;
+    width: 196px;
+}
+
+.inputbox input {
+    position: relative;
+    width: 100%;
+    padding: 20px 10px 10px;
+    background: transparent;
+    outline: none;
+    box-shadow: none;
+    border: none;
+    color: #ffffff;
+    font-size: 1em;
+    letter-spacing: 0.05em;
+    transition: 0.5s;
+    z-index: 10;
+}
+
+.inputbox span {
+    position: absolute;
+    left: 0;
+    padding: 20px 10px 10px;
+    font-size: 1em;
+    color: #ffffff;
+    letter-spacing: 00.05em;
+    transition: 0.3s;
+    pointer-events: none;
+}
+
+.inputbox input:valid ~ span,
+.inputbox input:focus ~ span {
+    color: #ffffff;
+    transform: translateX(-10px) translateY(-84px);
+    font-size: 0.75em;
+}
+
+.inputbox i {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 2px;
+    background: #127ba9;
+    border-radius: 4px;
+    transition: 0.5s;
+    pointer-events: none;
+    z-index: 9;
+}
+
+.inputbox input:valid ~ i,
+.inputbox input:focus ~ i {
+    height: 44px;
+}

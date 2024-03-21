@@ -1,7 +1,8 @@
 from aiogram.types import WebAppInfo, ReplyKeyboardMarkup
 from aiogram import types
 
-web_app = WebAppInfo(url='https://github.com/lad1chka/lad1chka.github.io')
+
+web_app = WebAppInfo(url='https://lad1chka.github.io/')
 
 keyboard = ReplyKeyboardMarkup(
     keyboard=[
