@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/static/profile_base_style.css">
+    <title></title>
+</head>
+<body>
+
+<div class="container">
+
+    <!--Уровень User-->
+    <nav>
+        <div style="display: inline-block" class="star-icon"></div>
+        <div style="margin-block: 10px;display: inline-block" class="experience-bar">
+            <div class="experience-fill">
+                {% block level %}{% endblock %}
+            </div>
+        </div>
+    </nav>
+
+
+    <div style="display: flex; margin-top: 5px">
+        <!--Аватарка-->
+        <div class="block1" style="margin-top: 20px;">
+            <div id="avatar-container" onclick="uploadAvatar()">
+                <label for="avatar-input">
+                    <div id="avatar-circle">
+                        <span id="choose-text">Вставьте фото</span>
+                        <img id="avatar-image" src="placeholder.jpg" alt="Вставьте фото">
+                    </div>
+                </label>
+                <input type="file" id="avatar-input" accept="image/*"/>
+            </div>
+            {% block name %}{% endblock %}
+        </div>
+
+        <!--Достижения-->
+        <div class="block2">
+            <div class="card">
+                <div class="card-content" style="margin-left: 20px;padding-top: 50px">
+                    {% block achivements %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="/static/profile_base_script.js"></script>
+</body>
+</html>

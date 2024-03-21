@@ -1,9 +1,8 @@
 from aiogram import Bot, Dispatcher
 import asyncio
-
 import handlers
 
-bot = Bot(token='')
+bot = Bot(token='7137335580:AAEDfH1S824JOBxG45kXV8h5hdYAFfUJYNI')
 
 def register_routers(dp: Dispatcher) -> None:
     """Registers routers"""
