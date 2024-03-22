@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database import get_async_session
 from src.user_profile.models import user
 from src.user_profile.schemas import UserUpdate, UserCreate
+from src.user_profile.inner_func import get_user_by_id
 
 router = APIRouter(
     prefix="/user_profile",
@@ -30,22 +31,6 @@ error409 = {
     "data": "User already exists",
     "details": None
 }
-
-
-async def get_user_by_id(
-        user_id: int,
-        session: AsyncSession = Depends(get_async_session)):
-    try:
-        query = select(user).where(user.c.id == user_id)
-        result = await session.execute(query)
-        data = result.mappings().first()
-
-        if not data:
-            data = "User not found"
-
-        return data
-    except Exception:
-        raise HTTPException(status_code=500, detail=error)
 
 
 # принимает джейсон вида UserCreat
@@ -197,7 +182,7 @@ async def update_profile(
 # принимает user_id и update_xp(то, на сколько надо изменить xp)
 # 404 если такого юзера нет
 # 500 если внутрення ошибка сервера
-@router.post("/update_user")
+@router.post("/update_xp")
 async def update_xp(
         user_id: int,
         update_xp: int,
@@ -231,7 +216,7 @@ async def update_xp(
 # принимает user_id и achievment
 # 404 если такого юзера нет
 # 500 если внутрення ошибка сервера
-@router.post("/update_user")
+@router.post("/update_achievment")
 async def update_achievment(
         user_id: int,
         achievment: str,

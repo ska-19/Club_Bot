@@ -7,7 +7,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database import get_async_session
 from src.club.models import club
 from src.club.schemas import ClubUpdate, ClubCreate
-from src.user_profile.router import get_user_by_id
+from src.user_profile.inner_func import get_user_by_id
+from src.user_club.router import join_to_the_club
+from src.user_club.schemas import UserJoin
+from src.club.inner_func import get_club_by_id, check_leg_name
 
 router = APIRouter(
     prefix="/club",
@@ -33,44 +36,12 @@ error409 = {
 }
 
 
-async def get_club_by_id(
-        club_id: int,
-        session: AsyncSession = Depends(get_async_session)):
-    try:
-        query = select(club).where(club.c.id == club_id)
-        result = await session.execute(query)
-        data = result.mappings().first()
-
-        if not data:
-            data = "Club not found"
-
-        return data
-    except Exception:
-        raise HTTPException(status_code=500, detail=error)
-
-
-# внутренняя функция, принимает имя клуба, возвращает true, если клуба с таким именем нет, false иначе
-async def check_leg_name(
-        club_name: str,
-        session: AsyncSession = Depends(get_async_session)) -> bool:
-    try:
-        query = select(club).where(club.c.name == club_name)
-        result = await session.execute(query)
-        data = result.mappings().first()
-
-        if not data:
-            return True
-        else:
-            return False
-    except Exception:
-        raise HTTPException(status_code=500, detail=error)
-
-
 # принимает джейсон вида ClubCreate
 # 200 + джейсон со всеми данными, если все хорошо
 # 404 если owner (=user_id) не существует
 # 409 если клуб с таким именем уже существует
 # 500 если внутрення ошибка сервера
+# + ошибки от join_to_the_club
 @router.post("/create_club")
 async def create_club(
         new_club: ClubCreate,
@@ -88,6 +59,12 @@ async def create_club(
         await session.execute(stmt)
         await session.commit()
 
+        # TODO : как достать айди пользователя, то что ниже - не работает
+        user_join = UserJoin(club_id=club_dict['id'], user_id=club_dict['owner'], role='owner')
+        print(2)
+        k = join_to_the_club(user_join)
+        print(k)
+
         return {
             "status": "success",
             "data": club_dict,  # TODO: how return ClubRead schemas
@@ -102,7 +79,8 @@ async def create_club(
                 "data": "User not found",
                 "details": None
                  })
-    except Exception:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()
