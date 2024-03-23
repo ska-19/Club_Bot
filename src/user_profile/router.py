@@ -57,6 +57,16 @@ async def get_user_by_id(
 async def create_user(
         new_user: UserCreate,
         session: AsyncSession = Depends(get_async_session)):
+    """ Создаёт нового пользователя
+
+    :param new_user: джейсон вида UserCreat
+    :return:
+        200 + джейсон со всеми данными(которые уже заполненны (комментарии что есть что в schemas)), если все хорошо.
+        409 если юзер с таким именем уже существует.
+        500 если внутрення ошибка сервера.
+        если в каком то поле возвращается string значит это поле пустое.
+
+    """
     try:
         user_dict = new_user.dict()
         data = await get_user_by_id(user_dict['id'], session)
@@ -101,13 +111,19 @@ async def create_user(
         await session.rollback()
 
 
-# принимает user_id
-# 404 если такого юзера нет
-# 500 если внутрення ошибка сервера
 @router.get("/get_user")
 async def get_user(
         user_id: int,
         session: AsyncSession = Depends(get_async_session)):
+    """ Получает данные пользователя по его id
+
+    :param user_id:
+    :return:
+        200 + джейсон со всеми данными, если все хорошо.
+        404 если такого юзера нет.
+        500 если внутрення ошибка сервера.
+    """
+
     try:
         data = await get_user_by_id(user_id, session)
         if data == "User not found":
@@ -123,14 +139,21 @@ async def get_user(
         raise HTTPException(status_code=500, detail=error)
 
 
-# принимает user_id
-# 404 если такого юзера нет
-# 500 если внутрення ошибка сервера
 @router.get("/get_attr")
 async def get_user_attr(
         user_id: int,
         col: str,
         session: AsyncSession = Depends(get_async_session)):
+    """Получает данные пользователя по его id и атрибуту
+
+    :param user_id:
+    :param col:
+    :return:
+        200 + джейсон со всеми данными, если все хорошо.
+        404 если такого юзера нет.
+        500 если внутрення ошибка сервера.
+    """
+
     try:
         data = await get_user_by_id(user_id, session)
         if data == "User not found":
@@ -148,14 +171,20 @@ async def get_user_attr(
         await session.rollback()
 
 
-# принимает user_id и джейсон вида UserUpdate
-# 404 если такого юзера нет
-# 500 если внутрення ошибка сервера
 @router.post("/update_user")
 async def update_profile(
         user_id: int,
         update_data: UserUpdate,
         session: AsyncSession = Depends(get_async_session)):
+    """Обновляет данные пользователя
+
+    :param user_id:
+    :param update_data:
+    :return:
+        200 + джейсон со всеми данными, если все хорошо.
+        404 если такого юзера нет.
+        500 если внутрення ошибка сервера.
+    """
     try:
         data = await get_user_by_id(user_id, session)
         if data == "User not found":
@@ -194,20 +223,26 @@ async def update_profile(
         await session.rollback()
 
 
-# принимает user_id и update_xp(то, на сколько надо изменить xp)
-# 404 если такого юзера нет
-# 500 если внутрення ошибка сервера
 @router.post("/update_user")
 async def update_xp(
         user_id: int,
         update_xp: int,
         session: AsyncSession = Depends(get_async_session)):
+    """Обновляет xp пользователя
+
+    :param user_id:
+    :param update_xp: на сколько надо изменить xp
+    :return:
+        200 + джейсон со всеми данными, если все хорошо.
+        404 если такого юзера нет.
+        500 если внутрення ошибка сервера.
+    """
     try:
         data = await get_user_by_id(user_id, session)
         if data == "User not found":
             raise ValueError
         stmt = update(user).where(user.c.id == user_id).values(
-            xp=data['xp']+update_xp
+            xp=data['xp'] + update_xp
         )
         await session.execute(stmt)
         await session.commit()
@@ -228,14 +263,20 @@ async def update_xp(
         await session.rollback()
 
 
-# принимает user_id и achievment
-# 404 если такого юзера нет
-# 500 если внутрення ошибка сервера
 @router.post("/update_user")
 async def update_achievment(
         user_id: int,
         achievment: str,
         session: AsyncSession = Depends(get_async_session)):
+    """Обновляет достижение пользователя
+
+    :param user_id:
+    :param achievment:
+    :return:
+        200 + джейсон со всеми данными, если все хорошо.
+        404 если такого юзера нет.
+        500 если внутрення ошибка сервера.
+    """
     try:
         data = await get_user_by_id(user_id, session)
         if data == "User not found":

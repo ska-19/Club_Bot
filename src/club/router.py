@@ -49,10 +49,17 @@ async def get_club_by_id(
         raise HTTPException(status_code=500, detail=error)
 
 
-# внутренняя функция, принимает имя клуба, возвращает true, если клуба с таким именем нет, false иначе
 async def check_leg_name(
         club_name: str,
         session: AsyncSession = Depends(get_async_session)) -> bool:
+    """ Проверяет существует ли клуб с таким именем, внутренняя функция
+
+    :param club_name:
+    :return:
+        True - если клуба с таким именем нет.
+        False - если клуб с таким именем существует.
+
+    """
     try:
         query = select(club).where(club.c.name == club_name)
         result = await session.execute(query)
@@ -66,15 +73,20 @@ async def check_leg_name(
         raise HTTPException(status_code=500, detail=error)
 
 
-# принимает джейсон вида ClubCreate
-# 200 + джейсон со всеми данными, если все хорошо
-# 404 если owner (=user_id) не существует
-# 409 если клуб с таким именем уже существует
-# 500 если внутрення ошибка сервера
 @router.post("/create_club")
 async def create_club(
         new_club: ClubCreate,
         session: AsyncSession = Depends(get_async_session)):
+    """ Создаёт новый клуб
+
+    :param new_club: джейсон вида ClubCreate
+    :return:
+        200 + джейсон со всеми данными, если все хорошо.
+        404 если owner (=user_id) не существует.
+        409 если клуб с таким именем уже существует.
+        500 если внутрення ошибка сервера.
+
+    """
     try:
         club_dict = new_club.dict()
         if await get_user_by_id(club_dict['owner'], session) == "User not found":
@@ -108,14 +120,19 @@ async def create_club(
         await session.rollback()
 
 
-# принимает club_id
-# 200 + джейсон со всеми данными, если все хорошо
-# 404 если такого клуба нет
-# 500 если внутрення ошибка сервера
 @router.get("/get_club")
 async def get_club(
         club_id: int,
         session: AsyncSession = Depends(get_async_session)):
+    """ Получает данные клуба по его id
+
+    :param club_id:
+    :return:
+        200 + джейсон со всеми данными, если все хорошо.
+        404 если такого клуба нет.
+        500 если внутрення ошибка сервера.
+
+    """
     try:
         data = await get_club_by_id(club_id, session)
         if data == "Club not found":
@@ -131,16 +148,22 @@ async def get_club(
         raise HTTPException(status_code=500, detail=error)
 
 
-# принимает club_id и джейсон вида ClubUpdate
-# 200 + джейсон со всеми данными(обновленными), если все хорошо
-# 404 если такого клуба нет
-# 409 если клуб с таким именем уже существует
-# 500 если внутрення ошибка сервера
 @router.post("/update_club")
 async def update_club(
         club_id: int,
         update_data: ClubUpdate,
         session: AsyncSession = Depends(get_async_session)):
+    """ Обновляет данные клуба по его id
+
+    :param club_id:
+    :param update_data: джейсон вида ClubUpdate
+    :return:
+        200 + джейсон со всеми данными(обновленными), если все хорошо.
+        404 если такого клуба нет.
+        409 если клуб с таким именем уже существует.
+        500 если внутрення ошибка сервера.
+
+    """
     try:
         data = await get_club_by_id(club_id, session)
         if data == "Club not found":
