@@ -13,13 +13,20 @@ error = {
 }
 
 
-# внутренняя функция, принимает user_id и club_id возвращает rec_id
-# перед вызовом обязательно проверить существоание записи (check_rec)
 async def get_rec_id(
         user_id: int,
         club_id: int,
         session: AsyncSession = Depends(get_async_session)
 ) -> int:
+    """ Возвращает id записи в таблице club_x_user, внутренняя функция
+
+        Note: перед вызовом обязательно проверить существоание записи (check_rec)
+
+        :param user_id:
+        :param club_id:
+        :return: rec_id (int)
+
+    """
     try:
         query = select(club_x_user).where(
             (club_x_user.c.user_id == user_id) &
@@ -32,12 +39,20 @@ async def get_rec_id(
         raise HTTPException(status_code=500, detail=error)
 
 
-# внутренняя функция, принимает user_id и club_id, возвращает true, если такой записи нет, false иначе
 async def check_rec(
         user_id: int,
         club_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
+    """ Проверяет существование записи в таблице club_x_user, внутренняя функция
+
+        :param user_id:
+        :param club_id:
+        :return:
+            True если записи нет.
+            False если запись есть.
+
+    """
     try:
         query = select(club_x_user).where(
             (club_x_user.c.user_id == user_id) &

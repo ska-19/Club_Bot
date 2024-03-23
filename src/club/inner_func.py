@@ -29,10 +29,17 @@ async def get_club_by_id(
         raise HTTPException(status_code=500, detail=error)
 
 
-# внутренняя функция, принимает имя клуба, возвращает true, если клуба с таким именем нет, false иначе
 async def check_leg_name(
         club_name: str,
         session: AsyncSession = Depends(get_async_session)) -> bool:
+    """ Проверяет существует ли клуб с таким именем, внутренняя функция
+
+       :param club_name:
+       :return:
+           True - если клуба с таким именем нет.
+           False - если клуб с таким именем существует.
+
+    """
     try:
         query = select(club).where(club.c.name == club_name)
         result = await session.execute(query)
