@@ -23,3 +23,11 @@ INSERT INTO club_x_user (club_id, user_id, role, date_joined) VALUES
 (3, 5, 'Member', CURRENT_TIMESTAMP),
 (4, 1, 'Member', CURRENT_TIMESTAMP),
 (5, 2, 'Owner', CURRENT_TIMESTAMP
+
+
+
+
+
+delete from club_x_user;
+delete from club;
+delete from "user";

@@ -9,8 +9,9 @@ from src.user_club.models import club_x_user
 from src.user_profile.models import user
 from src.club.models import club
 from src.user_club.schemas import UserJoin, UpdateRole, UserDisjoin
-from src.user_profile.router import get_user_by_id
-from src.club.router import get_club_by_id
+from src.user_profile.inner_func import get_user_by_id
+from src.club.inner_func import get_club_by_id
+from src.user_club.inner_func import get_rec_id, check_rec
 
 router = APIRouter(
     prefix="/join",
@@ -60,71 +61,16 @@ success = {
 }
 
 
-async def get_rec_id(
-        user_id: int,
-        club_id: int,
-        session: AsyncSession = Depends(get_async_session)
-) -> int:
-    """ Возвращает id записи в таблице club_x_user, внутренняя функция
-
-    Note: перед вызовом обязательно проверить существоание записи (check_rec)
-
-    :param user_id:
-    :param club_id:
-    :return: rec_id (int)
-
-    """
-    try:
-        query = select(club_x_user).where(
-            (club_x_user.c.user_id == user_id) &
-            (club_x_user.c.club_id == club_id))
-        result = await session.execute(query)
-        data = result.mappings().first()
-
-        return data['id']
-    except Exception:
-        raise HTTPException(status_code=500, detail=error)
-
-
-async def check_rec(
-        user_id: int,
-        club_id: int,
-        session: AsyncSession = Depends(get_async_session)
-):
-    """ Проверяет существование записи в таблице club_x_user, внутренняя функция
-
-    :param user_id:
-    :param club_id:
-    :return:
-        True если записи нет.
-        False если запись есть.
-
-    """
-    try:
-        query = select(club_x_user).where(
-            (club_x_user.c.user_id == user_id) &
-            (club_x_user.c.club_id == club_id))
-        result = await session.execute(query)
-        data = result.mappings().first()
-
-        if not data:
-            return True
-        else:
-            return False
-    except Exception:
-        raise HTTPException(status_code=500, detail=error)
-
-
 async def get_users_by_dict(
         data,
         session: AsyncSession = Depends(get_async_session)
 ):
     """ Возвращает список пользователей по списку словарей, содержащих user_id, внутренняя функция
 
-    Note: перед вызовом обязательно проверить что data является списком словарей с полем user_id и он не пуст
+       Note: перед вызовом обязательно проверить что data является списком словарей с полем user_id и он не пуст
 
-    :param data:
-    :return:
+       :param data:
+       :return:
 
     """
     try:
@@ -148,15 +94,15 @@ async def join_to_the_club(
 ):
     """ Присоединяет пользователя к клубу
 
-    :param join_data: джейсон вида UserJoin
-    :return:
-        200 + success, если все хорошо.
-        404 + error404u, если пользователь не найден.
-        404 + error404c, если клуб не найден.
-        409 если такая запись уже существует.
-        500 если внутрення ошибка сервера.
+       :param join_data: джейсон вида UserJoin
+       :return:
+           200 + success, если все хорошо.
+           404 + error404u, если пользователь не найден.
+           404 + error404c, если клуб не найден.
+           409 если такая запись уже существует.
+           500 если внутрення ошибка сервера.
 
-    Note: error404u и error404c имена переменных с джейсонами-ошибками.
+       Note: error404u и error404c имена переменных с джейсонами-ошибками.
 
     """
     try:
@@ -196,13 +142,13 @@ async def disjoin_club(
 ):
     """ Удаляет запись о присоединении пользователя к клубу
 
-    :param data: джейсон вида UserDisjoin
-    :return:
-        200 + success, если все хорошо.
-        404 + error404uc, если пользователь не состоит в клубе.
-        404 + error404u, если пользователь не найден.
-        404 + error404c, если клуб не найден.
-        500 если внутрення ошибка сервера.
+       :param data: джейсон вида UserDisjoin
+       :return:
+           200 + success, если все хорошо.
+           404 + error404uc, если пользователь не состоит в клубе.
+           404 + error404u, если пользователь не найден.
+           404 + error404c, если клуб не найден.
+           500 если внутрення ошибка сервера.
 
     """
     try:
@@ -242,13 +188,13 @@ async def role_update(
 ):
     """ Обновляет роль пользователя в клубе
 
-    :param new_role: джейсон вида UpdateRole
-    :return:
-        200 + success, если все хорошо.
-        404 + error404uc, если пользователь не состоит в клубе.
-        404 + error404u, если пользователь не найден.
-        404 + error404c, если клуб не найден.
-        500 если внутрення ошибка сервера.
+       :param new_role: джейсон вида UpdateRole
+       :return:
+           200 + success, если все хорошо.
+           404 + error404uc, если пользователь не состоит в клубе.
+           404 + error404u, если пользователь не найден.
+           404 + error404c, если клуб не найден.
+           500 если внутрення ошибка сервера.
 
     """
     try:
@@ -288,12 +234,12 @@ async def get_users_in_club(
 ):
     """ Возвращает список пользователей в клубе
 
-    :param club_id:
-    :return:
-        200 + джейсон со списком всех пользователей, если все хорошо.
-        404 + error404c, если клуб не найден.
-        404 + error404s, если таких пользователей нет.
-        500 если внутрення ошибка сервера.
+       :param club_id:
+       :return:
+           200 + джейсон со списком всех пользователей, если все хорошо.
+           404 + error404c, если клуб не найден.
+           404 + error404s, если таких пользователей нет.
+           500 если внутрення ошибка сервера.
 
     """
     try:
@@ -331,13 +277,13 @@ async def get_users_with_role(
 ):
     """ Возвращает список пользователей в клубе с определенной ролью
 
-    :param club_id:
-    :param role:
-    :return:
-        200 + джейсон со cписком всех пользователей с этой ролью, если все хорошо.
-        404 + error404c, если клуб не найден.
-        404 + error404s, если таких пользователей нет.
-        500 если внутрення ошибка сервера.
+        :param club_id:
+        :param role:
+        :return:
+            200 + джейсон со cписком всех пользователей с этой ролью, если все хорошо.
+            404 + error404c, если клуб не найден.
+            404 + error404s, если таких пользователей нет.
+            500 если внутрення ошибка сервера.
 
     """
     try:
@@ -376,12 +322,12 @@ async def get_clubs_by_user(
 ):
     """ Возвращает список клубов, в которых состоит пользователь
 
-    :param user_id:
-    :return:
-        200 + джейсон со cписком всех клубой, в которых состоит пользователь, если все хорошо.
-        404 + error404u, если пользователь не найден.
-        404 если таких клубов нет.
-        500 если внутрення ошибка сервера.
+        :param user_id:
+        :return:
+            200 + джейсон со cписком всех клубой, в которых состоит пользователь, если все хорошо.
+            404 + error404u, если пользователь не найден.
+            404 если таких клубов нет.
+            500 если внутрення ошибка сервера.
 
     """
     try:
