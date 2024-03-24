@@ -1,67 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select, insert, update
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter
+from sqlalchemy import select, insert, update, delete
 
 from datetime import datetime
 
-from src.database import get_async_session
-from src.events.models import club, event
+from src.club.inner_func import get_club_by_id
 from src.events.schemas import EventCreate, EventUpdate, EventReg
-from src.user_club.router import get_role, check_rec, get_user_by_id, get_club_by_id
-from src.user_profile.models import user
-from src.club.router import error
+from src.user_club.inner_func import check_rec, get_role
+from src.events.inner_func import *
+from src.user_profile.inner_func import get_user_by_id
 
 router = APIRouter(
     prefix="/events",
     tags=["events"]
 )
-
-error404u = {
-    "status": "error",
-    "data": "User not found",
-    "details": None
-}
-
-error404e = {
-    "status": "error",
-    "data": "Event not found",
-    "details": None
-}
-
-error404c = {
-    "status": "error",
-    "data": "Club not found",
-    "details": None
-}
-
-error404uc = {
-    "status": "error",
-    "data": "This user not in this club",
-    "details": None
-}
-
-error404p = {
-    "status": "error",
-    "data": "User has no permission to create/update event",
-    "details": None
-}
-
-# внутреняя функция принимает для соблюдения преемственности с club
-async def get_event_by_id(
-        event_id: int,
-        session: AsyncSession = Depends(get_async_session)
-):
-    try:
-        query = select(event).where(event.c.id == event_id)
-        result = await session.execute(query)
-        data = result.mappings().first()
-
-        if not data:
-            data = "Event not found"
-
-        return data
-    except Exception:
-        raise HTTPException(status_code=500, detail=error)
 
 @router.post("/create_event")
 async def create_event(
@@ -195,7 +146,7 @@ async def event_reg(
             raise ValueError('404u')
         if await get_event_by_id(data.event_id, session) == "Event not found":
             raise ValueError('404e')
-        if not await check_rec(data.user_id, data.event_id, session):
+        if not await check_rec(data.user_id, data.club_id, session):
             raise ValueError('404uc')
 
         event_dict = data.model_dump()
@@ -216,6 +167,102 @@ async def event_reg(
             raise HTTPException(status_code=404, detail=error404e)
         if str(e) == '404uc':
             raise HTTPException(status_code=404, detail=error404uc)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+    finally:
+        await session.rollback()
+
+
+@router.get("/get_event_club")
+async def get_event_club(
+        club_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    try:
+        if await get_club_by_id(club_id, session) == "Club not found":
+            raise ValueError('404c')
+        data = await get_all_event_club(club_id, session)
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
+    except ValueError as e:
+        if str(e) == '404c':
+            raise HTTPException(status_code=404, detail=error404c)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+    finally:
+        await session.rollback()
+
+
+
+@router.post("/event_disreg")
+async def event_disreg(
+        user_id: int,
+        event_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    try:
+        if await get_user_by_id(user_id, session) == "User not found":
+            raise ValueError('404u')
+        if await get_event_by_id(event_id, session) == "Event not found":
+            raise ValueError('404e')
+        if not await check_rec_event(user_id, event_id, session):
+            raise ValueError('404eu')
+
+        query = select(event).where(
+            (event.c.user_id == user_id) &
+            (event.c.event_id == event_id))
+        result = await session.execute(query)
+        data = result.mappings().first()
+
+        query = delete(event).where(
+            (event.c.user_id == user_id) &
+            (event.c.event_id == event_id))
+        await session.execute(query)
+        await session.commit()
+
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
+    except ValueError as e:
+        if str(e) == '404u':
+            raise HTTPException(status_code=404, detail=error404u)
+        if str(e) == '404e':
+            raise HTTPException(status_code=404, detail=error404e)
+        if str(e) == '404eu':
+            raise HTTPException(status_code=404, detail=error404eu)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+    finally:
+        await session.rollback()
+
+
+@router.post("/delete_event")
+async def delete_event(
+        event_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    try:
+        data = await get_event_by_id(event_id, session)
+        if data == "Event not found":
+            raise ValueError('404e')
+
+        query = delete(event).where(event.c.id == event_id)
+        await session.execute(query)
+        await session.commit()
+
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
+    except ValueError as e:
+        if str(e) == '404e':
+            raise HTTPException(status_code=404, detail=error404e)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
     finally:

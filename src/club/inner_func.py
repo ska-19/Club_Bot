@@ -12,6 +12,18 @@ error = {
     "details": None
 }
 
+error404 = {
+    "status": "error",
+    "data": "Club not found",
+    "details": None
+}
+
+error409 = {
+    "status": "error",
+    "data": "Club with the same name already exists",
+    "details": None
+}
+
 
 async def get_club_by_id(
         club_id: int,

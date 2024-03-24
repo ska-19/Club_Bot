@@ -1,16 +1,10 @@
-from datetime import datetime
-
-from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select, insert, update, delete
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database import get_async_session
 from src.user_club.models import club_x_user
-from src.user_profile.models import user
 from src.club.models import club
 from src.user_club.schemas import UserJoin, UpdateRole, UserDisjoin
-from src.user_profile.router import get_user_by_id
 from src.club.router import get_club_by_id
+from src.user_profile.inner_func import *
 
 router = APIRouter(
     prefix="/join",
@@ -58,90 +52,6 @@ success = {
     "data": None,
     "details": None
 }
-
-
-# внутренняя функция, принимает user_id и club_id возвращает rec_id
-# перед вызовом обязательно проверить существоание записи (check_rec)
-async def get_rec_id(
-        user_id: int,
-        club_id: int,
-        session: AsyncSession = Depends(get_async_session)
-) -> int:
-    try:
-        query = select(club_x_user).where(
-            (club_x_user.c.user_id == user_id) &
-            (club_x_user.c.club_id == club_id))
-        result = await session.execute(query)
-        data = result.mappings().first()
-
-        return data['id']
-    except Exception:
-        raise HTTPException(status_code=500, detail=error)
-
-
-# внутренняя функция, принимает user_id и club_id, возвращает true, если такой записи нет, false иначе
-async def check_rec(
-        user_id: int,
-        club_id: int,
-        session: AsyncSession = Depends(get_async_session)
-):
-    try:
-        query = select(club_x_user).where(
-            (club_x_user.c.user_id == user_id) &
-            (club_x_user.c.club_id == club_id))
-        result = await session.execute(query)
-        data = result.mappings().first()
-
-        if not data:
-            return True
-        else:
-            return False
-    except Exception:
-        raise HTTPException(status_code=500, detail=error)
-
-
-# внутреняя функция, принимает user_id и club_id, возвращает роль пользователя в клубе
-async def get_role( #TODO: мб сделать ее внешней
-        user_id: int,
-        club_id: int,
-        session: AsyncSession = Depends(get_async_session)
-):
-    if await check_rec(user_id, club_id, session):
-        return "User not in the club"
-    try:
-        query = select(club_x_user).where(
-            (club_x_user.c.user_id == user_id) &
-            (club_x_user.c.club_id == club_id))
-        result = await session.execute(query)
-        data = result.mappings().first()
-
-        if not data:
-            return "User not found"
-
-        return data['role']
-    except Exception:
-        raise HTTPException(status_code=500, detail=error)
-
-
-# внутрення функция для получения списка юзеров по списку словарей, содержащих user_id
-# при вызове функции обязательно проверить что data является списком словарей с полем user_id и он не пуст
-async def get_users_by_dict(
-        data,
-        session: AsyncSession = Depends(get_async_session)
-):
-    try:
-        user_ids = [item['user_id'] for item in data]
-        query = select(user).where(user.c.id.in_(user_ids))
-        result = await session.execute(query)
-        data = result.mappings().all()
-
-        if not data:
-            raise Exception
-
-        return data
-    except Exception:
-        raise HTTPException(status_code=500, detail=error)
-
 
 # принимает джейсон вида UserJoin
 # 200 + success, если все хорошо

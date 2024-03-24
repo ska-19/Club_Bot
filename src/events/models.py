@@ -12,7 +12,7 @@ event = Table(
     Column('id', Integer, primary_key=True),
     Column('club_id', Integer, ForeignKey('club.id'), nullable=False),
     Column('host_id', Integer, ForeignKey('user.id'), nullable=False),
-    # Column('date', TIMESTAMP, nullable=False),
+    Column('date', TIMESTAMP, nullable=False),
     Column('sinopsis', Text, nullable=False),
     Column('contact', String(255), nullable=False),
     Column('speaker', String(255), nullable=False)
@@ -24,5 +24,5 @@ event_reg = Table(
     Column('user_id', Integer, ForeignKey('user.id'), nullable=False),
     Column('event_id', Integer, ForeignKey('event.id'), nullable=False),
     Column('confirm', Boolean, nullable=False, default=False),
-    # Column('reg_date', TIMESTAMP, nullable=False)
+    Column('reg_date', TIMESTAMP, nullable=False)
 )
