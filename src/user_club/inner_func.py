@@ -66,3 +66,29 @@ async def check_rec(
             return False
     except Exception:
         raise HTTPException(status_code=500, detail=error)
+
+
+async def get_users_by_dict(
+        data,
+        session: AsyncSession = Depends(get_async_session)
+):
+    """ Возвращает список пользователей по списку словарей, содержащих user_id, внутренняя функция
+
+       Note: перед вызовом обязательно проверить что data является списком словарей с полем user_id и он не пуст
+
+       :param data:
+       :return:
+
+    """
+    try:
+        user_ids = [item['user_id'] for item in data]
+        query = select(user).where(user.c.id.in_(user_ids))
+        result = await session.execute(query)
+        data = result.mappings().all()
+
+        if not data:
+            raise Exception
+
+        return data
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)

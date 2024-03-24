@@ -11,7 +11,7 @@ from src.club.models import club
 from src.user_club.schemas import UserJoin, UpdateRole, UserDisjoin
 from src.user_profile.inner_func import get_user_by_id
 from src.club.inner_func import get_club_by_id
-from src.user_club.inner_func import get_rec_id, check_rec
+from src.user_club.inner_func import get_rec_id, check_rec, get_users_by_dict
 
 router = APIRouter(
     prefix="/join",
