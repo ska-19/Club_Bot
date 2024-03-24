@@ -102,6 +102,7 @@ async def get_user(
             200 + джейсон со всеми данными, если все хорошо.
             404 если такого юзера нет.
             500 если внутрення ошибка сервера.
+
     """
     try:
         data = await get_user_by_id(user_id, session)
@@ -131,6 +132,7 @@ async def get_user_attr(
             200 + джейсон со всеми данными, если все хорошо.
             404 если такого юзера нет.
             500 если внутрення ошибка сервера.
+
     """
     try:
         data = await get_user_by_id(user_id, session)
@@ -162,6 +164,7 @@ async def update_profile(
            200 + джейсон со всеми данными, если все хорошо.
            404 если такого юзера нет.
            500 если внутрення ошибка сервера.
+
     """
     try:
         data = await get_user_by_id(user_id, session)
@@ -214,13 +217,14 @@ async def update_xp(
             200 + джейсон со всеми данными, если все хорошо.
             404 если такого юзера нет.
             500 если внутрення ошибка сервера.
+
     """
     try:
         data = await get_user_by_id(user_id, session)
         if data == "User not found":
             raise ValueError
         stmt = update(user).where(user.c.id == user_id).values(
-            xp=data['xp']+update_xp
+            xp=data['xp'] + update_xp
         )
         await session.execute(stmt)
         await session.commit()
@@ -254,6 +258,7 @@ async def update_achievment(
             200 + джейсон со всеми данными, если все хорошо.
             404 если такого юзера нет.
             500 если внутрення ошибка сервера.
+
     """
     try:
         data = await get_user_by_id(user_id, session)
