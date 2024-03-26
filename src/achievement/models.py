@@ -9,7 +9,8 @@ from src.database import Base, metadata
 achievement = Table(
     'achievement', metadata,
     Column('id', Integer, primary_key=True),
-    Column('info', Text)
+    Column('info', Text),
+    Column('exp', Integer),
 )
 
 user_x_achievement = Table(
@@ -17,5 +18,13 @@ user_x_achievement = Table(
     Column('id', Integer, primary_key=True),
     Column('user_id', Integer, ForeignKey('user.id'), nullable=False),
     Column('achievement_id', Integer, ForeignKey('achievement.id'), nullable=False),
-    Column('info', Text)
+    Column('context', Text)
+)
+
+club_x_achievement = Table(
+    'club_x_achievement', metadata,
+    Column('id', Integer, primary_key=True),
+    Column('club_id', Integer, ForeignKey('club.id'), nullable=False),
+    Column('achievement_id', Integer, ForeignKey('achievement.id'), nullable=False),
+    Column('context', Text)
 )
