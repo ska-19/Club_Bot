@@ -230,8 +230,6 @@ async def update_xp(
         await session.commit()
 
         data = await get_user_by_id(user_id, session)
-        if data == "User not found":
-            raise ValueError
         return {
             "status": "success",
             "data": data,
@@ -250,7 +248,7 @@ async def update_achievment(
         user_id: int,
         achievment: str,
         session: AsyncSession = Depends(get_async_session)):
-    """Обновляет достижение пользователя
+    """Обновляет достижение пользователя (не работает, вроде Кирилл взял на себя очивки)
 
         :param user_id:
         :param achievment:
@@ -281,7 +279,8 @@ async def update_achievment(
         }
     except ValueError:
         raise HTTPException(status_code=404, detail=error404)
-    except Exception:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()

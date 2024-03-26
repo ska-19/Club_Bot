@@ -67,7 +67,9 @@ async def check_rec(
     except Exception:
         raise HTTPException(status_code=500, detail=error)
 
+
  # внутреняя функция, принимает user_id и club_id, возвращает роль пользователя в клубе
+
 
 async def get_role(  # TODO: мб сделать ее внешней
             user_id: int,
@@ -89,6 +91,7 @@ async def get_role(  # TODO: мб сделать ее внешней
             return data['role']
         except Exception:
             raise HTTPException(status_code=500, detail=error)
+
 
 async def get_users_by_dict(
         data,

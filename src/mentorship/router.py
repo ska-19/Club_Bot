@@ -85,7 +85,7 @@ async def get_mentees(
         raise HTTPException(status_code=500, detail=error)
 
 
-@router.update("/update_mentorship")
+@router.post("/update_mentorship")
 async def update_mentorship(
         mentorship_id: int,
         update_data: NewMentorship,
