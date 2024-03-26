@@ -10,6 +10,7 @@ class ClubCreate(BaseModel):
     photo: str
     bio: str
     links: str
+    channel_link: str
     comfort_time: str
     date_created: date
 
@@ -25,4 +26,5 @@ class ClubUpdate(BaseModel):
     bio: str
     links: str
     comfort_time: str
+    channel_link: str
     date_created: date
