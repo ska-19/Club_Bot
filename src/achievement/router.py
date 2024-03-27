@@ -26,18 +26,18 @@ async def add_achievement(
             raise ValueError('404u')
         if await get_club_by_id(new_data.club_id, session) == "Club not found":
             raise ValueError('404c')
-        role = await get_role(new_data.user_id, new_data.club_id, session)
+        role = await get_role(new_data.admin_id, new_data.club_id, session)
         if role == "User not in the club":
             raise ValueError('404uc')
         if role == "admin" or role == "owner":
             achievement_dict = new_data.model_dump()
+
             query = insert(achievement).values(info=achievement_dict['info'],
                                                exp=achievement_dict['exp'])
-            await session.execute(query)
+            result = await session.execute(query)
             await session.commit()
-
             query = insert(club_x_achievement).values(club_id=new_data.club_id,
-                                                      achievement_id=achievement_dict['id'],
+                                                      achievement_id=result.inserted_primary_key[0],
                                                       context=None)
             await session.execute(query)
             await session.commit()
@@ -96,7 +96,7 @@ async def update_achievement(
             raise ValueError('404u')
         if await get_club_by_id(new_data.club_id, session) == "Club not found":
             raise ValueError('404c')
-        role = await get_role(new_data.user_id, new_data.club_id, session)
+        role = await get_role(new_data.admin_id, new_data.club_id, session)
         if role == "User not in the club":
             raise ValueError('404uc')
         if role == "admin" or role == "owner":
@@ -137,7 +137,7 @@ async def add_to_user(
             raise ValueError('404ad')
         if await get_user_by_id(new_data.user_id, session) == "User not found":
             raise ValueError('404u')
-        query = select(club_x_achievement).where(club_x_achievement.c.id == new_data.user_id)
+        query = select(club_x_achievement).where(club_x_achievement.c.id == new_data.club_x_achievement_id)
         result = await session.execute(query)
         data = result.mappings().first()
         if not data:
@@ -219,3 +219,6 @@ async def get_by_user(
             raise HTTPException(status_code=404, detail=error404u)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
+
+
+#TODO: добавить удаление ачивок и возможность получить все ачивки в клубе
