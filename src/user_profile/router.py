@@ -102,6 +102,7 @@ async def get_user(
             200 + джейсон со всеми данными, если все хорошо.
             404 если такого юзера нет.
             500 если внутрення ошибка сервера.
+
     """
     try:
         data = await get_user_by_id(user_id, session)
@@ -131,6 +132,7 @@ async def get_user_attr(
             200 + джейсон со всеми данными, если все хорошо.
             404 если такого юзера нет.
             500 если внутрення ошибка сервера.
+
     """
     try:
         data = await get_user_by_id(user_id, session)
@@ -162,6 +164,7 @@ async def update_profile(
            200 + джейсон со всеми данными, если все хорошо.
            404 если такого юзера нет.
            500 если внутрення ошибка сервера.
+
     """
     try:
         data = await get_user_by_id(user_id, session)
@@ -214,20 +217,19 @@ async def update_xp(
             200 + джейсон со всеми данными, если все хорошо.
             404 если такого юзера нет.
             500 если внутрення ошибка сервера.
+
     """
     try:
         data = await get_user_by_id(user_id, session)
         if data == "User not found":
             raise ValueError
         stmt = update(user).where(user.c.id == user_id).values(
-            xp=data['xp']+update_xp
+            xp=data['xp'] + update_xp
         )
         await session.execute(stmt)
         await session.commit()
 
         data = await get_user_by_id(user_id, session)
-        if data == "User not found":
-            raise ValueError
         return {
             "status": "success",
             "data": data,
@@ -246,7 +248,7 @@ async def update_achievment(
         user_id: int,
         achievment: str,
         session: AsyncSession = Depends(get_async_session)):
-    """Обновляет достижение пользователя
+    """Обновляет достижение пользователя (не работает, вроде Кирилл взял на себя очивки)
 
         :param user_id:
         :param achievment:
@@ -254,6 +256,7 @@ async def update_achievment(
             200 + джейсон со всеми данными, если все хорошо.
             404 если такого юзера нет.
             500 если внутрення ошибка сервера.
+
     """
     try:
         data = await get_user_by_id(user_id, session)
@@ -276,7 +279,8 @@ async def update_achievment(
         }
     except ValueError:
         raise HTTPException(status_code=404, detail=error404)
-    except Exception:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()

@@ -47,7 +47,6 @@ error404eu = {
     "details": None
 }
 
-
 # внутреняя функция принимает для соблюдения преемственности с club
 async def get_event_by_id(
         event_id: int,
