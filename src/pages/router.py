@@ -43,20 +43,20 @@ async def update_profile_user(
 
 
 @router.get("/main_base")
-def get_profile_base(request: Request):
+def get_main_base(request: Request):
+    return templates.TemplateResponse("main_base.html", {"request": request})
+
+
+@router.get("/main_user/{id}")
+def get_main_user(request: Request):
     pass
 
 
-@router.get("/main_user/{id}")  # тут id из club_user
-def get_profile_user(request: Request, user_info=Depends()):  # а тут что в депендс?
+@router.get("/club_base")
+def get_club_base(request: Request):
     pass
 
 
-@router.get("/main_base")
-def get_profile_base(request: Request):
-    pass
-
-
-@router.get("/main_user/{club_id}")
-def get_profile_user(request: Request, user_info=Depends(get_club_by_id)):  # а тут что в депендс?
+@router.get("/club_user/{user_id}")
+def get_club_user(request: Request):
     pass

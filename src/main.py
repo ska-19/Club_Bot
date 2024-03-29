@@ -15,7 +15,7 @@ from src.pages.router import router as router_pages
 
 
 app = FastAPI(
-    title="Trading App"
+    title="Club bot"
 )
 
 app.mount("/images", StaticFiles(directory="src/static/images"), name="images")
