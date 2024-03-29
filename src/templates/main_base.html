@@ -14,13 +14,13 @@
     <nav>
         <!-- кнопка клуба + кубки клуба + кликабельно-->
         <div class="logo-container">
-            <span class="site-name">{% block club_name %}{% endblock %}Клуб</span>
+            <span class="site-name">{% block club_name %}{% endblock %}</span>
         </div>
 
 
         <div class="image-container" style="display: flex; align-items: center">
             <span style="display: inline-block; text-align: center; width: calc(100% - 30px); flex-grow: 1;">
-                        {% block exp_club %}{% endblock %}1234
+                        {% block exp_club %}{% endblock %}
             </span>
             <img style="display: inline-block; vertical-align: middle; float: right;" src="/images/exp.png"
                  alt="Иконка">
@@ -39,9 +39,9 @@
         <div class="block1" style="margin-top: 20px">
             <button class="card" style="height: 60px; width: 160px; justify-content: center; vertical-align: center">
                 <h1 id="Name" style="bottom: 5px;font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
-                    {% block user %}{% endblock %}Имя Фамилия</h1>
+                    {% block user %}{% endblock %}</h1>
                 <h1 id="Status" style="bottom: 5px; font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
-                    {% block status %}{% endblock %}Участник</h1>
+                    {% block status %}{% endblock %}</h1>
             </button>
         </div>
 
@@ -83,7 +83,7 @@
                 <h1 style="bottom: 5px;font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
                     Баланс</h1>
                 <h1 style="bottom: 5px;font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
-                    {% block money %}{% endblock %}123</h1>
+                    {% block money %}{% endblock %}</h1>
             </button>
         </div>
 
