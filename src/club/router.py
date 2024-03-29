@@ -36,16 +36,20 @@ error409 = {
 }
 
 
-# принимает джейсон вида ClubCreate
-# 200 + джейсон со всеми данными, если все хорошо
-# 404 если owner (=user_id) не существует
-# 409 если клуб с таким именем уже существует
-# 500 если внутрення ошибка сервера
-# + ошибки от join_to_the_club
 @router.post("/create_club")
 async def create_club(
         new_club: ClubCreate,
         session: AsyncSession = Depends(get_async_session)):
+    """ Создаёт новый клуб  !!!важно вызвать
+
+        :param new_club: джейсон вида ClubCreate
+        :return:
+            200 + джейсон со всеми данными, если все хорошо.
+            404 если owner (=user_id) не существует.
+            409 если клуб с таким именем уже существует.
+            500 если внутрення ошибка сервера.
+
+    """
     try:
         club_dict = new_club.dict()
         if await get_user_by_id(club_dict['owner'], session) == "User not found":
@@ -55,15 +59,14 @@ async def create_club(
             raise ValueError('409')
 
         club_dict['date_joined'] = datetime.utcnow()
-        stmt = insert(club).values(**club_dict)
-        await session.execute(stmt)
+        owner = club_dict["owner"]
+        stmt = insert(club).values(**club_dict).returning(club.c.id)
+        result = await session.execute(stmt)
         await session.commit()
 
-        # TODO : как достать айди пользователя, то что ниже - не работает
-        user_join = UserJoin(club_id=club_dict['id'], user_id=club_dict['owner'], role='owner')
-        print(2)
-        k = join_to_the_club(user_join)
-        print(k)
+        id = result.fetchone()[0]
+        userjoin = UserJoin(club_id=id, user_id=owner, role='owner')
+        await join_to_the_club(userjoin, session)
 
         return {
             "status": "success",
@@ -79,21 +82,25 @@ async def create_club(
                 "data": "User not found",
                 "details": None
                  })
-    except Exception as e:
-        print(e)
+    except Exception:
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()
 
 
-# принимает club_id
-# 200 + джейсон со всеми данными, если все хорошо
-# 404 если такого клуба нет
-# 500 если внутрення ошибка сервера
 @router.get("/get_club")
 async def get_club(
         club_id: int,
         session: AsyncSession = Depends(get_async_session)):
+    """ Получает данные клуба по его id
+
+        :param club_id:
+        :return:
+            200 + джейсон со всеми данными, если все хорошо.
+            404 если такого клуба нет.
+            500 если внутрення ошибка сервера.
+
+    """
     try:
         data = await get_club_by_id(club_id, session)
         if data == "Club not found":
@@ -109,16 +116,50 @@ async def get_club(
         raise HTTPException(status_code=500, detail=error)
 
 
-# принимает club_id и джейсон вида ClubUpdate
-# 200 + джейсон со всеми данными(обновленными), если все хорошо
-# 404 если такого клуба нет
-# 409 если клуб с таким именем уже существует
-# 500 если внутрення ошибка сервера
+@router.get("/get_channel_link")
+async def get_club(
+        club_id: int,
+        session: AsyncSession = Depends(get_async_session)):
+    """ Получает ссылку на канал клуба по его id
+
+        :param club_id:
+        :return:
+            200 + джейсон со всеми данными, если все хорошо.
+            404 если такого клуба нет.
+            500 если внутрення ошибка сервера.
+
+    """
+    try:
+        data = await get_club_by_id(club_id, session)
+        if data == "Club not found":
+            raise ValueError
+        return {
+            "status": "success",
+            "data": data['channel_link'],
+            "details": None
+        }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+
+
 @router.post("/update_club")
 async def update_club(
         club_id: int,
         update_data: ClubUpdate,
         session: AsyncSession = Depends(get_async_session)):
+    """ Обновляет данные клуба по его id
+
+        :param club_id:
+        :param update_data: джейсон вида ClubUpdate
+        :return:
+            200 + джейсон со всеми данными(обновленными), если все хорошо.
+            404 если такого клуба нет.
+            409 если клуб с таким именем уже существует.
+            500 если внутрення ошибка сервера.
+
+    """
     try:
         data = await get_club_by_id(club_id, session)
         if data == "Club not found":
@@ -133,7 +174,8 @@ async def update_club(
             bio=update_data.bio,
             links=update_data.links,
             comfort_time=update_data.comfort_time,
-            date_created=update_data.date_created
+            date_created=update_data.date_created,
+            channel_link=update_data.channel_link
         )
         await session.execute(stmt)
         await session.commit()
