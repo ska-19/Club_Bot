@@ -120,6 +120,23 @@ nav {
     background: rgba(132, 38, 209, 0.5);
 }
 
+.saveBtn {
+    padding: 10px 20px;
+    border: none;
+    background: rgba(97, 0, 255, 0.7);
+    border-radius: 10px;
+    color: #fff;
+    text-transform: uppercase;
+    font-weight: 700;
+
+    transition: background .2s linear;
+}
+
+.saveBtn:hover {
+    background: rgba(132, 38, 209, 0.5);
+}
+
+
 .usercard {
     text-align: center;
 }
