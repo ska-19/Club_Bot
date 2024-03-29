@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.responses import RedirectResponse
 
 from src.database import get_async_session
-from src.user_profile.  router import get_user_by_id, update_profile
+from src.user_profile.router import get_user_by_id, update_profile
 from src.user_profile.schemas import UserUpdate
 from src.club.router import get_club_by_id
 
@@ -54,7 +54,7 @@ def get_main_user(request: Request):
 
 @router.get("/club_base")
 def get_club_base(request: Request):
-    pass
+    return templates.TemplateResponse("club_base.html", {"request": request})
 
 
 @router.get("/club_user/{user_id}")

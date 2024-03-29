@@ -34,5 +34,27 @@
 {% block content %}
 {% for event in events %}
 <!--события-->
+<div class="form-container" style="margin-top: 30px">
+        <form class="form" id="form">
+            <h1 style="font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">Событие</h1>
+            <div style="display: flex">
+                <div class="form-group" style="width: 60%">
+                    <label for="Date of Birth">Дата</label>
+                    <input required="" name="Date" id="Date of Birth" type="text" style="width: 115px"
+                           value="{{event.date}}" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="City">Спикер</label>
+                    <input required="" name="Speaker" id="City" type="text" style="width: 125px" value="{{event.speaker}}" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="textarea">О событии</label>
+                <textarea required="" cols="50" rows="10" id="textarea" name="textarea"
+                          style="width: 280px; height: 80px" readonly>{{ event.sinopsis }}</textarea>
+            </div>
+            <button type="button" class="JoinEvent">Участвовать</button>
+        </form>
+    </div>
 {% endfor %}
 {% endblock %}

@@ -12,7 +12,7 @@
 
 
     <nav>
-        <!-- кнопка клуба + кубки кклуба + кликабельно-->
+        <!-- кнопка клуба + кубки клуба + кликабельно-->
         <div class="logo-container">
             <span class="site-name">{% block club_name %}{% endblock %}Клуб</span>
         </div>
@@ -21,7 +21,8 @@
             <span style="display: inline-block; text-align: center; width: calc(100% - 30px); flex-grow: 1;">
                         {% block exp_club %}{% endblock %}1234
             </span>
-            <img style="display: inline-block; vertical-align: middle; float: right;" src="/images/exp.png" alt="Иконка">
+            <img style="display: inline-block; vertical-align: middle; float: right;" src="/images/exp.png"
+                 alt="Иконка">
         </div>
     </nav>
 
@@ -78,7 +79,7 @@
                 <h1 style="bottom: 5px;font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
                     Баланс</h1>
                 <h1 style="bottom: 5px;font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
-                     {% block money %}{% endblock %}123</h1>
+                    {% block money %}{% endblock %}123</h1>
             </button>
         </div>
 
@@ -106,6 +107,8 @@
 
     <!--Далее перечисление событий-->
     {% block content %}{% endblock %}
+
+
 </div>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="/static/main_base_script.js"></script>
