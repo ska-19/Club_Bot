@@ -58,23 +58,13 @@
             {% block Education %}{% endblock %}
             {% block UserInfo %}{% endblock %}
             <button type="button" class="editBtn" onclick="editForm()">Изменить</button>
+            <button type="button" class="saveBtn" style="display: none">Сохранить</button>
         </form>
     </div>
 
 
     <!-- Кнопка "На главную" -->
-    <div style="bottom: 40px">
-        <button class="btn_GoToTheClub" type="button" style="margin-top: 40px">
-            <strong>На главную</strong>
-            <div id="container-stars">
-                <div id="stars"></div>
-            </div>
-            <div id="glow">
-                <div class="circle"></div>
-                <div class="circle"></div>
-            </div>
-        </button>
-    </div>
+    {% block href_main %}{% endblock %}
 
 
 </div>

@@ -102,17 +102,14 @@ function editForm() {
     var editBtn = document.querySelector(".editBtn");
     editBtn.style.display = "none";
 
-    var saveBtn = document.createElement("button");
-    saveBtn.innerHTML = "Сохранить";
-    saveBtn.classList.add("editBtn"); // добавляем класс для стилизации
+    var saveBtn = document.querySelector(".saveBtn");
+    saveBtn.style.display = "inline-block";
 
     saveBtn.onclick = function () {
         inputs.forEach(function (input) {
             input.readOnly = true;
         });
-        editBtn.style.display = "block";
-        saveBtn.parentNode.removeChild(saveBtn);
+        editBtn.style.display = "inline-block";
+        saveBtn.style.display = "none";
     };
-
-    editBtn.parentNode.appendChild(saveBtn);
 }

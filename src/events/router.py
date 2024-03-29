@@ -14,6 +14,7 @@ router = APIRouter(
     tags=["events"]
 )
 
+
 @router.post("/create_event")
 async def create_event(
         new_event: EventCreate,
@@ -30,7 +31,7 @@ async def create_event(
             raise ValueError('404uc')
         if role == "admin" or role == "owner":
             event_dict = new_event.model_dump()
-            event_dict['date_created'] = datetime.utcnow()
+            event_dict['date'] = datetime.utcnow()
             query = insert(event).values(**event_dict)
             await session.execute(query)
             await session.commit()
@@ -55,8 +56,6 @@ async def create_event(
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()
-
-
 
 
 # принимает event_id
@@ -103,7 +102,7 @@ async def update_event(
             raise ValueError('404p')
 
         event_dict = update_data.model_dump()
-        event_dict['date_updated'] = datetime.utcnow()
+        event_dict['date'] = datetime.utcnow()
         query = update(event).where(event.c.id == event_id).values(**event_dict)
         await session.execute(query)
         await session.commit()
@@ -128,16 +127,11 @@ async def update_event(
         await session.rollback()
 
 
-
-
-
-
-
 # принимает json вида EventReg
 # 200 - успешно создано, возвращает json со всеми данными
 # 500 - ошибка сервера
-@router.post("/event_reg") #TODO: возможно стоит сделать отдельную папку userxevent
-async def event_reg(
+@router.post("/event_reg")  # TODO: возможно стоит сделать отдельную папку userxevent
+async def reg_event(
         data: EventReg,
         session: AsyncSession = Depends(get_async_session)
 ):
@@ -146,13 +140,16 @@ async def event_reg(
             raise ValueError('404u')
         if await get_event_by_id(data.event_id, session) == "Event not found":
             raise ValueError('404e')
-        if not await check_rec(data.user_id, data.club_id, session):
+        club_id = await get_club_id_by_event_id(data.event_id, session)
+        if await check_rec(data.user_id, club_id, session):
             raise ValueError('404uc')
-
         event_dict = data.model_dump()
         event_dict['reg_date'] = datetime.utcnow()
-        query = insert(event).values(**event_dict)
+        print(event_dict)
+        query = insert(event_reg).values(**event_dict)
+        print('here')
         await session.execute(query)
+
         await session.commit()
 
         return {
@@ -196,7 +193,6 @@ async def get_event_club(
         await session.rollback()
 
 
-
 @router.post("/event_disreg")
 async def event_disreg(
         user_id: int,
@@ -208,18 +204,19 @@ async def event_disreg(
             raise ValueError('404u')
         if await get_event_by_id(event_id, session) == "Event not found":
             raise ValueError('404e')
+        print('here')
         if not await check_rec_event(user_id, event_id, session):
             raise ValueError('404eu')
 
-        query = select(event).where(
-            (event.c.user_id == user_id) &
-            (event.c.event_id == event_id))
+        query = select(event_reg).where(
+            (event_reg.c.user_id == user_id) &
+            (event_reg.c.event_id == event_id))
         result = await session.execute(query)
         data = result.mappings().first()
 
-        query = delete(event).where(
-            (event.c.user_id == user_id) &
-            (event.c.event_id == event_id))
+        query = delete(event_reg).where(
+            (event_reg.c.user_id == user_id) &
+            (event_reg.c.event_id == event_id))
         await session.execute(query)
         await session.commit()
 

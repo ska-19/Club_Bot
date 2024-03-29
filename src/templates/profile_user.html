@@ -3,7 +3,7 @@
 
 {% block level %}
 <div class="experience-level">
-    <!--пока заглушка--> Level {{ user_info.xp }}
+    Level {{ user_info.xp }}
 </div>
 {% endblock %}
 
@@ -57,4 +57,20 @@
         {{ user_info.bio }}
     </textarea>
 </div>
+{% endblock %}
+
+
+{% block href_main %}
+<a href="/pages/main_user/{id}?user_id={{user_info.id}}">
+    <button class="btn_GoToTheClub" type="button" style="margin-top: 20px">
+        <strong>На главную</strong>
+        <div id="container-stars">
+            <div id="stars"></div>
+        </div>
+        <div id="glow">
+            <div class="circle"></div>
+            <div class="circle"></div>
+        </div>
+    </button>
+</a>
 {% endblock %}
