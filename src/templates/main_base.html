@@ -13,9 +13,7 @@
 
     <nav>
         <!-- кнопка клуба + кубки клуба + кликабельно-->
-        <div class="logo-container">
-            <span class="site-name">{% block club_name %}{% endblock %}</span>
-        </div>
+        {% block club_name %}{% endblock %}
 
 
         <div class="image-container" style="display: flex; align-items: center">
@@ -37,12 +35,7 @@
 
         <!-- Имя, статус + переход в профиль-->
         <div class="block1" style="margin-top: 20px">
-            <button class="card" style="height: 60px; width: 160px; justify-content: center; vertical-align: center">
-                <h1 id="Name" style="bottom: 5px;font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
-                    {% block user %}{% endblock %}</h1>
-                <h1 id="Status" style="bottom: 5px; font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
-                    {% block status %}{% endblock %}</h1>
-            </button>
+             {% block user_status %}{% endblock %}
         </div>
 
 

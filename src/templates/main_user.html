@@ -2,7 +2,11 @@
 
 
 {% block club_name %}
-{{ club_info.name }}
+<a href="/pages/club_user/{{user_info.id}}">
+    <div class="logo-container">
+        <span class="site-name">{{ club_info.name }}</span>
+    </div>
+</a>
 {% endblock %}
 
 
@@ -11,8 +15,15 @@
 {% endblock %}
 
 
-{% block user %}
-{{ user_info.name }} {{ user_info.surname }}
+{% block user_status %}
+<a href="/pages/profile_user/{{user_info.id}}">
+    <button class="card" style="height: 60px; width: 160px; justify-content: center; vertical-align: center">
+        <h1 id="Name" style="bottom: 5px;font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
+            {{ user_info.surname }}</h1>
+        <h1 id="Status" style="bottom: 5px; font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
+            {{ user_x_club_info.role }}</h1>
+    </button>
+</a>
 {% endblock %}
 
 
@@ -35,26 +46,27 @@
 {% for event in events %}
 <!--события-->
 <div class="form-container" style="margin-top: 30px">
-        <form class="form" id="form">
-            <h1 style="font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">Событие</h1>
-            <div style="display: flex">
-                <div class="form-group" style="width: 60%">
-                    <label for="Date of Birth">Дата</label>
-                    <input required="" name="Date" id="Date of Birth" type="text" style="width: 115px"
-                           value="{{event.date}}" readonly>
-                </div>
-                <div class="form-group">
-                    <label for="City">Спикер</label>
-                    <input required="" name="Speaker" id="City" type="text" style="width: 125px" value="{{event.speaker}}" readonly>
-                </div>
+    <form class="form" id="form">
+        <h1 style="font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">Событие</h1>
+        <div style="display: flex">
+            <div class="form-group" style="width: 60%">
+                <label for="Date of Birth">Дата</label>
+                <input required="" name="Date" id="Date of Birth" type="text" style="width: 115px"
+                       value="{{event.date}}" readonly>
             </div>
             <div class="form-group">
-                <label for="textarea">О событии</label>
-                <textarea required="" cols="50" rows="10" id="textarea" name="textarea"
-                          style="width: 280px; height: 80px" readonly>{{ event.sinopsis }}</textarea>
+                <label for="City">Спикер</label>
+                <input required="" name="Speaker" id="City" type="text" style="width: 125px" value="{{event.speaker}}"
+                       readonly>
             </div>
-            <button type="button" class="JoinEvent">Участвовать</button>
-        </form>
-    </div>
+        </div>
+        <div class="form-group">
+            <label for="textarea">О событии</label>
+            <textarea required="" cols="50" rows="10" id="textarea" name="textarea"
+                      style="width: 280px; height: 80px" readonly>{{ event.sinopsis }}</textarea>
+        </div>
+        <button type="button" class="JoinEvent">Участвовать</button>
+    </form>
+</div>
 {% endfor %}
 {% endblock %}
