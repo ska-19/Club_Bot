@@ -66,3 +66,54 @@ async def check_rec(
             return False
     except Exception:
         raise HTTPException(status_code=500, detail=error)
+
+
+ # внутреняя функция, принимает user_id и club_id, возвращает роль пользователя в клубе
+
+
+async def get_role(  # TODO: мб сделать ее внешней
+            user_id: int,
+            club_id: int,
+            session: AsyncSession = Depends(get_async_session)
+    ):
+        if await check_rec(user_id, club_id, session):
+            return "User not in the club"
+        try:
+            query = select(club_x_user).where(
+                (club_x_user.c.user_id == user_id) &
+                (club_x_user.c.club_id == club_id))
+            result = await session.execute(query)
+            data = result.mappings().first()
+
+            if not data:
+                return "User not found"
+
+            return data['role']
+        except Exception:
+            raise HTTPException(status_code=500, detail=error)
+
+
+async def get_users_by_dict(
+        data,
+        session: AsyncSession = Depends(get_async_session)
+):
+    """ Возвращает список пользователей по списку словарей, содержащих user_id, внутренняя функция
+
+       Note: перед вызовом обязательно проверить что data является списком словарей с полем user_id и он не пуст
+
+       :param data:
+       :return:
+
+    """
+    try:
+        user_ids = [item['user_id'] for item in data]
+        query = select(user).where(user.c.id.in_(user_ids))
+        result = await session.execute(query)
+        data = result.mappings().all()
+
+        if not data:
+            raise Exception
+
+        return data
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
