@@ -10,6 +10,8 @@ from bot_instance import bot
 from handlers import user_handlers, questionnaire_handlers
 from confige import BotConfig
 
+from database.models import async_main
+
 
 def register_routers(dp: Dispatcher) -> None:
     """Registers routers"""
@@ -21,6 +23,8 @@ async def main() -> None:
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
     )
+
+    await async_main()
 
     config = BotConfig(admin_ids=[52786051], welcome_message="Welcome!")
     dp = Dispatcher(storage=MemoryStorage())

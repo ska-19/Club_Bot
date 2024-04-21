@@ -1,4 +1,4 @@
-from aiogram.filters import Command
+from aiogram.filters import Command, CommandStart
 from aiogram import Router, types
 from aiogram import F
 
@@ -25,7 +25,7 @@ async def cmd_dice(message: types.Message):
     await message.delete()
 
 
-@router.message(Command("start"))
+@router.message(CommandStart())
 async def cmd_start(message: types.Message, config: BotConfig):
     await message.answer(text=config.welcome_message, reply_markup=get_main_kb())
 

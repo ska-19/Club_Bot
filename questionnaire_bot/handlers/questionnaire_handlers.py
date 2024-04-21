@@ -2,10 +2,12 @@ from aiogram import Router, F
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import Message, ReplyKeyboardRemove
+from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery
 
 from keyboards.simple_kb import make_colum_keyboard
 from keyboards.user_keyboards import get_main_kb
+
+from database import requests as rq 
 
 router = Router()
 
@@ -28,7 +30,6 @@ class HobbiesQuest(StatesGroup):
     choosing_hobbies = State()
     tell_hobbies = State()
     tell_expectations = State()
-    invite_friends = State()
     choosing_stay_in_touch = State()
 
 
@@ -47,12 +48,17 @@ async def cmd_quest(message: Message, state: FSMContext):
         text="Вы когда-нибудь слышали о клубах по интересам?\n <b>Выберете один из вариантов:</b>",
         reply_markup=make_colum_keyboard(available_knew_interest_clubs)
     )
+    await rq.set_user(message.from_user.id)
     await state.set_state(HobbiesQuest.choosing_knew_interest_clubs)
 
 
 @router.message(HobbiesQuest.choosing_knew_interest_clubs, F.text.in_(available_knew_interest_clubs))
 async def quest_chosen(message: Message, state: FSMContext):
-    await state.update_data(chosen_knew_interest_clubs=message.text.lower())
+    # await state.update_data(chosen_knew_interest_clubs=message.text.lower())
+    chosen_knew_interest_clubs = message.text.lower()
+    for i in range(len(available_knew_interest_clubs)):
+        if available_knew_interest_clubs[i].lower() == chosen_knew_interest_clubs:
+            await state.update_data(chosen_knew_interest_clubs=i)
     await message.answer(
         text="Готовы ли вы к новым знакомствам?",
         reply_markup=make_colum_keyboard(available_readiness_new_meetings)
@@ -67,7 +73,11 @@ async def quest_chosen_incorrectly_clubs(message: Message):
 
 @router.message(HobbiesQuest.choosing_readiness_new_meetings, F.text.in_(available_readiness_new_meetings))
 async def quest_chosen(message: Message, state: FSMContext):
-    await state.update_data(chosen_readiness_new_meetings=message.text.lower())
+    # await state.update_data(chosen_readiness_new_meetings=message.text.lower())
+    chosen_readiness_new_meetings = message.text.lower()
+    for i in range(len(available_readiness_new_meetings)):
+        if available_readiness_new_meetings[i].lower() == chosen_readiness_new_meetings:
+            await state.update_data(chosen_readiness_new_meetings=i)
     await message.answer(
         text="Какие у вас ожидания от клуба?",
         reply_markup=make_colum_keyboard(available_expectations)
@@ -82,7 +92,11 @@ async def quest_chosen_incorrectly_readiness(message: Message):
 
 @router.message(HobbiesQuest.choosing_expectations, F.text.in_(available_expectations))
 async def quest_chosen(message: Message, state: FSMContext):
-    await state.update_data(chosen_expectations=message.text.lower())
+    # await state.update_data(chosen_expectations=message.text.lower())
+    chosen_expectations = message.text.lower()
+    for i in range(len(available_expectations)):
+        if available_expectations[i].lower() == chosen_expectations:
+            await state.update_data(chosen_expectations=i)
     await message.answer(
         text="Как вы предпочитаете встречи?",
         reply_markup=make_colum_keyboard(available_meeting_format)
@@ -97,7 +111,11 @@ async def quest_chosen_incorrectly_expectations(message: Message):
 
 @router.message(HobbiesQuest.choosing_meeting_format, F.text.in_(available_meeting_format))
 async def quest_chosen(message: Message, state: FSMContext):
-    await state.update_data(chosen_meeting_format=message.text.lower())
+    # await state.update_data(chosen_meeting_format=message.text.lower())
+    chosen_meeting_format = message.text.lower()
+    for i in range(len(available_meeting_format)):
+        if available_meeting_format[i].lower() == chosen_meeting_format:
+            await state.update_data(chosen_meeting_format=i)
     await message.answer(
         text="Выберите ваши хобби",
         reply_markup=make_colum_keyboard(available_hobbies)
@@ -163,7 +181,11 @@ async def quest_tell_expectations_incorrectly(message: Message):
 
 @router.message(HobbiesQuest.choosing_stay_in_touch, F.text.in_(available_stay_in_touch))
 async def quest_chosen(message: Message, state: FSMContext):
-    await state.update_data(chosen_stay_in_touch=message.text.lower())
+    # await state.update_data(chosen_stay_in_touch=message.text.lower())
+    chosen_stay_in_touch = message.text.lower()
+    for i in range(len(available_stay_in_touch)):
+        if available_stay_in_touch[i].lower() == chosen_stay_in_touch:
+            await state.update_data(chosen_stay_in_touch=i)
     user_data = await state.get_data()
     await message.answer(
         text=f"Вы {user_data['chosen_knew_interest_clubs']} о клубах по интересам.\n"
@@ -173,9 +195,10 @@ async def quest_chosen(message: Message, state: FSMContext):
              f"Ваши хобби: {user_data['chosen_hobbies']}.\n"
              f"Описание хобби: {user_data['tell_hobbies']}.\n"
              f"Ожидания от клуба: {user_data['tell_expectations']}.\n"
-             f"Оставаться на связи: {message.text.lower()}.\n",
+             f"Оставаться на связи: {user_data['chosen_stay_in_touch']}.",
         reply_markup=get_main_kb()
     )
+    await rq.set_user_questionnaire(message.from_user.id, user_data),
     await state.clear()
 
 
