@@ -38,7 +38,7 @@ async def send_error_message(message: Message, keyboard_options: list[str],
                                                "из списка ниже:"):
     await message.answer(
         text=error_text,
-        reply_markup=make_colum_keyboard(keyboard_options)
+        reply_markup=make_colum_keyboard(keyboard_options, [])
     )
 
 
@@ -116,6 +116,7 @@ async def quest_chosen(message: Message, state: FSMContext):
     for i in range(len(available_meeting_format)):
         if available_meeting_format[i].lower() == chosen_meeting_format:
             await state.update_data(chosen_meeting_format=i)
+            await state.update_data(chosen_hobbies='')
     await message.answer(
         text="Выберите ваши хобби",
         reply_markup=make_colum_keyboard(available_hobbies)
@@ -129,13 +130,38 @@ async def quest_chosen_incorrectly_format(message: Message):
 
 
 @router.message(HobbiesQuest.choosing_hobbies, F.text.in_(available_hobbies))
-async def quest_chosen(message: Message, state: FSMContext):
-    await state.update_data(chosen_hobbies=message.text.lower())
+async def choosing_hobbies(message: Message, state: FSMContext):
+    user_data = await state.get_data()
+    chosen_hobbies_str = str(user_data['chosen_hobbies'])
+    if chosen_hobbies_str is None:
+        chosen_hobbies_str = ""
+    chosen_hobbies = chosen_hobbies_str.lower().split(', ')
+
+    chosen_hobbies.append(message.text.lower())
+    await state.update_data(chosen_hobbies={', '.join(chosen_hobbies)})
     await message.answer(
-        text="Какие у вас хобби?",
+        text="Вы можете продолжить или выбрать еще хобби",
+        reply_markup=make_colum_keyboard(available_hobbies, chosen_hobbies, continue_button=True)
+    )
+
+@router.message(HobbiesQuest.choosing_hobbies, F.text=="Продолжить")
+async def tell_hobbies(message: Message, state: FSMContext):
+    user_data = await state.get_data()
+    chosen_hobbies_str = user_data['chosen_hobbies']
+    await message.answer(
+        text=f"Какие у вас хобби? \n Ваши хобби: {chosen_hobbies_str}",
         reply_markup=ReplyKeyboardRemove()
     )
     await state.set_state(HobbiesQuest.tell_hobbies)
+
+# @router.message(HobbiesQuest.choosing_hobbies, F.text.in_(available_hobbies))
+# async def quest_chosen(message: Message, state: FSMContext):
+#     await state.update_data(chosen_hobbies=message.text.lower())
+#     await message.answer(
+#         text="Какие у вас хобби?",
+#         reply_markup=ReplyKeyboardRemove()
+#     )
+#     await state.set_state(HobbiesQuest.tell_hobbies)
 
 
 @router.message(StateFilter("HobbiesQuest:choosing_hobbies"))
