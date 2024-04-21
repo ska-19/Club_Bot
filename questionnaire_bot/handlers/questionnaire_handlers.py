@@ -138,7 +138,7 @@ async def choosing_hobbies(message: Message, state: FSMContext):
     chosen_hobbies = chosen_hobbies_str.lower().split(', ')
 
     chosen_hobbies.append(message.text.lower())
-    await state.update_data(chosen_hobbies={', '.join(chosen_hobbies)})
+    await state.update_data(chosen_hobbies=', '.join(chosen_hobbies))
     await message.answer(
         text="Вы можете продолжить или выбрать еще хобби",
         reply_markup=make_colum_keyboard(available_hobbies, chosen_hobbies, continue_button=True)
