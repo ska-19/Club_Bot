@@ -24,9 +24,8 @@ def make_colum_keyboard(items: list[str], chosen_items: list[str] = None, contin
         chosen_items = []
 
     for item in items:
-        if item.lower() in chosen_items:
-            keyboard.append([KeyboardButton(text=f"✅ {item}")])
-        else:
+        if item.lower() not in chosen_items:
+            # keyboard.append([KeyboardButton(text=f"✅ {item}")])
             keyboard.append([KeyboardButton(text=item)])
     if continue_button:
         keyboard.append([KeyboardButton(text="Продолжить")])

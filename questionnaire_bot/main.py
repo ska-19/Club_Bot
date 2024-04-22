@@ -26,7 +26,10 @@ async def main() -> None:
 
     await async_main()
 
-    config = BotConfig(admin_ids=[52786051], welcome_message="Welcome!")
+    config = BotConfig(
+        admin_ids=[52786051],
+        welcome_message="Привет! Я бот-анкета, собирающий данные для умного старшего брата. \n\n <b>Давай начнем!</b>"
+    )
     dp = Dispatcher(storage=MemoryStorage())
     dp["config"] = config
 
