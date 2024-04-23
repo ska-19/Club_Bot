@@ -5,7 +5,6 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 def get_main_kb(is_admin: bool = False) -> ReplyKeyboardMarkup:
     """Get main command keyboard."""
     kb = [
-        [KeyboardButton(text="/start")],
         [KeyboardButton(text="/quest")],
         [KeyboardButton(text="/dice")],
     ]

@@ -1,11 +1,8 @@
 from aiogram.filters import Command, CommandStart
 from aiogram import Router, types
-from aiogram import F
 
-from keyboards.user_keyboards import get_main_kb, get_main_ikb
-from confige import BotConfig
+from keyboards.user_keyboards import get_main_kb
 
-#config
 from confige import BotConfig
 
 import io
@@ -16,21 +13,22 @@ import pandas as pd
 
 router = Router()
 
+
 @router.message(Command("dice"))
 async def cmd_dice(message: types.Message):
-    """The function answers dice to your message"""
-
     await message.answer_dice(emoji="🎲")
-
     await message.delete()
 
 
 @router.message(CommandStart())
 async def cmd_start(message: types.Message, config: BotConfig):
+    is_admin = False
     if message.from_user.id in config.admin_ids:
         is_admin = True
     await message.answer(
-        text="<b>Привет! Я бот-анкета, собирающий данные для умного старшего брата.</b> \n\n Давай начнем!",
+        text="<b>Привет! Я бот-анкета, собирающий данные для исследования.</b> \n\n "
+             "В анкете всего 12 простых простых вопросов, время прохождения ~2 минуты. \n\n"
+             "Давайте начнем! 👉🏻/quest",
         reply_markup=get_main_kb(is_admin)
     )
 
@@ -43,7 +41,6 @@ async def cmd_admin_info(message: types.Message, config: BotConfig):
         await message.answer("You are not an admin.")
 
     await message.delete()
-
 
 
 @router.message(Command("admin_exp_csv"))
@@ -91,4 +88,38 @@ async def cmd_admin_export_db(message: types.Message, config: BotConfig):
     else:
         await message.answer("You are not an admin.")
 
+    await message.delete()
+
+
+# help
+@router.message(Command("help"))
+async def cmd_help(message: types.Message):
+    await message.answer(
+        text="Доступные команды: \n"
+             "/start - начало работы с ботом \n"
+             "/quest - начать анкетирование \n"
+             "info - подробности"
+             "/dice - кинуть кубик 🎲 \n"
+             "/help - помощь \n"
+    )
+    await message.delete()
+
+
+@router.message(Command("info"))
+async def cmd_info(message: types.Message):
+    await message.answer(
+        text="Бот-анкета, собирающий данные для умного старшего брата. \n\n"
+             "Для прохождения анкеты нажмите /quest\n\n"
+             "Бот-анкета ничего не делает кроме сбора данных.\n"
+             "Отправляя данные вы соглашаетесь на их сохранение и обработку.\n"
+             "Для связи с админом используйте \n/feedback"
+    )
+    await message.delete()
+
+
+@router.message(Command("feedback"))
+async def cmd_feedback(message: types.Message):
+    await message.answer(
+        text="Для связи с администратором напишите пользователю: @yep_admin"
+    )
     await message.delete()

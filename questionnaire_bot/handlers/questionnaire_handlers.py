@@ -11,14 +11,14 @@ from database import requests as rq
 
 router = Router()
 
-available_knew_interest_clubs = ["Ни когда не слышал", "Слышал, но не состоял", "Состоял/Состою"]
+available_knew_interest_clubs = ["Никогда не слышал", "Слышал, но не состоял", "Состоял/Состою"]
 available_readiness_new_meetings = ["Да!", "Зависит от настроения", "Не люблю знакомиться с новыми людьми"]
 available_expectations = ["100% фана", "75% фана, немного серьезности", "50% фана, 50% серьезности",
                           "25% фана, 75% серьезности", "0% фана, только деловые беседы"]
 available_meeting_format = ["Готов вживую", "Только онлайн"]
 available_zodiac_signs = ["Овен", "Телец", "Близнецы", "Рак", "Лев", "Дева", "Весы", "Скорпион", "Стрелец",
                           "Козерог", "Водолей", "Рыбы"]
-available_personality_type = ["Статег", "Учёный", "Командир", "Полемист",
+available_personality_type = ["Стратег", "Учёный", "Командир", "Полемист",
                               "Активист", "Посредник", "Тренер", "Борец",
                               "Администратор", "Защитник", "Менеджер", "Консул",
                               "Виртуоз", "Артист", "Делец", "Развлекатель"]
@@ -26,7 +26,7 @@ available_gender = ["Мужской", "Женский", "Пропустить"]
 
 available_hobbies = ["Ведение соцсетей и блогов", "Путешествия", "Музыка", "Книги", "Кино и сериалы", "Видеоигры",
                      "Игра на музыкальных инструментах", "Кулинария", "Искусство и рукоделие", "Коллекционирование",
-                     "Техника и автомобили", "Среди этих нет моих хобби"]
+                     "Техника и автомобили"]
 available_stay_in_touch = ["Да", "Нет"]
 
 
@@ -46,9 +46,10 @@ class HobbiesQuest(StatesGroup):
 
 
 async def send_error_message(message: Message, keyboard_options: list[str],
-                             error_text: str = "😭 Я не понимаю такого ответа.\n\nПожалуйста, выберите один из вариантов "
+                             error_text: str = "😭 Я не понимаю такого ответа.\n\n"
+                                               "Пожалуйста, выберите один из вариантов"
                                                "из списка ниже:"):
-    await message.answer(
+    await message.reply(
         text=error_text,
         reply_markup=make_colum_keyboard(keyboard_options, [])
     )
@@ -75,7 +76,7 @@ async def quest_chosen(message: Message, state: FSMContext):
         if available_knew_interest_clubs[i].lower() == chosen_knew_interest_clubs:
             await state.update_data(chosen_knew_interest_clubs=i)
     await message.answer(
-        text="🙈Готовы ли вы к новым знакомствам?",
+        text="🙈<b>Готовы ли вы к новым знакомствам?</b>",
         reply_markup=make_colum_keyboard(available_readiness_new_meetings)
     )
     await state.set_state(HobbiesQuest.choosing_readiness_new_meetings)
@@ -94,7 +95,7 @@ async def quest_chosen(message: Message, state: FSMContext):
         if available_readiness_new_meetings[i].lower() == chosen_readiness_new_meetings:
             await state.update_data(chosen_readiness_new_meetings=i)
     await message.answer(
-        text="Какие у вас ожидания от клуба?",
+        text="<b>Какие у вас ожидания от клуба?</b>",
         reply_markup=make_colum_keyboard(available_expectations)
     )
     await state.set_state(HobbiesQuest.choosing_expectations)
@@ -113,7 +114,7 @@ async def quest_chosen(message: Message, state: FSMContext):
         if available_expectations[i].lower() == chosen_expectations:
             await state.update_data(chosen_expectations=i)
     await message.answer(
-        text="☕️ Как предпочитаешь встречаться: вживую или онлайн?",
+        text="☕️<b>Как предпочитаете встречаться: вживую или онлайн?</b>",
         reply_markup=make_colum_keyboard(available_meeting_format)
     )
     await state.set_state(HobbiesQuest.choosing_meeting_format)
@@ -133,7 +134,7 @@ async def quest_chosen(message: Message, state: FSMContext):
             await state.update_data(chosen_meeting_format=i)
             await state.update_data(chosen_hobbies='')
     await message.answer(
-        text="🌚Выберете свой знак зодиака",
+        text="🌚<b>Выберете свой знак зодиака</b>",
         reply_markup=make_colum_keyboard(available_zodiac_signs)
     )
     await state.set_state(HobbiesQuest.choosing_zodiac_signs)
@@ -171,7 +172,7 @@ async def choosing_personality_type(message: Message, state: FSMContext):
         if available_personality_type[i].lower() == chosen_personality_type:
             await state.update_data(chosen_personality_type=i)
     await message.answer(
-        text="🐙Выберете свой пол",
+        text="🐙<b>Выберете свой пол </b>",
         reply_markup=make_colum_keyboard(available_gender)
     )
     await state.set_state(HobbiesQuest.choosing_gender)
@@ -222,7 +223,7 @@ async def tell_hobbies(message: Message, state: FSMContext):
     await rq.set_user_choosing_questionnaire(message.from_user.id, user_data)
     await message.answer(
         text="🏂 <b>Расскажите про ваши увлечения подробней!</b>\n\n"
-             "Просто пару предложений о твоих профессиональных интересах, взглядах, хобби)",
+             "Просто пару предложений одним сообщением о ваших интересах, взглядах, хобби)",
         reply_markup=ReplyKeyboardRemove()
     )
     await state.set_state(HobbiesQuest.tell_hobbies)
@@ -240,9 +241,10 @@ async def quest_chosen_incorrectly_hobbies(message: Message):
 async def tell_hobbies(message: Message, state: FSMContext):
     await state.update_data(tell_hobbies=message.text.lower())
     await message.answer(
-        text="<b>Кем ты работаешь и чем занимаешься?</b>\n\n"
+        text="👨🏻‍🔬 <b>Кем вы работаете и чем занимаетесь?</b>\n\n"
              "❌ Дизайнер \n"
-             "✅ Motion-дизайнер в Et-tech стартапе, занимаюсь созданием визуальным оформлением онлайн курсов.",
+             "✅ Motion-дизайнер в Et-tech стартапе, занимаюсь созданием визуальным оформлением онлайн курсов.\n\n"
+             "Если не работаете, расскажите на кого учитесь и чем хотите заниматься.",
         reply_markup=ReplyKeyboardRemove()
     )
     await state.set_state(HobbiesQuest.tell_what_do_you_do)
@@ -260,7 +262,7 @@ async def quest_tell_hobbies_incorrectly(message: Message):
 async def tell_what_do_you_do(message: Message, state: FSMContext):
     await state.update_data(tell_what_do_you_do=message.text.lower())
     await message.answer(
-        text="<b>Если бы вы состояли в клубе, то зачем?</b>\n\n"
+        text="📝 <b>Если бы вы состояли в клубе, то зачем?</b>\n\n"
              "Просто пару предложений о том, что вы хотели бы получить от клуба.",
         reply_markup=ReplyKeyboardRemove()
     )
@@ -279,7 +281,7 @@ async def quest_tell_what_do_you_do_incorrectly(message: Message):
 async def invite_friends(message: Message, state: FSMContext):
     await state.update_data(tell_expectations=message.text.lower())
     await message.answer(
-        text="Вы хотите остаться с нами на связи?",
+        text="🫶🏻 Вы хотите остаться с нами на связи?",
         reply_markup=make_colum_keyboard(available_stay_in_touch)
     )
     await state.set_state(HobbiesQuest.choosing_stay_in_touch)
@@ -302,18 +304,14 @@ async def quest_chosen(message: Message, state: FSMContext):
             await state.update_data(chosen_stay_in_touch=i)
     user_data = await state.get_data()
     await message.answer(
-        text=f"Вы {user_data['chosen_knew_interest_clubs']} о клубах по интересам.\n"
-             f"Готовы к новым знакомствам: {user_data['chosen_readiness_new_meetings']}.\n"
-             f"Ожидания от клуба: {user_data['chosen_expectations']}.\n"
-             f"Предпочтение встреч: {user_data['chosen_meeting_format']}.\n"
-             f"Ваш знак зодиака: {user_data['chosen_zodiac_signs']}.\n"
-             f"Ваш тип личности: {user_data['chosen_personality_type']}.\n"
-             f"Ваш пол: {user_data['chosen_gender']}.\n"
-             f"Ваши хобби: {user_data['chosen_hobbies']}.\n"
-             f"Описание хобби: {user_data['tell_hobbies']}.\n"
-             f"Чем вы занимаетесь в свободное время: {user_data['tell_what_do_you_do']}.\n"
-             f"Ожидания от клуба: {user_data['tell_expectations']}.\n"
-             f"Оставаться на связи: {user_data['chosen_stay_in_touch']}.",
+        text="🎉<b>Вы прошли все вопросы! Спасибо за ответы!</b> ❤️\n\n"
+             "Создателям очень важно собрать как можно больше ответов, чтобы воплотить в жизнь свой замысел!\n\n"
+             "Вы можете помочь нам! Заодно поучаствовать в <b>розыгрыше призов</b>, опросив своего хорошего друга!\n"
+             "Ещё раз нажав на /quest\n\n\n"
+             "p.s. Как вы могли заметить вопросы простые и их не много)\n"
+             "Уверены, что вы знаете увлечения своих друзей "
+             "и сможете заполнить анкету ещё раз, даже если их нет рядом.",
+
         reply_markup=get_main_kb()
     )
     await rq.set_user_tell_questionnaire(message.from_user.id, user_data),

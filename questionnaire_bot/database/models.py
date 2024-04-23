@@ -38,45 +38,6 @@ class Questionnaire(Base):
     # user_id: Mapped[int] = mapped_column(ForeignKey('users.id')
 
 
-# class Category(Base):
-#     __tablename__ = 'categories'
-    
-#     id: Mapped[int] = mapped_column(primary_key=True)
-#     name: Mapped[str] = mapped_column(String(25))
-
-
-# class Item(Base):
-#     __tablename__ = 'items'
-    
-#     id: Mapped[int] = mapped_column(primary_key=True)
-#     name: Mapped[str] = mapped_column(String(30))
-#     description: Mapped[str] = mapped_column(String(128))
-#     price: Mapped[str] = mapped_column(String(10))
-#     category: Mapped[int] = mapped_column(ForeignKey('categories.id'))
-
-
-# class Basket(Base):
-#     __tablename__ = 'basket'
-    
-#     id: Mapped[int] = mapped_column(primary_key=True)
-#     user: Mapped[int] = mapped_column(ForeignKey('users.id'))
-#     item: Mapped[int] = mapped_column(ForeignKey('items.id'))
-
-
 async def async_main():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-
-# questionnaire = Table(
-#     'questionnaire', metadata,
-#     Column('id', Integer, primary_key=True, autoincrement=True),
-#     Column('user_id', Integer),
-#     Column('choosing_knew_interest_clubs', Integer),
-#     Column('choosing_readiness_new_meetings', Integer),
-#     Column('choosing_expectations', Integer),
-#     Column('choosing_meeting_format', Integer),
-#     Column('choosing_hobbies', String(255)),
-#     Column('tell_hobbies', Text),
-#     Column('tell_expectations', Text),
-#     Column('choosing_stay_in_touch', Integer),
-# )
