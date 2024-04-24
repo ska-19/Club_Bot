@@ -1,4 +1,5 @@
 from aiogram.filters import Command, CommandStart
+from aiogram.fsm.context import FSMContext
 from aiogram import Router, types
 
 from keyboards.user_keyboards import get_main_kb
@@ -21,16 +22,17 @@ async def cmd_dice(message: types.Message):
 
 
 @router.message(CommandStart())
-async def cmd_start(message: types.Message, config: BotConfig):
+async def cmd_start(message: types.Message, config: BotConfig, state: FSMContext):
     is_admin = False
     if message.from_user.id in config.admin_ids:
         is_admin = True
     await message.answer(
-        text="<b>Привет! Я бот-анкета, собирающий данные для исследования.</b> \n\n "
+        text="👋🏻 <b>Привет! Я бот-анкета, собирающий данные для исследования.</b> \n\n"
              "В анкете всего 12 простых простых вопросов, время прохождения ~2 минуты. \n\n"
              "Давайте начнем! 👉🏻/quest",
         reply_markup=get_main_kb(is_admin)
     )
+    await state.clear()
 
 
 @router.message(Command("admin_info"))
@@ -95,10 +97,10 @@ async def cmd_admin_export_db(message: types.Message, config: BotConfig):
 @router.message(Command("help"))
 async def cmd_help(message: types.Message):
     await message.answer(
-        text="Доступные команды: \n"
+        text="📍 Доступные команды: \n"
              "/start - начало работы с ботом \n"
              "/quest - начать анкетирование \n"
-             "info - подробности"
+             "/info - подробности \n"
              "/dice - кинуть кубик 🎲 \n"
              "/help - помощь \n"
     )
@@ -108,7 +110,7 @@ async def cmd_help(message: types.Message):
 @router.message(Command("info"))
 async def cmd_info(message: types.Message):
     await message.answer(
-        text="Бот-анкета, собирающий данные для умного старшего брата. \n\n"
+        text="👾 Бот-анкета, собирающий данные для умного старшего брата. \n\n"
              "Для прохождения анкеты нажмите /quest\n\n"
              "Бот-анкета ничего не делает кроме сбора данных.\n"
              "Отправляя данные вы соглашаетесь на их сохранение и обработку.\n"
@@ -120,6 +122,6 @@ async def cmd_info(message: types.Message):
 @router.message(Command("feedback"))
 async def cmd_feedback(message: types.Message):
     await message.answer(
-        text="Для связи с администратором напишите пользователю: @yep_admin"
+        text="🤫 Для связи с администратором напишите пользователю: @yep_admin"
     )
     await message.delete()

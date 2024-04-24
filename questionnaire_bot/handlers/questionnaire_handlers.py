@@ -55,10 +55,10 @@ async def send_error_message(message: Message, keyboard_options: list[str],
     )
 
 
-@router.message(StateFilter(None), Command("quest"))
+@router.message(Command("quest"))
 async def cmd_quest(message: Message, state: FSMContext):
     await message.answer(
-        text="<b>Вы когда-нибудь слышали о клубах по интересам?</b>\n\n"
+        text="🎩 <b>Вы когда-нибудь слышали о клубах по интересам?</b>\n\n"
              "Клуб по интересам - это сообщество людей, которые увлечены одной темой и хотят общаться с "
              "единомышленниками.\n\n"
              "Выберете один из вариантов:",
@@ -76,7 +76,7 @@ async def quest_chosen(message: Message, state: FSMContext):
         if available_knew_interest_clubs[i].lower() == chosen_knew_interest_clubs:
             await state.update_data(chosen_knew_interest_clubs=i)
     await message.answer(
-        text="🙈<b>Готовы ли вы к новым знакомствам?</b>",
+        text="🙈 <b>Готовы ли вы к новым знакомствам?</b>",
         reply_markup=make_colum_keyboard(available_readiness_new_meetings)
     )
     await state.set_state(HobbiesQuest.choosing_readiness_new_meetings)
@@ -95,7 +95,7 @@ async def quest_chosen(message: Message, state: FSMContext):
         if available_readiness_new_meetings[i].lower() == chosen_readiness_new_meetings:
             await state.update_data(chosen_readiness_new_meetings=i)
     await message.answer(
-        text="<b>Какие у вас ожидания от клуба?</b>",
+        text="🌟 <b>Какие у вас ожидания от клуба?</b>",
         reply_markup=make_colum_keyboard(available_expectations)
     )
     await state.set_state(HobbiesQuest.choosing_expectations)
@@ -114,7 +114,7 @@ async def quest_chosen(message: Message, state: FSMContext):
         if available_expectations[i].lower() == chosen_expectations:
             await state.update_data(chosen_expectations=i)
     await message.answer(
-        text="☕️<b>Как предпочитаете встречаться: вживую или онлайн?</b>",
+        text="👨‍💻 <b>Как предпочитаете встречаться: вживую или онлайн?</b>",
         reply_markup=make_colum_keyboard(available_meeting_format)
     )
     await state.set_state(HobbiesQuest.choosing_meeting_format)
@@ -134,7 +134,7 @@ async def quest_chosen(message: Message, state: FSMContext):
             await state.update_data(chosen_meeting_format=i)
             await state.update_data(chosen_hobbies='')
     await message.answer(
-        text="🌚<b>Выберете свой знак зодиака</b>",
+        text="🌚 <b>Выберете свой знак зодиака</b>",
         reply_markup=make_colum_keyboard(available_zodiac_signs)
     )
     await state.set_state(HobbiesQuest.choosing_zodiac_signs)
@@ -172,7 +172,7 @@ async def choosing_personality_type(message: Message, state: FSMContext):
         if available_personality_type[i].lower() == chosen_personality_type:
             await state.update_data(chosen_personality_type=i)
     await message.answer(
-        text="🐙<b>Выберете свой пол </b>",
+        text="🐙 <b>Выберете свой пол </b>",
         reply_markup=make_colum_keyboard(available_gender)
     )
     await state.set_state(HobbiesQuest.choosing_gender)
@@ -304,7 +304,7 @@ async def quest_chosen(message: Message, state: FSMContext):
             await state.update_data(chosen_stay_in_touch=i)
     user_data = await state.get_data()
     await message.answer(
-        text="🎉<b>Вы прошли все вопросы! Спасибо за ответы!</b> ❤️\n\n"
+        text="🎉 <b>Вы прошли все вопросы! Спасибо за ответы!</b> ❤️\n\n"
              "Создателям очень важно собрать как можно больше ответов, чтобы воплотить в жизнь свой замысел!\n\n"
              "Вы можете помочь нам! Заодно поучаствовать в <b>розыгрыше призов</b>, опросив своего хорошего друга!\n"
              "Ещё раз нажав на /quest\n\n\n"

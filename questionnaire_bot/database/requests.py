@@ -49,10 +49,3 @@ async def set_user_tell_questionnaire(tg_id, user_questionnaire_data):
         questionnaire.choosing_stay_in_touch = user_questionnaire_data['chosen_stay_in_touch']
 
         await session.commit()
-
-
-# async def get_my_basket(tg_id):
-#     async with async_session() as session:
-#         user = await session.scalar(select(User).where(User.tg_id == tg_id))
-#         basket_items = await session.scalars(select(Basket).where(Basket.user == user.id))
-#         return basket_items
