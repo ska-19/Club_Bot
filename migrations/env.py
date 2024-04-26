@@ -12,11 +12,11 @@ sys.path.append(os.path.join(sys.path[0], 'src'))
 
 from src.config import DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER
 from src.database import metadata
+from src.achievement.models import *
 from src.user_profile.models import *
 from src.club.models import *
 from src.user_club.models import *
 from src.events.models import *
-from src.user_profile.models import *
 from src.mentorship.models import *
 
 # this is the Alembic Config object, which provides

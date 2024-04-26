@@ -8,6 +8,7 @@ from src.events.router import router as router_events
 # from src.achievement.router import router as router_achievement
 from src.club.router import router as router_club
 from src.mentorship.router import router as router_mentorship
+from src.statistics.router import router as router_statistics
 # from src.quetionnaire.router import router as router_quetionnaire
 # from src.randomcofee.router import router as router_randomcofee
 from src.user_club.router import router as router_user_club
@@ -38,6 +39,7 @@ app.include_router(router_events)
 # app.include_router(router_randomcofee)
 # app.include_router(router_quetionnaire)
 app.include_router(router_mentorship)
+app.include_router(router_statistics)
 # app.include_router(router_achievement)
 app.include_router(router_club)
 app.include_router(router_user_club)

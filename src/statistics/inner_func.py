@@ -79,10 +79,10 @@ async def check_event_valid(
            """
     try:
         join = event_reg.join(event, event_reg.c.event_id == event.c.id)
-        query = (select(event_reg.c.event_id, event.c.club)
+        query = (select(event_reg.c.event_id, event.c.club_id)
                  .select_from(join)
                  .where((event_reg.c.event_id == event_id) &
-                        (event.c.club == club_id)))
+                        (event.c.club_id == club_id)))
 
         result = await session.execute(query)
         data = result.mappings().first()

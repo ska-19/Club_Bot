@@ -7,6 +7,7 @@ from sqlalchemy import select, insert, update
 from sqlalchemy.ext.asyncio import AsyncSession
 import pandas as pd
 import tempfile
+import openpyxl
 
 from src.database import get_async_session
 from src.user_club.models import club_x_user
@@ -58,13 +59,13 @@ async def get_users_in_club_xlsx(
             raise HTTPException(status_code=403, detail=error403)
 
         join = club_x_user.join(user, club_x_user.c.user_id == user.c.id)
-        query = select(user.c.username, club_x_user.c.role, club_x_user.c.date_joined).select_from(join).where(
+        query = select(user, club_x_user.c.role, club_x_user.c.date_joined, club_x_user.c.balance).select_from(join).where(
             club_x_user.c.club_id == club_id)
 
         result = await session.execute(query)
         df = pd.DataFrame(result.mappings().all())
 
-        if not df:
+        if df.empty:
             raise ValueError('404u')
 
         with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
@@ -108,13 +109,13 @@ async def get_users_in_event_xlsx(
             raise ValueError('404ec')
 
         join = event_reg.join(user, event_reg.c.user_id == user.c.id)
-        query = select(user.c.username, event_reg.c.role, event_reg.c.date_joined).select_from(join).where(
+        query = select(user, event_reg.c.confirm, event_reg.c.reg_date).select_from(join).where(
             event_reg.c.event_id == event_id)
 
         result = await session.execute(query)
         df = pd.DataFrame(result.mappings().all())
 
-        if not df:
+        if df.empty:
             raise ValueError('404u')
 
         with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
@@ -124,7 +125,7 @@ async def get_users_in_event_xlsx(
         background_tasks.add_task(os.unlink, tmp_path)
 
         data = await get_event_by_id(event_id, session)
-        name_event = data['id']
+        name_event = data['name']
         # поменять в бд, добавить название события
         data = await get_club_by_id(club_id, session)
         name_club = data['name']
@@ -168,14 +169,14 @@ async def get_users_in_club_events_xlsx(
                 .join(event_reg, event.c.id == event_reg.c.event_id)
                 .join(user, event_reg.c.user_id == user.c.id))
 
-        query = (select(event.c.id, event.c.date, event_reg.c.user_id, event_reg.c.confirm, event_reg.c.reg_date, user)
+        query = (select(event.c.name, event.c.date, event_reg.c.confirm, event_reg.c.reg_date, user)
                  .select_from(join)
                  .where(event.c.club_id == club_id))
 
         result = await session.execute(query)
         df = pd.DataFrame(result.mappings().all())
 
-        if not df:
+        if df.empty:
             raise ValueError('404u')
 
         with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:

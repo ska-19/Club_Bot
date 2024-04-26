@@ -10,6 +10,7 @@ from src.database import Base, metadata
 event = Table(
     'event', metadata,
     Column('id', Integer, primary_key=True),
+    Column('name', String(255), nullable=False),
     Column('club_id', Integer, ForeignKey('club.id'), nullable=False),
     Column('host_id', Integer, ForeignKey('user.id'), nullable=False),
     Column('date', TIMESTAMP, nullable=False),

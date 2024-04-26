@@ -14,7 +14,6 @@ router = APIRouter(
     tags=["events"]
 )
 
-
 @router.post("/create_event")
 async def create_event(
         new_event: EventCreate,
@@ -130,7 +129,7 @@ async def update_event(
 # принимает json вида EventReg
 # 200 - успешно создано, возвращает json со всеми данными
 # 500 - ошибка сервера
-@router.post("/event_reg")  # TODO: возможно стоит сделать отдельную папку userxevent
+@router.post("/event_reg")
 async def reg_event(
         data: EventReg,
         session: AsyncSession = Depends(get_async_session)

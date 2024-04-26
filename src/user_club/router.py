@@ -234,7 +234,7 @@ async def role_update(
             raise ValueError('404uc')
 
         rec_id = await get_rec_id(new_role_dict['user_id'], new_role_dict['club_id'], session)
-        stmt = update(club_x_user).where(club_x_user.c.id == rec_id).values(role=new_role.role)
+        stmt = update(club_x_user).where(club_x_user.c.id == rec_id).values(role=new_role.new_role)
         await session.execute(stmt)
         await session.commit()
 
