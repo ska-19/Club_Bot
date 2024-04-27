@@ -18,6 +18,8 @@ from src.club.models import *
 from src.user_club.models import *
 from src.events.models import *
 from src.mentorship.models import *
+from src.achievement.models import *
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

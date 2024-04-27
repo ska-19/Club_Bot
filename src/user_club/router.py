@@ -117,7 +117,7 @@ async def get_balance(
 ):
     """ Возвращает баланс пользователя в клубе
 
-           :param data: джейсон вида User
+           :param
            :return:
                200 + success, если все хорошо.
                404 + error404uc, если пользователь не состоит в клубе.
@@ -178,7 +178,7 @@ async def disjoin_club(
     """
     try:
         data_dict = data.dict()
-        if await get_user_by_id(data_dict['user_id '], session) == "User not found":
+        if await get_user_by_id(data_dict['user_id'], session) == "User not found":
             raise ValueError('404u')
 
         if await get_club_by_id(data_dict['club_id'], session) == "Club not found":
@@ -315,7 +315,7 @@ async def get_users_in_club(
 ):
     """ Возвращает список пользователей в клубе
 
-       :param club_id:
+       :param club_id
        :return:
            200 + джейсон со списком всех пользователей, если все хорошо.
            404 + error404c, если клуб не найден.
@@ -404,7 +404,7 @@ async def get_clubs_by_user(
 ):
     """ Возвращает список клубов, в которых состоит пользователь
 
-        :param user_id:
+        :param user_id
         :return:
             200 + джейсон со cписком всех клубой, в которых состоит пользователь, если все хорошо.
             404 + error404u, если пользователь не найден.

@@ -31,5 +31,5 @@ user = Table(
     Column('xp', Integer, default=0, nullable=False),
     Column('city', String, nullable=False),
     Column('education', String, nullable=False),
-    Column('achievments', JSON)
+    # Column('achievments', JSON)
 )
