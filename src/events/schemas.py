@@ -6,7 +6,8 @@ from pydantic import BaseModel
 class EventCreate(BaseModel):
     club_id: int
     host_id: int
-    date: date
+    name: str
+    date: datetime
     sinopsis: str
     contact: str
     speaker: str
@@ -15,7 +16,8 @@ class EventCreate(BaseModel):
 class EventUpdate(BaseModel):
     club_id: int
     host_id: int
-    date: date
+    name: str
+    date: datetime
     sinopsis: str
     contact: str
     speaker: str
