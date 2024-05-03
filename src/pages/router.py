@@ -71,9 +71,9 @@ async def get_main_user(
 ):
     user_clubs = await get_clubs_by_user(user_info['user_id'], session)
     club_info = dict(user_clubs['data'][0])
-    user_x_club_info_role = await get_role(user_info['user_id'], club_info['user_id'], session)
-    user_x_club_info_balance = await get_balance(user_info['user_id'], club_info['user_id'], session)
-    event_data = await get_event_club(club_info['user_id'], session)
+    user_x_club_info_role = await get_role(user_info['user_id'], club_info['id'], session)
+    user_x_club_info_balance = await get_balance(user_info['user_id'], club_info['id'], session)
+    event_data = await get_event_club(club_info['id'], session)
     event_info = event_data['data']
     events = [dict(event) for event in event_info]
     club_info['xp'] = 0
@@ -88,35 +88,6 @@ async def get_main_user(
         "user_x_club_info": user_x_club_info,
         "events": events
     })
-
-
-# @router.get("/main_user/{id}")
-# async def get_main_user(
-#         request: Request,
-#         user_info=Depends(get_user),
-#         session: AsyncSession = Depends(get_async_session)
-# ):
-#     user_data = dict(user_info['data'])
-#     user_clubs = await get_clubs_by_user(user_data['id'], session)
-#     club_info = dict(user_clubs['data'][0])
-#     user_x_club_info_role = await get_role(user_data['id'], club_info['id'], session)
-#     user_x_club_info_balance = await get_balance(user_data['id'], club_info['id'], session)
-#     event_data = await get_event_club(club_info['id'], session)
-#     event_info = event_data['data']
-#     events = [dict(event) for event in event_info]
-#     club_info['xp'] = 0
-#     user_x_club_info = {
-#         'role': user_x_club_info_role,
-#         'balance': user_x_club_info_balance['data']
-#     }
-#     return templates.TemplateResponse("main_user.html", {
-#         "request": request,
-#         "user_info": user_data,
-#         "club_info": club_info,
-#         "user_x_club_info": user_x_club_info,
-#         "events": events
-#     })
-
 
 @router.get("/club_base")
 def get_club_base(request: Request):
