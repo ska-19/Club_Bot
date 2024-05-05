@@ -1,6 +1,21 @@
 {% extends "club_base.html" %}
 
 
+{% block club_name %}
+{{ club_info.name }}
+{% endblock %}
+
+
+{% block exp_club %}
+{{ club_info.xp }}
+{% endblock %}
+
+
+{% block bio_club %}
+{{ club_info.bio }}
+{% endblock %}
+
+
 {% block href_main %}
 <a href="/pages/main_user/{{user_info.id}}">
     <button class="btn_GoToTheClub" type="button" style="margin-top: 20px">
@@ -14,4 +29,16 @@
         </div>
     </button>
 </a>
+{% endblock %}
+
+
+{% block club_users %}
+{% for user in users %}
+<div class="card"
+     style="margin-top: 5px;left: 20px;height: 30px; width: 350px; justify-content: center;display: flex">
+    <h1 style="font-size: 14px; color: #7a9a8a;position: relative; z-index: 2">
+        {{ user.username }} {{ user.role }}
+    </h1>
+</div>
+{% endfor %}
 {% endblock %}
