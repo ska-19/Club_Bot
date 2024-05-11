@@ -3,22 +3,22 @@ from sqlalchemy import select, insert, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
-from src.achievement.models import achievement, user_x_achievement, club_x_achievement
-from src.achievement.schemas import AddAchievementClub, UpdateAchievementClub, AddAchievementUser
-from src.achievement.inner_func import *
+from src.reward.models import reward, user_x_reward, club_x_reward
+from src.reward.schemas import AddRewardClub, UpdateRewardClub, AddRewardUser
+from src.reward.inner_func import *
 from src.user_club.inner_func import check_rec, get_role
 from src.user_profile.inner_func import get_user_by_id
 from src.club.inner_func import get_club_by_id
 
 router = APIRouter(
-    prefix="/achievement",
-    tags=["achievement"]
+    prefix="/reward",
+    tags=["reward"]
 )
 
 
-@router.post("/add_achievement")
-async def add_achievement(
-        new_data: AddAchievementClub,
+@router.post("/add_reward")
+async def add_reward(
+        new_data: AddRewardClub,
         session: AsyncSession = Depends(get_async_session)
 ):
     try:
@@ -30,21 +30,21 @@ async def add_achievement(
         if role == "User not in the club":
             raise ValueError('404uc')
         if role == "admin" or role == "owner":
-            achievement_dict = new_data.model_dump()
+            reward_dict = new_data.model_dump()
 
-            query = insert(achievement).values(info=achievement_dict['info'],
-                                               exp=achievement_dict['exp'])
+            query = insert(reward).values(info=reward_dict['info'],
+                                          exp=reward_dict['exp'])
             result = await session.execute(query)
             await session.commit()
-            query = insert(club_x_achievement).values(club_id=new_data.club_id,
-                                                      achievement_id=result.inserted_primary_key[0],
+            query = insert(club_x_reward).values(club_id=new_data.club_id,
+                                                      reward_id=result.inserted_primary_key[0],
                                                       context=None)
             await session.execute(query)
             await session.commit()
 
             return {
                 "status": "success",
-                "data": achievement_dict,
+                "data": reward_dict,
                 "details": None
             }
         else:
@@ -64,14 +64,14 @@ async def add_achievement(
         await session.rollback()
 
 
-@router.get("/get_achievement")
-async def get_achievement(
-        achievement_id: int,
+@router.get("/get_reward")
+async def get_reward(
+        reward_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
     try:
-        data = await get_achievement_by_id(achievement_id, session)
-        if data == "Achievement not found":
+        data = await get_reward_by_id(reward_id, session)
+        if data == "Reward not found":
             raise ValueError('404a')
         return {
             "status": "success",
@@ -85,10 +85,10 @@ async def get_achievement(
         raise HTTPException(status_code=500, detail=error)
 
 
-@router.post("/update_achievement")
-async def update_achievement(
-        achievement_id: int,
-        new_data: UpdateAchievementClub,
+@router.post("/update_reward")
+async def update_reward(
+        reward_id: int,
+        new_data: UpdateRewardClub,
         session: AsyncSession = Depends(get_async_session)
 ):
     try:
@@ -100,8 +100,8 @@ async def update_achievement(
         if role == "User not in the club":
             raise ValueError('404uc')
         if role == "admin" or role == "owner":
-            query = update(achievement).where(achievement.c.id == achievement_id).values(info=new_data.info,
-                                                                                         exp=new_data.exp)
+            query = update(reward).where(reward.c.id == reward_id).values(info=new_data.info,
+                                                                               exp=new_data.exp)
             await session.execute(query)
             await session.commit()
 
@@ -127,9 +127,9 @@ async def update_achievement(
         await session.rollback()
 
 
-@router.post("/add_achievement_to_user")
+@router.post("/add_reward_to_user")
 async def add_to_user(
-        new_data: AddAchievementUser,
+        new_data: AddRewardUser,
         session: AsyncSession = Depends(get_async_session)
 ):
     try:
@@ -137,22 +137,22 @@ async def add_to_user(
             raise ValueError('404ad')
         if await get_user_by_id(new_data.user_id, session) == "User not found":
             raise ValueError('404u')
-        query = select(club_x_achievement).where(club_x_achievement.c.id == new_data.club_x_achievement_id)
+        query = select(club_x_reward).where(club_x_reward.c.id == new_data.club_x_reward_id)
         result = await session.execute(query)
         data = result.mappings().first()
         if not data:
             raise ValueError('404ac')
         role = await get_role(new_data.admin_id, data['club_id'], session)
         if role == "owner" or role == "admin":
-            query = insert(user_x_achievement).values(user_id=new_data.user_id,
-                                                      achievement_id=data['achievement_id'],
-                                                      context=None)
+            query = insert(user_x_reward).values(user_id=new_data.user_id,
+                                                 reward_id=data['reward_id'],
+                                                 context=None)
             await session.execute(query)
             await session.commit()
             return_data = {
                 "admin_id": new_data.admin_id,
                 "user_id": new_data.user_id,
-                "achievement_id": data['achievement_id'],
+                "reward_id": data['reward_id'],
                 "club_id": data['club_id'],
 
             }
@@ -178,15 +178,15 @@ async def add_to_user(
         await session.rollback()
 
 
-@router.get("/get_users_by_achievement")
-async def get_by_achievement(
-        achievement_id: int,
+@router.get("/get_users_by_reward")
+async def get_by_reward(
+        reward_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
     try:
-        if await get_achievement_by_id(achievement_id, session) == "Achievement not found":
+        if await get_reward_by_id(reward_id, session) == "Reward not found":
             raise ValueError('404a')
-        data = await get_all_user_by_achievement_id(achievement_id, session)
+        data = await get_all_user_by_reward_id(reward_id, session)
         return {
             "status": "success",
             "data": data,
@@ -200,7 +200,7 @@ async def get_by_achievement(
 
 
 
-@router.get("/get_achievement_by_user")
+@router.get("/get_reward_by_user")
 async def get_by_user(
         user_id: int,
         session: AsyncSession = Depends(get_async_session)
@@ -208,7 +208,7 @@ async def get_by_user(
     try:
         if await get_user_by_id(user_id, session) == "User not found":
             raise ValueError('404u')
-        data = await get_all_achievement_by_user_id(user_id, session)
+        data = await get_all_reward_by_user_id(user_id, session)
         return {
             "status": "success",
             "data": data,
