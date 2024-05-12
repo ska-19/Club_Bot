@@ -39,19 +39,16 @@ async def get_profile_user(
     return templates.TemplateResponse("profile_user.html", {"request": request, "user_info": user_data})
 
 
-@router.put("/profile_user/{user_id}")
+@router.post("/profile_user/{user_id}")
 async def update_profile_user(
         user_id: int,
-        update_data: UserUpdate,
-        session: AsyncSession = Depends(get_async_session)):
-    try:
-        await update_profile(user_id, update_data, session)
-        return RedirectResponse(url=f"/pages/profile_user/{user_id}")
-
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        request: Request,
+        user_update: UserUpdate,
+        user_info=Depends(get_user),
+        session: AsyncSession = Depends(get_async_session)
+):
+    await update_profile(user_id, user_update, session)
+    return RedirectResponse(url=f"/pages/profile_user/{user_id}")
 
 
 # Функции для взаимодействия со страницами "Главное"
