@@ -2,22 +2,19 @@
 body {
     margin: 0;
     padding: 0;
-    font-size: 18px;
+    font-size: 16px;
     font-family: Arial, sans-serif;
-}
-
-nav {
-    color: #fff;
-    padding: 10px;
 }
 
 .experience-bar { /* Шкала опыта*/
     position: relative;
-    width: 30%;
+    width: 40%;
     height: 20px;
-    background-color: #181456;
+    background-color: #4b4a65;
     border-radius: 10px;
     margin-top: 20px;
+    animation: gradient 5s ease infinite;
+    filter: drop-shadow(0px 0px 20px rgba(223, 185, 255, 0.68));
 }
 
 .experience-level { /* Текст у лвла */
@@ -25,91 +22,28 @@ nav {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 14px;
-    color: #ffffff;
+    font-size: 12px;
+    color: rgb(255, 255, 255);
 }
 
 .experience-fill { /* заполенение шкалы опыта*/
     height: 100%;
     border-radius: 10px;
-    background-color: #3d32d2;
-    width: 70%; /* Пример: заполнено на 70% */
-}
-
-.star-icon {
-    width: 40px;
-    height: 40px;
-    background: url('src/static/images/exp.png');
-    background-size: cover;
-    display: inline-block;
+    background-color: #756bbc;
+    width: 30%;
 }
 
 .container {
-    width: 100%;
-    height: 810px;
-    --s: 84px;
-    --c1: #291544;
-    --c2: #1f0b3b;
-    --c3: #130628;
-
-    --_g: 0 120deg, #0000 0;
-    background: conic-gradient(
-            from 0deg at calc(500% / 6) calc(100% / 3),
-            var(--c3) var(--_g)
-    ),
-    conic-gradient(
-            from -120deg at calc(100% / 6) calc(100% / 3),
-            var(--c2) var(--_g)
-    ),
-    conic-gradient(
-            from 120deg at calc(100% / 3) calc(500% / 6),
-            var(--c1) var(--_g)
-    ),
-    conic-gradient(
-            from 120deg at calc(200% / 3) calc(500% / 6),
-            var(--c1) var(--_g)
-    ),
-    conic-gradient(
-            from -180deg at calc(100% / 3) 50%,
-            var(--c2) 60deg,
-            var(--c1) var(--_g)
-    ),
-    conic-gradient(
-            from 60deg at calc(200% / 3) 50%,
-            var(--c1) 60deg,
-            var(--c3) var(--_g)
-    ),
-    conic-gradient(
-            from -60deg at 50% calc(100% / 3),
-            var(--c1) 120deg,
-            var(--c2) 0 240deg,
-            var(--c3) 0
-    );
-    background-size: calc(var(--s) * 1.732) var(--s);
+    background: #ededed;
     max-width: 390px;
-}
-
-.inner {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 200px;
-}
-
-.img {
-    width: 110px;
-}
-
-.item {
-    text-align: center;
 }
 
 .editBtn {
     display: inline-block;
     padding: 10px 20px;
     border: none;
-    background: rgba(97, 0, 255, 0.7);
+    background: #ededed;
     border-radius: 10px;
-    color: #fff;
     text-transform: uppercase;
     font-weight: 700;
 
@@ -117,28 +51,21 @@ nav {
 }
 
 .editBtn:hover {
-    background: rgba(132, 38, 209, 0.5);
+    background: lightgray;
 }
 
 .saveBtn {
     padding: 10px 20px;
     border: none;
-    background: rgba(97, 0, 255, 0.7);
+    background: #ededed;
     border-radius: 10px;
-    color: #fff;
     text-transform: uppercase;
     font-weight: 700;
-
     transition: background .2s linear;
 }
 
 .saveBtn:hover {
-    background: rgba(132, 38, 209, 0.5);
-}
-
-
-.usercard {
-    text-align: center;
+    background: lightgray;
 }
 
 #avatar-container {
@@ -148,8 +75,11 @@ nav {
     height: 120px;
     overflow: hidden;
     display: inline-block;
-    background-color: lightgray;
+    background-color: #ffffff;
     border-radius: 50%;
+    animation: gradient 5s ease infinite;
+    filter: drop-shadow(0px 0px 20px rgba(223, 185, 255, 0.68));
+
 }
 
 #avatar-circle {
@@ -196,7 +126,7 @@ nav {
     transition: 0.5s;
     animation: gradient_301 5s ease infinite;
     border: double 4px transparent;
-    background-image: linear-gradient(#1f0025, #744bff), linear-gradient(137.48deg, #501c9b 10%, #ffa600 45%, #8F51EA 67%, #0044ff 87%);
+    background-image: linear-gradient(#756bbc, #744bff), linear-gradient(137.48deg, #501c9b 10%, #ffa600 45%, #8F51EA 67%, #0044ff 87%);
     background-origin: border-box;
     background-clip: content-box, border-box;
 }
@@ -322,7 +252,7 @@ strong {
 
 @keyframes gradient_301 {
     0% {
-        background-position: 0% 50%;
+        background-position: 0 50%;
     }
 
     50% {
@@ -330,7 +260,7 @@ strong {
     }
 
     100% {
-        background-position: 0% 50%;
+        background-position: 0 50%;
     }
 }
 
@@ -342,7 +272,7 @@ strong {
 
     70% {
         transform: scale(1);
-        box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
+        box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
     }
 
     100% {
@@ -355,28 +285,10 @@ strong {
     position: relative;
     width: 190px;
     height: 160px;
-    background: rgba(97, 0, 255, 0.7);
-    background: linear-gradient(137deg, rgba(97, 0, 255, 0.7) 0%, #291544 100%);
-    transition: 0.3s ease;
     border-radius: 30px;
-    filter: drop-shadow(0px 0px 30px rgba(132, 38, 209, 0.5));
-}
-
-.card::after {
-    content: '';
-    background-color: #181818;
-    position: absolute;
-    z-index: 1;
-    transition: 0.3s ease;
-    height: 98%;
-    width: 98%;
-    top: 1%;
-    left: 1%;
-    border-radius: 28px;
-}
-
-.card:hover {
-    filter: drop-shadow(0px 0px 30px rgb(141, 22, 164));
+    background-color: #ffffff;
+    animation: gradient 5s ease infinite;
+    filter: drop-shadow(0px 0px 20px rgba(223, 185, 255, 0.68));
 }
 
 .block1 {
@@ -387,10 +299,8 @@ strong {
     margin-left: 10px;
     width: 370px;
     height: 370px;
-    background: rgba(97, 0, 255, 0.7);
-    background: linear-gradient(137deg, rgba(97, 0, 255, 0.7) 0%, #291544 100%);
-    transition: 0.3s ease;
-    border: 2px solid transparent;
+    background-color: #ffffff;
+    border: 1px solid transparent;
     padding: 32px 24px;
     font-size: 11px;
     color: #7a9a8a;
@@ -400,43 +310,9 @@ strong {
     box-sizing: border-box;
     border-radius: 30px;
     animation: gradient 5s ease infinite;
-    filter: drop-shadow(0px 0px 30px rgba(132, 38, 209, 0.5));
+    filter: drop-shadow(0px 0px 20px rgba(223, 185, 255, 0.68));
 }
 
-.form-container::after {
-    content: '';
-    background-color: #2a2a2a;
-    position: absolute;
-    z-index: 1;
-    transition: 0.3s ease;
-    height: 99%;
-    width: 99%;
-    top: 1%;
-    left: 1%;
-    border-radius: 28px;
-}
-
-.form-container:hover {
-    filter: drop-shadow(0px 0px 30px rgb(141, 22, 164));
-}
-
-@keyframes gradient {
-    0% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
-
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
-.form-container button:active {
-    scale: 0.95;
-}
 
 .form-container .form {
     position: relative;
@@ -455,7 +331,6 @@ strong {
 .form-container .form-group label {
     display: block;
     margin-bottom: 5px;
-    color: #717171;
     font-weight: 600;
     font-size: 12px;
 }
@@ -464,10 +339,9 @@ strong {
     width: 100%;
     padding: 12px 16px;
     border-radius: 8px;
-    color: #7a9a8a;
     font-family: inherit;
     background-color: transparent;
-    border: 1px solid #414141;
+    border: 1px solid #7c7c7c;
 }
 
 .form-container .form-group textarea {
@@ -475,47 +349,18 @@ strong {
     padding: 12px 16px;
     border-radius: 8px;
     resize: none;
-    color: #7a9a8a;
     height: 96px;
-    border: 1px solid #414141;
+    border: 1px solid #7c7c7c;
     background-color: transparent;
     font-family: inherit;
 }
 
-.form-container .form-group input::placeholder {
-    opacity: 0.5;
-}
-
 .form-container .form-group input:focus {
     outline: none;
-    border-color: rgba(132, 38, 209, 0.5);
+    border-color: rgba(135, 29, 255, 0.72);
 }
 
 .form-container .form-group textarea:focus {
     outline: none;
-    border-color: rgba(132, 38, 209, 0.5);
-}
-
-.form-container .form-submit-btn {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    align-self: flex-start;
-    font-family: inherit;
-    color: #717171;
-    font-weight: 600;
-    width: 40%;
-    background: #313131;
-    border: 1px solid #414141;
-    padding: 12px 16px;
-    font-size: inherit;
-    gap: 8px;
-    margin-top: 8px;
-    cursor: pointer;
-    border-radius: 6px;
-}
-
-.form-container .form-submit-btn:hover {
-    background-color: #7a9a8a;
-    border-color: #7a9a8a;
+    border-color: rgba(135, 29, 255, 0.72);
 }
