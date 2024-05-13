@@ -2,7 +2,7 @@
 
 
 {% block club_name %}
-<a href="/pages/club_user/{{user_info.id}}">
+<a href="/pages/club_user/{{user_info.id}}" style="text-decoration: none; color: #000000">
     <div class="logo-container">
         <span class="site-name">{{ club_info.name }}</span>
     </div>
@@ -16,19 +16,14 @@
 
 
 {% block user_status %}
-<a href="/pages/profile_user/{{user_info.id}}">
-    <button class="card" style="height: 60px; width: 160px; justify-content: center; vertical-align: center">
-        <h1 id="Name" style="bottom: 5px;font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
+<a href="/pages/profile_user/{{user_info.id}}" style="text-decoration: none">
+    <button class="Btn" style="height: 60px; width: 160px; justify-content: center">
+        <h1 style="bottom: 7px;font-size: 14px; position: relative; z-index: 2">
             {{ user_info.surname }}</h1>
-        <h1 id="Status" style="bottom: 5px; font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
+        <h1 style="bottom: 7px; font-size: 10px; position: relative; z-index: 2">
             {{ user_x_club_info.role }}</h1>
     </button>
 </a>
-{% endblock %}
-
-
-{% block status %}
-{{ user_x_club_info.role }}
 {% endblock %}
 
 
@@ -47,7 +42,7 @@
 <!--события-->
 <div class="form-container" style="margin-top: 30px">
     <form class="form" id="form">
-        <h1 style="font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">Событие</h1>
+        <h1 style="font-size: 15px;position: relative; z-index: 2">Событие</h1>
         <div style="display: flex">
             <div class="form-group" style="width: 60%">
                 <label for="Date of Birth">Дата</label>

@@ -35,7 +35,8 @@ async def get_profile_user(
         session: AsyncSession = Depends(get_async_session)
 ):
     user_data = dict(user_info['data'])
-    user_data['achievment'] = await get_achievement_by_user(user_data['id'], session)
+    achievements = await get_achievement_by_user(user_data['id'], session)
+    user_data['achievement'] = achievements['data']
     return templates.TemplateResponse("profile_user.html", {"request": request, "user_info": user_data})
 
 

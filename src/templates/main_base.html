@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/main_base_style.css">
+    <link rel="stylesheet" href="/css_js/main_base_style.css">
     <title></title>
 </head>
 <body>
@@ -26,31 +26,25 @@
     </nav>
 
 
-    <div style="margin-top: 10px">
-    </div>
-
-
-    <div style="display: flex; margin-top: 5px">
-
-
+    <div style="display: flex; justify-content: center">
         <!-- Имя, статус + переход в профиль-->
-        <div class="block1" style="margin-top: 20px">
+        <div class="block1" style="margin-top: 20px; margin-left: 15px">
              {% block user_status %}{% endblock %}
         </div>
 
 
         <!-- Кнопка "Сменить клуб"-->
         <div class="block1" style="margin-top: 20px;">
-            <button class="card"
+            <button class="Btn"
                     style="left: 30px;height: 60px; width: 160px; justify-content: center; vertical-align: center">
-                <h1 style="bottom: 5px;font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
+                <h1 style="bottom: 5px;font-size: 14px; position: relative; z-index: 2">
                     Сменить клуб {% block clubs %}{% endblock %}</h1>
             </button>
         </div>
     </div>
 
 
-    <div style="margin-top: 50px">
+    <div style="margin-top: 40px">
     </div>
 
 
@@ -60,10 +54,10 @@
 
 
         <!-- блок 1: магазин, картинка магаза, навожусь, там ссылка, надпись "магазин" (пока нерабочая)-->
-        <div class="block2" style="margin-top: 20px">
-            <button class="card"
+        <div class="block2" style="margin-top: 20px; margin-left: 5px">
+            <button class="Btn"
                     style="z-index: 2;height: 80px; width: 115px; justify-content: center; vertical-align: center">
-                <h1 style="bottom: 5px;font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
+                <h1 style="bottom: 5px;font-size: 15px; position: relative; z-index: 2">
                     Магазин</h1>
             </button>
         </div>
@@ -71,11 +65,11 @@
 
         <!-- блок 2: деньги, картинка денег, навожусь, вижу, сколько у меня валюты-->
         <div class="block3" style="margin-top: 20px">
-            <button class="card"
+            <button class="Btn"
                     style="z-index: 2;height: 80px; width: 115px; justify-content: center; vertical-align: center">
-                <h1 style="bottom: 5px;font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
+                <h1 style="bottom: 5px;font-size: 15px; position: relative; z-index: 2">
                     Баланс</h1>
-                <h1 style="bottom: 5px;font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
+                <h1 style="bottom: 5px;font-size: 15px; position: relative; z-index: 2">
                     {% block money %}{% endblock %}</h1>
             </button>
         </div>
@@ -83,23 +77,23 @@
 
         <!-- блок 3: ссылка в канал/чат клуба-->
         <div class="block4" style="margin-top: 20px">
-            <button class="card"
+            <button class="Btn"
                     style="z-index: 2;height: 80px; width: 115px; justify-content: center; vertical-align: center">
-                <h1 style="bottom: 5px;font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
+                <h1 style="bottom: 5px;font-size: 15px; position: relative; z-index: 2">
                     В канал</h1>
             </button>
         </div>
     </div>
 
 
-    <div style="margin-top: 80px">
+    <div style="margin-top: 40px">
     </div>
 
 
     <!-- События-->
     <div class="card"
          style="left: 50px;height: 50px; width: 290px; justify-content: center;display: flex">
-        <h1 style="font-size: 20px; color: #7a9a8a;position: relative; z-index: 2">СОБЫТИЯ</h1>
+        <h1 style="font-size: 19px; position: relative; z-index: 2">СОБЫТИЯ</h1>
     </div>
 
 
@@ -109,6 +103,6 @@
 
 </div>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="/static/main_base_script.js"></script>
+<script src="/css_js/main_base_script.js"></script>
 </body>
 </html>
