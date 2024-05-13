@@ -1,3 +1,5 @@
+
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select, insert, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -80,7 +82,7 @@ async def get_reward(
         }
     except ValueError as e:
         if str(e) == '404a':
-            raise HTTPException(status_code=404, detail=error404a)
+            raise HTTPException(status_code=404, detail=error404r)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
 
@@ -96,6 +98,8 @@ async def update_reward(
             raise ValueError('404u')
         if await get_club_by_id(new_data.club_id, session) == "Club not found":
             raise ValueError('404c')
+        if await get_reward_by_id(reward_id, session) == "Reward not found":
+            raise ValueError('404r')
         role = await get_role(new_data.admin_id, new_data.club_id, session)
         if role == "User not in the club":
             raise ValueError('404uc')
@@ -121,6 +125,8 @@ async def update_reward(
             raise HTTPException(status_code=404, detail=error404uc)
         if str(e) == '404p':
             raise HTTPException(status_code=404, detail=error404p)
+        if str(e) == '404r':
+            raise HTTPException(status_code=404, detail=error404r)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
     finally:
@@ -134,48 +140,47 @@ async def add_to_user(
 ):
     try:
         if await get_user_by_id(new_data.admin_id, session) == "User not found":
-            raise ValueError('404ad')
+            raise ValueError('404u')
         if await get_user_by_id(new_data.user_id, session) == "User not found":
             raise ValueError('404u')
-        query = select(club_x_reward).where(club_x_reward.c.id == new_data.club_x_reward_id)
-        result = await session.execute(query)
-        data = result.mappings().first()
-        if not data:
-            raise ValueError('404ac')
-        role = await get_role(new_data.admin_id, data['club_id'], session)
-        if role == "owner" or role == "admin":
+        if await get_reward_by_id(new_data.reward_id, session) == "Reward not found":
+            raise ValueError('404r')
+        if await check_reward_user(new_data.reward_id, new_data.user_id, session) == "User already has this reward":
+            raise ValueError('404re')
+        stmt = select(club_x_reward).where(club_x_reward.c.reward_id == new_data.reward_id)
+        club_id = await session.execute(stmt)
+        club_id = club_id.mappings().first()['club_id']
+        role = await get_role(new_data.admin_id, club_id, session)
+        if role == "User not in the club":
+            raise ValueError('404uc')
+        if role == "admin" or role == "owner":
             query = insert(user_x_reward).values(user_id=new_data.user_id,
-                                                 reward_id=data['reward_id'],
+                                                 reward_id=new_data.reward_id,
                                                  context=None)
             await session.execute(query)
             await session.commit()
-            return_data = {
-                "admin_id": new_data.admin_id,
-                "user_id": new_data.user_id,
-                "reward_id": data['reward_id'],
-                "club_id": data['club_id'],
 
-            }
             return {
                 "status": "success",
-                "data": return_data,
+                "data": new_data.dict(),
                 "details": None
             }
         else:
             raise ValueError('404p')
     except ValueError as e:
-        if str(e) == '404ad':
-            raise HTTPException(status_code=404, detail=error404ad)
         if str(e) == '404u':
             raise HTTPException(status_code=404, detail=error404u)
-        if str(e) == '404ac':
-            raise HTTPException(status_code=404, detail=error404ac)
+        if str(e) == '404a':
+            raise HTTPException(status_code=404, detail=error404r)
+        if str(e) == '404r':
+            raise HTTPException(status_code=404, detail=error404r)
+        if str(e) == '404uc':
+            raise HTTPException(status_code=404, detail=error404uc)
         if str(e) == '404p':
             raise HTTPException(status_code=404, detail=error404p)
-    except Exception:
-        raise HTTPException(status_code=500, detail=error)
-    finally:
-        await session.rollback()
+        if str(e) == '404re':
+            raise HTTPException(status_code=404, detail=error404re)
+
 
 
 @router.get("/get_users_by_reward")
@@ -194,7 +199,7 @@ async def get_by_reward(
         }
     except ValueError as e:
         if str(e) == '404a':
-            raise HTTPException(status_code=404, detail=error404a)
+            raise HTTPException(status_code=404, detail=error404r)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
 

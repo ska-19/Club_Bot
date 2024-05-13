@@ -20,4 +20,4 @@ class UpdateRewardClub(BaseModel):
 class AddRewardUser(BaseModel):
     admin_id: int
     user_id: int
-    club_x_reward_id: int
+    reward_id: int

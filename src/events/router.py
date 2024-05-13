@@ -204,7 +204,6 @@ async def event_disreg(
             raise ValueError('404u')
         if await get_event_by_id(event_id, session) == "Event not found":
             raise ValueError('404e')
-        print('here')
         if not await check_rec_event(user_id, event_id, session):
             raise ValueError('404eu')
 
@@ -238,7 +237,10 @@ async def event_disreg(
         await session.rollback()
 
 
-@router.post("/delete_event")
+
+from sqlalchemy.dialects import postgresql
+
+@router.post("/delete_event") #TODO: пофиксить удаление
 async def delete_event(
         event_id: int,
         session: AsyncSession = Depends(get_async_session)
@@ -247,11 +249,11 @@ async def delete_event(
         data = await get_event_by_id(event_id, session)
         if data == "Event not found":
             raise ValueError('404e')
-
         query = delete(event).where(event.c.id == event_id)
+        print(query.compile(dialect=postgresql.dialect()))
         await session.execute(query)
+        print('a')
         await session.commit()
-
         return {
             "status": "success",
             "data": data,
