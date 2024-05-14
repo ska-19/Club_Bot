@@ -1,4 +1,4 @@
-let tg = window.Telegram.WebApp;
+/*let tg = window.Telegram.WebApp;
 
 tg.expand();
 
@@ -13,17 +13,6 @@ const userData = {
     last_name: tg.initDataUnsafe.user.last_name,
     info: ''
 };
-
-function saveUserInfo() {
-    userData.info = document.getElementById('InputUserInfo').value();
-    if (tg.MainButton.isVisible) {
-        tg.MainButton.hide();
-    } else {
-        tg.MainButton.setText("Ваши изменения сохранены");
-        item = "3";
-        tg.MainButton.show();
-    }
-}
 
 const dataToSend = {
     user_id: userData.user_id,
@@ -51,12 +40,11 @@ window.addEventListener('beforeunload', function (event) {
 let usercard = document.getElementById("usercard");
 let p = document.createElement("p");
 document.getElementById("name").value = userData.last_name + " " + userData.first_name;
-usercard.appendChild(p);
+usercard.appendChild(p);*/
 
 ///////////////////////////////////////
 //Далее функции для фронтенда, без использования тг
 ///////////////////////////////////////
-
 
 //Изменение аватарки
 function uploadAvatar() {
@@ -93,13 +81,15 @@ function uploadAvatar() {
     });
 }
 
+//кнопка "Изменить"
 function editForm() {
+    console.log("Success");
     var inputs = document.querySelectorAll("input, textarea");
     inputs.forEach(function (input) {
         input.readOnly = false;
     });
 
-    var editBtn = document.querySelector(".editBtn");
+    var editBtn = document.querySelector(".Btn");
     editBtn.style.display = "none";
 
     var saveBtn = document.querySelector(".saveBtn");
@@ -112,4 +102,38 @@ function editForm() {
         editBtn.style.display = "inline-block";
         saveBtn.style.display = "none";
     };
+}
+
+//Кнопка "Сохранить"
+function saveUserInfo() {
+    const currentUrl = window.location.href;
+    const urlParts = currentUrl.split('/');
+    const userId = urlParts[urlParts.length - 1];
+    const userData = {
+        user_id: userId,
+        dob: document.getElementById('DateOfBirth').value,
+        city: document.getElementById('City').value,
+        education: document.getElementById('Education').value,
+        bio: document.getElementById('textarea').value
+    };
+
+    fetch(`/pages/profile_user/${userData.user_id}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Success:', data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
 }

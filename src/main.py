@@ -20,7 +20,7 @@ app = FastAPI(
 )
 
 app.mount("/images", StaticFiles(directory="src/static/images"), name="images")
-app.mount("/static", StaticFiles(directory="src/static"), name="static")
+app.mount("/css_js", StaticFiles(directory="src/static/css_js"), name="css_js")
 
 # app.include_router(
 #     fastapi_users.get_auth_router(auth_backend),
