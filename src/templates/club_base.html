@@ -10,17 +10,16 @@
 
 <div class="container">
 
+
+    <!-- кнопка клуба + кубки клуба + кликабельно-->
     <nav>
-        <!-- кнопка клуба + кубки клуба + кликабельно-->
         <div class="logo-container">
             <span class="site-name">{% block club_name %}{% endblock %}</span>
         </div>
-
         <div class="image-container" style="display: flex; align-items: center">
-            <span style="display: inline-block; text-align: center; width: calc(100% - 30px); flex-grow: 1;">
-                        {% block exp_club %}{% endblock %}
+            <span style="display: inline-block; text-align: center; flex-grow: 1">{% block exp_club %}{% endblock %}
             </span>
-            <img style="display: inline-block; vertical-align: middle; float: right;" src="/images/exp.png"
+            <img style="display: inline-block; vertical-align: middle; float: right" src="/images/exp.png"
                  alt="Иконка">
         </div>
     </nav>
@@ -38,7 +37,7 @@
             <div class="card" style="height: 260px; width: 260px; justify-content: center; vertical-align: center">
                 <div class="card-content" style="text-align: center; padding-top: 80px">
                     <h1 id="achivements" style=" font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
-                         {% block bio_club %}{% endblock %}
+                        {% block bio_club %}{% endblock %}
                     </h1>
                 </div>
             </div>
@@ -63,7 +62,6 @@
 
     <!-- Кнопка "На главную" -->
     {% block href_main %}{% endblock %}
-
 
 
     <div style="margin-top: 40px">

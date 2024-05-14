@@ -11,16 +11,13 @@
 <div class="container">
 
 
+    <!-- кнопка клуба + кубки клуба + кликабельно-->
     <nav>
-        <!-- кнопка клуба + кубки клуба + кликабельно-->
         {% block club_name %}{% endblock %}
-
-
         <div class="image-container" style="display: flex; align-items: center">
-            <span style="display: inline-block; text-align: center; width: calc(100% - 30px); flex-grow: 1;">
-                        {% block exp_club %}{% endblock %}
+            <span style="display: inline-block; text-align: center; flex-grow: 1">{% block exp_club %}{% endblock %}
             </span>
-            <img style="display: inline-block; vertical-align: middle; float: right;" src="/images/exp.png"
+            <img style="display: inline-block; vertical-align: middle; float: right" src="/images/exp.png"
                  alt="Иконка">
         </div>
     </nav>
