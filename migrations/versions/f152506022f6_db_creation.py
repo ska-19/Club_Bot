@@ -1,6 +1,6 @@
 """db creation
 
-Revision ID: fa1f58459641
+Revision ID: f152506022f6
 Revises: 
 Create Date: 2024-04-27 20:37:38.693611
 
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'fa1f58459641'
+revision: str = 'f152506022f6'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
