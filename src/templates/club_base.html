@@ -3,23 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="/css_js/club_base_style.css">
+    <link rel="stylesheet" type="text/css" href="/static/club_base_style.css">
     <title></title>
 </head>
 <body>
 
 <div class="container">
 
-
-    <!-- кнопка клуба + кубки клуба + кликабельно-->
     <nav>
+        <!-- кнопка клуба + кубки клуба + кликабельно-->
         <div class="logo-container">
-            <span class="site-name">{% block club_name %}{% endblock %}</span>
+            <span class="site-name">{% block club_name %}{% endblock %}Клуб</span>
         </div>
+
         <div class="image-container" style="display: flex; align-items: center">
-            <span style="display: inline-block; text-align: center; flex-grow: 1">{% block exp_club %}{% endblock %}
+            <span style="display: inline-block; text-align: center; width: calc(100% - 30px); flex-grow: 1;">
+                        {% block exp_club %}{% endblock %}1234
             </span>
-            <img style="display: inline-block; vertical-align: middle; float: right" src="/images/exp.png"
+            <img style="display: inline-block; vertical-align: middle; float: right;" src="/images/exp.png"
                  alt="Иконка">
         </div>
     </nav>
@@ -37,7 +38,7 @@
             <div class="card" style="height: 260px; width: 260px; justify-content: center; vertical-align: center">
                 <div class="card-content" style="text-align: center; padding-top: 80px">
                     <h1 id="achivements" style=" font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
-                        {% block bio_club %}{% endblock %}
+                        Инфо о клубе
                     </h1>
                 </div>
             </div>
@@ -64,6 +65,7 @@
     {% block href_main %}{% endblock %}
 
 
+
     <div style="margin-top: 40px">
     </div>
 
@@ -74,9 +76,35 @@
         <h1 style="font-size: 20px; color: #7a9a8a;position: relative; z-index: 2">Участники</h1>
     </div>
 
-    {% block club_users %}{% endblock %}
+
+    <!-- Участник 1-->
+    <div class="card"
+         style="margin-top: 5px;left: 20px;height: 30px; width: 350px; justify-content: center;display: flex">
+        <h1 style="font-size: 14px; color: #7a9a8a;position: relative; z-index: 2">Участник1</h1>
+    </div>
+    <!-- Участник 2-->
+    <div class="card"
+         style="margin-top: 5px;left: 20px;height: 30px; width: 350px; justify-content: center;display: flex">
+        <h1 style="font-size: 14px; color: #7a9a8a;position: relative; z-index: 2">Участник2</h1>
+    </div>
+    <!-- Участник 3-->
+    <div class="card"
+         style="margin-top: 5px;left: 20px;height: 30px; width: 350px; justify-content: center;display: flex">
+        <h1 style="font-size: 14px; color: #7a9a8a;position: relative; z-index: 2">Участник3</h1>
+    </div>
+    <!-- Участник 4-->
+    <div class="card"
+         style="margin-top: 5px;left: 20px;height: 30px; width: 350px; justify-content: center;display: flex">
+        <h1 style="font-size: 14px; color: #7a9a8a;position: relative; z-index: 2">Участник4</h1>
+    </div>
+    <!-- Участник 5-->
+    <div class="card"
+         style="margin-top: 5px;left: 20px;height: 30px; width: 350px; justify-content: center;display: flex">
+        <h1 style="font-size: 14px; color: #7a9a8a;position: relative; z-index: 2">Участник5</h1>
+    </div>
+
 </div>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="/css_js/club_base_script.js"></script>
+<script src="/static/club_base_script.js"></script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css_js/profile_base_style.css">
+    <link rel="stylesheet" href="/static/profile_base_style.css">
     <title></title>
 </head>
 <body>
@@ -12,8 +12,9 @@
 
 
     <!--Уровень User-->
-    <nav style="padding: 10px">
-        <div style="margin-block: 10px; display: inline-block" class="experience-bar">
+    <nav>
+        <div style="display: inline-block" class="star-icon"></div>
+        <div style="margin-block: 10px;display: inline-block" class="experience-bar">
             <div class="experience-fill">
                 {% block level %}{% endblock %}
             </div>
@@ -28,12 +29,12 @@
                 <label for="avatar-input">
                     <div id="avatar-circle">
                         <span id="choose-text">Вставьте фото</span>
-                        <img id="avatar-image" src="/images/placeholder.jpg" alt="Вставьте фото">
+                        <img id="avatar-image" src="placeholder.jpg" alt="Вставьте фото">
                     </div>
                 </label>
                 <input type="file" id="avatar-input" accept="image/*"/>
             </div>
-            <center>{% block name %}{% endblock %}</center>
+            {% block name %}{% endblock %}
         </div>
 
         <!--Достижения-->
@@ -48,7 +49,7 @@
 
 
     <!--Инфа о user в виде формочки-->
-    <div class="form-container" style="margin-top: 35px">
+    <div class="form-container" style="margin-top: 30px">
         <form class="form" id="form">
             <div style="display: flex">
                 {% block dob %}{% endblock %}
@@ -57,7 +58,7 @@
             {% block Education %}{% endblock %}
             {% block UserInfo %}{% endblock %}
             <button type="button" class="editBtn" onclick="editForm()">Изменить</button>
-            <button type="button" class="saveBtn" style="display: none" onclick="saveUserInfo()">Сохранить</button>
+            <button type="button" class="saveBtn" style="display: none">Сохранить</button>
         </form>
     </div>
 
@@ -68,6 +69,6 @@
 
 </div>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="/css_js/profile_base_script.js"></script>
+<script src="/static/profile_base_script.js"></script>
 </body>
 </html>

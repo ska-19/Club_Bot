@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css_js/main_base_style.css">
+    <link rel="stylesheet" href="/static/main_base_style.css">
     <title></title>
 </head>
 <body>
@@ -11,37 +11,46 @@
 <div class="container">
 
 
-    <!-- кнопка клуба + кубки клуба + кликабельно-->
     <nav>
+        <!-- кнопка клуба + кубки клуба + кликабельно-->
         {% block club_name %}{% endblock %}
+
+
         <div class="image-container" style="display: flex; align-items: center">
-            <span style="display: inline-block; text-align: center; flex-grow: 1">{% block exp_club %}{% endblock %}
+            <span style="display: inline-block; text-align: center; width: calc(100% - 30px); flex-grow: 1;">
+                        {% block exp_club %}{% endblock %}
             </span>
-            <img style="display: inline-block; vertical-align: middle; float: right" src="/images/exp.png"
+            <img style="display: inline-block; vertical-align: middle; float: right;" src="/images/exp.png"
                  alt="Иконка">
         </div>
     </nav>
 
 
-    <div style="display: flex; justify-content: center">
+    <div style="margin-top: 10px">
+    </div>
+
+
+    <div style="display: flex; margin-top: 5px">
+
+
         <!-- Имя, статус + переход в профиль-->
-        <div class="block1" style="margin-top: 20px; margin-left: 15px">
+        <div class="block1" style="margin-top: 20px">
              {% block user_status %}{% endblock %}
         </div>
 
 
         <!-- Кнопка "Сменить клуб"-->
         <div class="block1" style="margin-top: 20px;">
-            <button class="Btn"
+            <button class="card"
                     style="left: 30px;height: 60px; width: 160px; justify-content: center; vertical-align: center">
-                <h1 style="bottom: 5px;font-size: 14px; position: relative; z-index: 2">
+                <h1 style="bottom: 5px;font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
                     Сменить клуб {% block clubs %}{% endblock %}</h1>
             </button>
         </div>
     </div>
 
 
-    <div style="margin-top: 40px">
+    <div style="margin-top: 50px">
     </div>
 
 
@@ -51,10 +60,10 @@
 
 
         <!-- блок 1: магазин, картинка магаза, навожусь, там ссылка, надпись "магазин" (пока нерабочая)-->
-        <div class="block2" style="margin-top: 20px; margin-left: 5px">
-            <button class="Btn"
+        <div class="block2" style="margin-top: 20px">
+            <button class="card"
                     style="z-index: 2;height: 80px; width: 115px; justify-content: center; vertical-align: center">
-                <h1 style="bottom: 5px;font-size: 15px; position: relative; z-index: 2">
+                <h1 style="bottom: 5px;font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
                     Магазин</h1>
             </button>
         </div>
@@ -62,11 +71,11 @@
 
         <!-- блок 2: деньги, картинка денег, навожусь, вижу, сколько у меня валюты-->
         <div class="block3" style="margin-top: 20px">
-            <button class="Btn"
+            <button class="card"
                     style="z-index: 2;height: 80px; width: 115px; justify-content: center; vertical-align: center">
-                <h1 style="bottom: 5px;font-size: 15px; position: relative; z-index: 2">
+                <h1 style="bottom: 5px;font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
                     Баланс</h1>
-                <h1 style="bottom: 5px;font-size: 15px; position: relative; z-index: 2">
+                <h1 style="bottom: 5px;font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
                     {% block money %}{% endblock %}</h1>
             </button>
         </div>
@@ -74,23 +83,23 @@
 
         <!-- блок 3: ссылка в канал/чат клуба-->
         <div class="block4" style="margin-top: 20px">
-            <button class="Btn"
+            <button class="card"
                     style="z-index: 2;height: 80px; width: 115px; justify-content: center; vertical-align: center">
-                <h1 style="bottom: 5px;font-size: 15px; position: relative; z-index: 2">
+                <h1 style="bottom: 5px;font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
                     В канал</h1>
             </button>
         </div>
     </div>
 
 
-    <div style="margin-top: 40px">
+    <div style="margin-top: 80px">
     </div>
 
 
     <!-- События-->
     <div class="card"
          style="left: 50px;height: 50px; width: 290px; justify-content: center;display: flex">
-        <h1 style="font-size: 19px; position: relative; z-index: 2">СОБЫТИЯ</h1>
+        <h1 style="font-size: 20px; color: #7a9a8a;position: relative; z-index: 2">СОБЫТИЯ</h1>
     </div>
 
 
@@ -100,6 +109,6 @@
 
 </div>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="/css_js/main_base_script.js"></script>
+<script src="/static/main_base_script.js"></script>
 </body>
 </html>
