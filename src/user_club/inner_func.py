@@ -42,8 +42,7 @@ async def get_rec_id(
 async def check_rec(
         user_id: int,
         club_id: int,
-        session: AsyncSession = Depends(get_async_session)
-):
+        session: AsyncSession = Depends(get_async_session)):
     """ Проверяет существование записи в таблице club_x_user, внутренняя функция
 
         :param user_id:

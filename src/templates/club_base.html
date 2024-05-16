@@ -3,52 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="/static/profile_base_style.css">
+    <link rel="stylesheet" type="text/css" href="/css_js/club_base_style.css">
     <title></title>
 </head>
 <body>
 
 <div class="container">
 
-    <!--Уровень User-->
+
+    <!-- кнопка клуба + кубки клуба + кликабельно-->
     <nav>
-        <div style="display: inline-block" class="star-icon"></div>
-        <div style="margin-block: 10px;display: inline-block" class="experience-bar">
-            <div class="experience-fill">
-                {% block level %}{% endblock %}
-            </div>
+        <div class="logo-container">
+            <span class="site-name">{% block club_name %}{% endblock %}</span>
+        </div>
+        <div class="image-container" style="display: flex; align-items: center">
+            <span style="display: inline-block; text-align: center; flex-grow: 1">{% block exp_club %}{% endblock %}
+            </span>
+            <img style="display: inline-block; vertical-align: middle; float: right" src="/images/exp.png"
+                 alt="Иконка">
         </div>
     </nav>
 
 
-    <div style="display: flex; margin-top: 5px">
-        <!--Аватарка-->
-        <div class="block1" style="margin-top: 20px;">
-            <div id="avatar-container" onclick="uploadAvatar()">
-                <label for="avatar-input">
-                    <div id="avatar-circle">
-                        <span id="choose-text">Вставьте фото</span>
-                        <img id="avatar-image" src="placeholder.jpg" alt="Вставьте фото">
-                    </div>
-                </label>
-                <input type="file" id="avatar-input" accept="image/*"/>
-            </div>
-            {% block name %}{% endblock %}
-        </div>
+    <div style="margin-top: 20px">
+    </div>
 
-        <!--Достижения-->
-        <div class="block2">
-            <div class="card">
-                <div class="card-content" style="margin-left: 20px;padding-top: 50px">
-                    {% block achivements %}{% endblock %}
+
+    <div style="display: flex; margin-top: 5px">
+
+
+        <!-- Описание клуба-->
+        <div class="block1" style="margin-top: 20px">
+            <div class="card" style="height: 260px; width: 260px; justify-content: center; vertical-align: center">
+                <div class="card-content" style="text-align: center; padding-top: 80px">
+                    <h1 id="achivements" style=" font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
+                        {% block bio_club %}{% endblock %}
+                    </h1>
                 </div>
             </div>
+        </div>
+
+
+        <!-- Поле с кнопками "Пригласить друга" и другие-->
+        <div class="block2" style="margin-top: 20px">
+            <button class="card"
+                    style="top: 30px;height: 60px; width: 100px; justify-content: center; vertical-align: center">
+                <h1 style="bottom: 5px;font-size: 12px; color: #7a9a8a;position: relative; z-index: 2">
+                    Пригласить друга</h1>
+            </button>
+            <button class="card"
+                    style="top: 80px;height: 60px; width: 100px; justify-content: center; vertical-align: center">
+                <h1 style="bottom: 5px;font-size: 12px; color: #7a9a8a;position: relative; z-index: 2">
+                    Предложить новость</h1>
+            </button>
         </div>
     </div>
 
 
+    <!-- Кнопка "На главную" -->
+    {% block href_main %}{% endblock %}
+
+
+    <div style="margin-top: 40px">
+    </div>
+
+
+    <!-- Участники-->
+    <div class="card"
+         style="left: 20px;height: 50px; width: 350px; justify-content: center;display: flex">
+        <h1 style="font-size: 20px; color: #7a9a8a;position: relative; z-index: 2">Участники</h1>
+    </div>
+
+    {% block club_users %}{% endblock %}
 </div>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="/static/profile_base_script.js"></script>
+<script src="/css_js/club_base_script.js"></script>
 </body>
 </html>

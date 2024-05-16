@@ -35,9 +35,9 @@ error404uc = {
     "details": None
 }
 
-error404p = {
+error403 = {
     "status": "error",
-    "data": "User has no permission to create/update event",
+    "data": "Forbidden",
     "details": None
 }
 

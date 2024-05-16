@@ -26,4 +26,3 @@ class EventReg(BaseModel):
     event_id: int
     confirm: bool
     reg_date: date
-
