@@ -2,8 +2,10 @@
 
 
 {% block level %}
-<div class="experience-level">
-    Level {{ user_info.xp }}
+<div class="experience-fill" style="width: {{ user_info.xp_percent }}%">
+    <div class="experience-level">
+        Level {{ user_info.full_xp }}
+    </div>
 </div>
 {% endblock %}
 

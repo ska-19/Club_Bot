@@ -1,3 +1,4 @@
+import math
 from fastapi import APIRouter, Request, Depends, Form
 from fastapi.templating import Jinja2Templates
 
@@ -36,6 +37,11 @@ async def get_profile_user(
 ):
     user_data = dict(user_info['data'])
     achievements = await get_achievement_by_user(user_data['id'], session)
+    calc_exp = lambda x: (math.floor((-5 + math.sqrt(25 + 20 * x)) / 10), math.floor(
+        10 * (x - 5 * (math.floor((-5 + math.sqrt(25 + 20 * x)) / 10)) * ((math.floor((-5 + math.sqrt(25 + 20 * x)) / 10)) + 1)) / (
+                    (math.floor((-5 + math.sqrt(25 + 20 * x)) / 10)) + 1)))
+    user_data['full_xp'] = calc_exp(user_data['xp'])[0]
+    user_data['xp_percent'] = calc_exp(user_data['xp'])[1]
     user_data['achievement'] = achievements['data']
     return templates.TemplateResponse("profile_user.html", {"request": request, "user_info": user_data})
 

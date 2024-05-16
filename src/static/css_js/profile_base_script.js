@@ -89,7 +89,7 @@ function editForm() {
         input.readOnly = false;
     });
 
-    var editBtn = document.querySelector(".Btn");
+    var editBtn = document.querySelector(".editBtn");
     editBtn.style.display = "none";
 
     var saveBtn = document.querySelector(".saveBtn");
