@@ -14,6 +14,7 @@ router = APIRouter(
     tags=["events"]
 )
 
+
 @router.post("/create_event")
 async def create_event(
         new_event: EventCreate,
@@ -42,6 +43,7 @@ async def create_event(
             raise ValueError('404uc')
         if role == "admin" or role == "owner":
             event_dict = new_event.model_dump()
+            event_dict['date'] = datetime.utcnow()
             query = insert(event).values(**event_dict)
             await session.execute(query)
             await session.commit()
@@ -66,6 +68,12 @@ async def create_event(
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()
+
+
+# принимает event_id
+# 200 + джейсон со всеми данными, если все хорошо
+# 404 если события с таким id нет
+# 500 если внутрення ошибка сервера
 
 
 @router.get("/get_event")
@@ -129,6 +137,7 @@ async def update_event(
             raise ValueError('403')
 
         event_dict = update_data.model_dump()
+        event_dict['date'] = datetime.utcnow()
         query = update(event).where(event.c.id == event_id).values(**event_dict)
         await session.execute(query)
         await session.commit()
@@ -153,7 +162,10 @@ async def update_event(
         await session.rollback()
 
 
-@router.post("/event_reg")
+# принимает json вида EventReg
+# 200 - успешно создано, возвращает json со всеми данными
+# 500 - ошибка сервера
+@router.post("/event_reg")  # TODO: возможно стоит сделать отдельную папку userxevent
 async def reg_event(
         data: EventReg,
         session: AsyncSession = Depends(get_async_session)):
@@ -288,7 +300,10 @@ async def event_disreg(
         await session.rollback()
 
 
-@router.post("/delete_event")
+
+from sqlalchemy.dialects import postgresql
+
+@router.post("/delete_event") #TODO: пофиксить удаление
 async def delete_event(
         event_id: int,
         session: AsyncSession = Depends(get_async_session)):
@@ -305,11 +320,11 @@ async def delete_event(
         data = await get_event_by_id(event_id, session)
         if data == "Event not found":
             raise ValueError('404e')
-
         query = delete(event).where(event.c.id == event_id)
+        print(query.compile(dialect=postgresql.dialect()))
         await session.execute(query)
+        print('a')
         await session.commit()
-
         return {
             "status": "success",
             "data": data,

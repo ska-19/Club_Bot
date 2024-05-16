@@ -116,7 +116,7 @@ async def get_club(
         raise HTTPException(status_code=500, detail=error)
 
 
-@router.get("/get_channel_link")
+@router.get("/get_channel_link")  #TODO: а в чем разница с кодом выше???
 async def get_club(
         club_id: int,
         session: AsyncSession = Depends(get_async_session)):

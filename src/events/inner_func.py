@@ -56,7 +56,6 @@ async def get_event_by_id(
         query = select(event).where(event.c.id == event_id)
         result = await session.execute(query)
         data = result.mappings().first()
-
         if not data:
             data = "Event not found"
 

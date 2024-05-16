@@ -178,9 +178,8 @@ async def disjoin_club(
     """
     try:
         data_dict = data.dict()
-        if await get_user_by_id(data_dict['user_id'], session) == "User not found":
+        if await get_user_by_id(data_dict['user_id '], session) == "User not found": #TODO: вот здесь падает
             raise ValueError('404u')
-
         if await get_club_by_id(data_dict['club_id'], session) == "Club not found":
             raise ValueError('404c')
 
@@ -232,9 +231,8 @@ async def role_update(
 
         if await check_rec(new_role_dict['user_id'], new_role_dict['club_id'], session):
             raise ValueError('404uc')
-
         rec_id = await get_rec_id(new_role_dict['user_id'], new_role_dict['club_id'], session)
-        stmt = update(club_x_user).where(club_x_user.c.id == rec_id).values(role=new_role.new_role)
+        stmt = update(club_x_user).where(club_x_user.c.id == rec_id).values(role=new_role.role) #TODO: вот это не работает
         await session.execute(stmt)
         await session.commit()
 

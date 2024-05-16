@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from src.user_profile.router import router as router_user_profile
 
 from src.events.router import router as router_events
-from src.achievement.router import router as router_achievement
+from src.reward.router import router as router_reward
 from src.club.router import router as router_club
 from src.mentorship.router import router as router_mentorship
 from src.statistics.router import router as router_statistics
@@ -16,7 +16,7 @@ from src.pages.router import router as router_pages
 
 
 app = FastAPI(
-    title="Club bot"
+    title="Club Bot"
 )
 
 app.mount("/images", StaticFiles(directory="src/static/images"), name="images")
@@ -39,8 +39,7 @@ app.include_router(router_events)
 # app.include_router(router_randomcofee)
 # app.include_router(router_quetionnaire)
 app.include_router(router_mentorship)
-app.include_router(router_statistics)
-app.include_router(router_achievement)
+app.include_router(router_reward)
 app.include_router(router_club)
 app.include_router(router_user_club)
 app.include_router(router_pages)
