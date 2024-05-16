@@ -110,15 +110,16 @@ function saveUserInfo() {
     const urlParts = currentUrl.split('/');
     const userId = urlParts[urlParts.length - 1];
     const userData = {
-        user_id: userId,
         dob: document.getElementById('DateOfBirth').value,
         city: document.getElementById('City').value,
         education: document.getElementById('Education').value,
         bio: document.getElementById('textarea').value
     };
 
-    fetch(`/pages/profile_user/${userData.user_id}`, {
-        method: 'POST',
+    console.log("userData:", userData);
+
+    fetch(`/pages/profile_user/${userId}`, {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
@@ -132,8 +133,16 @@ function saveUserInfo() {
     })
     .then(data => {
         console.log('Success:', data);
+        window.location.reload();
     })
     .catch(error => {
         console.error('Error:', error);
     });
+}
+
+
+function editForm() {
+    document.querySelector('.editBtn').style.display = 'none';
+    document.querySelector('.saveBtn').style.display = 'inline';
+    document.querySelectorAll('input, textarea').forEach(input => input.removeAttribute('readonly'));
 }

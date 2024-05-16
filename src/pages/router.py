@@ -46,7 +46,7 @@ async def get_profile_user(
     return templates.TemplateResponse("profile_user.html", {"request": request, "user_info": user_data})
 
 
-@router.post("/profile_user/{user_id}")
+@router.put("/profile_user/{user_id}")
 async def update_profile_user(
         user_id: int,
         request: Request,
@@ -54,9 +54,9 @@ async def update_profile_user(
         user_info=Depends(get_user),
         session: AsyncSession = Depends(get_async_session)
 ):
-    await update_profile(user_id, user_update, session)
-    return RedirectResponse(url=f"/pages/profile_user/{user_id}")
-
+    print("Suka")
+    user = await update_profile(user_id, user_update, session)
+    return {"message": "Profile updated successfully", "user": user}
 
 # Функции для взаимодействия со страницами "Главное"
 @router.get("/main_base")
