@@ -38,8 +38,9 @@ async def get_profile_user(
     user_data = dict(user_info['data'])
     achievements = await get_achievement_by_user(user_data['id'], session)
     calc_exp = lambda x: (math.floor((-5 + math.sqrt(25 + 20 * x)) / 10), math.floor(
-        10 * (x - 5 * (math.floor((-5 + math.sqrt(25 + 20 * x)) / 10)) * ((math.floor((-5 + math.sqrt(25 + 20 * x)) / 10)) + 1)) / (
-                    (math.floor((-5 + math.sqrt(25 + 20 * x)) / 10)) + 1)))
+        10 * (x - 5 * (math.floor((-5 + math.sqrt(25 + 20 * x)) / 10)) * (
+                    (math.floor((-5 + math.sqrt(25 + 20 * x)) / 10)) + 1)) / (
+                (math.floor((-5 + math.sqrt(25 + 20 * x)) / 10)) + 1)))
     user_data['full_xp'] = calc_exp(user_data['xp'])[0]
     user_data['xp_percent'] = calc_exp(user_data['xp'])[1]
     user_data['achievement'] = achievements['data']
@@ -49,14 +50,12 @@ async def get_profile_user(
 @router.put("/profile_user/{user_id}")
 async def update_profile_user(
         user_id: int,
-        request: Request,
         user_update: UserUpdate,
-        user_info=Depends(get_user),
         session: AsyncSession = Depends(get_async_session)
 ):
-    print("Suka")
     user = await update_profile(user_id, user_update, session)
     return {"message": "Profile updated successfully", "user": user}
+
 
 # Функции для взаимодействия со страницами "Главное"
 @router.get("/main_base")
