@@ -5,38 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.reward.models import reward, user_x_reward
 from src.database import get_async_session
 from src.events.models import event
-from src.events.inner_func import error, error404u, error404c, error404uc
 
-error404ad = {
-    "status": "error",
-    "data": "Admin not found",
-    "details": None
-}
-
-error404ac = {
-    "status": "error",
-    "data": "Reward not found in club",
-    "details": None
-}
-
-error404p = {
-    "status": "error",
-    "data": "User has no permission to create/update reward",
-    "details": None
-}
-
-error404r = {
-    "status": "error",
-    "data": "Reward not found",
-    "details": None
-
-}
-
-error404re = {
-    "status": "error",
-    "data": "User already has this reward",
-    "details": None
-}
+from src.errors import *
 
 
 async def get_reward_by_id(

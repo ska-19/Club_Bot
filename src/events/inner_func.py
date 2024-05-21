@@ -5,49 +5,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database import get_async_session
 from src.events.models import event, event_reg
 
-error = {
-    "status": "error",
-    "data": None,
-    "details": None
-}
+from src.errors import *
 
-error404u = {
-    "status": "error",
-    "data": "User not found",
-    "details": None
-}
 
-error404e = {
-    "status": "error",
-    "data": "Event not found",
-    "details": None
-}
-
-error404c = {
-    "status": "error",
-    "data": "Club not found",
-    "details": None
-}
-
-error404uc = {
-    "status": "error",
-    "data": "This user not in this club",
-    "details": None
-}
-
-error403 = {
-    "status": "error",
-    "data": "Forbidden",
-    "details": None
-}
-
-error404eu = {
-    "status": "error",
-    "data": "User has not registration in this event",
-    "details": None
-}
-
-# внутреняя функция принимает для соблюдения преемственности с club
 async def get_event_by_id(
         event_id: int,
         session: AsyncSession = Depends(get_async_session)

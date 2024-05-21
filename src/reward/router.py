@@ -1,5 +1,3 @@
-
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select, insert, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,6 +9,8 @@ from src.reward.inner_func import *
 from src.user_club.inner_func import check_rec, get_role
 from src.user_profile.inner_func import get_user_by_id
 from src.club.inner_func import get_club_by_id
+
+from src.errors import *
 
 router = APIRouter(
     prefix="/reward",

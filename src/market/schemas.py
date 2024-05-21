@@ -2,6 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
+
 class AddProduct(BaseModel):
     name: str
     price: int
@@ -9,7 +10,9 @@ class AddProduct(BaseModel):
     photo: str
     quantity: int
     rating: int
+    admin_id: int
     club_id: int
+
 
 class UpdateProduct(BaseModel):
     name: str
@@ -18,5 +21,7 @@ class UpdateProduct(BaseModel):
     photo: str
     quantity: int
     rating: int
+    admin_id: int
     club_id: int
+
 
