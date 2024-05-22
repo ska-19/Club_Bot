@@ -21,15 +21,15 @@ class UserCreate(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    name: str
-    surname: str
-    email: str
-    tel: str
-    photo: str  # ссылка на фото
-    comfort_time: str  # удобное время для встреч
-    course: str
-    faculty: str
-    links: str  # ссылки на соц сети
+    # name: str
+    # surname: str
+    # email: str
+    # tel: str
+    # photo: str  # ссылка на фото
+    # comfort_time: str  # удобное время для встреч
+    # course: str
+    # faculty: str
+    # links: str  # ссылки на соц сети
     bio: str  # о себе
     dob: date
     city: str
