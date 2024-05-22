@@ -167,7 +167,6 @@ async def update_profile(
 
     """
     try:
-        print("SUKA")
         data = await get_user_by_id(user_id, session)
         if data == "User not found":
             raise ValueError

@@ -39,7 +39,7 @@ async def get_profile_user(
     achievements = await get_achievement_by_user(user_data['id'], session)
     calc_exp = lambda x: (math.floor((-5 + math.sqrt(25 + 20 * x)) / 10), math.floor(
         10 * (x - 5 * (math.floor((-5 + math.sqrt(25 + 20 * x)) / 10)) * (
-                    (math.floor((-5 + math.sqrt(25 + 20 * x)) / 10)) + 1)) / (
+                (math.floor((-5 + math.sqrt(25 + 20 * x)) / 10)) + 1)) / (
                 (math.floor((-5 + math.sqrt(25 + 20 * x)) / 10)) + 1)))
     user_data['full_xp'] = calc_exp(user_data['xp'])[0]
     user_data['xp_percent'] = calc_exp(user_data['xp'])[1]
@@ -89,6 +89,15 @@ async def get_main_user(
         "user_x_club_info": user_x_club_info,
         "events": events
     })
+
+@router.put("/main_user/{user_id}")
+async def update_main_user(
+        user_id: int,
+        EventReg: EventReg,
+        session: AsyncSession = Depends(get_async_session)
+):
+    user = await reg_event(EventReg, session)
+    return {"message": "Profile updated successfully", "user": user}
 
 
 # Функции для взаимодействия со страницами "О клубе"

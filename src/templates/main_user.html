@@ -60,7 +60,8 @@
             <textarea required="" cols="50" rows="10" id="textarea" name="textarea"
                       style="width: 280px; height: 80px" readonly>{{ event.sinopsis }}</textarea>
         </div>
-        <button type="button" class="JoinEvent">Участвовать</button>
+        <button type="button" class="RegEvent" onclick="regForm()">Участвовать</button>
+        <button type="button" class="DisregEvent" style="display: none" onclick="DisregForm()">Не участвовать</button>
     </form>
 </div>
 {% endfor %}
