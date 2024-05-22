@@ -29,6 +29,22 @@ async def get_club_by_id(
         raise HTTPException(status_code=500, detail=error)
 
 
+async def get_club_by_uid(
+        club_uid: str,
+        session: AsyncSession = Depends(get_async_session)):
+    try:
+        query = select(club).where(club.c.uid == club_uid)
+        result = await session.execute(query)
+        data = result.mappings().first()
+
+        if not data:
+            data = "Club not found"
+
+        return data
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+
+
 async def check_leg_name(
         club_name: str,
         session: AsyncSession = Depends(get_async_session)) -> bool:

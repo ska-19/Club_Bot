@@ -10,7 +10,7 @@ from src.club.schemas import ClubUpdate, ClubCreate
 from src.user_profile.inner_func import get_user_by_id
 from src.user_club.router import join_to_the_club
 from src.user_club.schemas import UserJoin
-from src.club.inner_func import get_club_by_id, check_leg_name
+from src.club.inner_func import get_club_by_id, check_leg_name, get_club_by_uid
 
 router = APIRouter(
     prefix="/club",
@@ -59,6 +59,7 @@ async def create_club(
             raise ValueError('409')
 
         club_dict['date_joined'] = datetime.utcnow()
+        club_dict['uid'] = '0'
         owner = club_dict["owner"]
         stmt = insert(club).values(**club_dict).returning(club.c.id)
         result = await session.execute(stmt)
@@ -67,6 +68,11 @@ async def create_club(
         id = result.fetchone()[0]
         userjoin = UserJoin(club_id=id, user_id=owner, role='owner')
         await join_to_the_club(userjoin, session)
+        uid = 'CL' + str(id) + '0' + str(owner) + '3'
+
+        stmt = update(club).where(club.c.id == id).values(uid=uid)
+        await session.execute(stmt)
+        await session.commit()
 
         return {
             "status": "success",
@@ -197,3 +203,32 @@ async def update_club(
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()
+
+
+@router.get('/search')
+async def search(
+        club_uid: str,
+        session: AsyncSession = Depends(get_async_session)
+):
+    """ ищет клуб по его uid
+
+           :param club_uid:
+           :return:
+               200 + success
+               404 если такого клуба нет.
+               500 если внутрення ошибка сервера.
+
+       """
+    try:
+        data = await get_club_by_uid(club_uid, session)
+        if data == "Club not found":
+            raise ValueError('404')
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
