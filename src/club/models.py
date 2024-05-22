@@ -18,6 +18,7 @@ club = Table(
     Column('date_created', Date),
     Column('date_joined', TIMESTAMP, nullable=False),
     Column('comfort_time', Text),  # meeting time
-    Column('channel_link', String(255), nullable=False)
+    Column('channel_link', String(255), nullable=False),
+    Column('uid', String(255), nullable=False),
     # TODO: add achievements, currency, prizes, etc.
 )
