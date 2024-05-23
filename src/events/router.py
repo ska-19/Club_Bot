@@ -19,6 +19,21 @@ router = APIRouter(
 )
 
 
+@router.get("/check_rec")
+async def get_check_rec(
+        event_id: int,
+        user_id: int,
+        session: AsyncSession = Depends(get_async_session),
+):
+    try:
+        if not await check_rec_event(user_id=user_id, event_id=event_id, session=session):
+            return False
+        return True
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+
+
+
 @router.post("/create_event")
 async def create_event(
         new_event: EventCreate,
@@ -47,7 +62,6 @@ async def create_event(
             raise ValueError('404uc')
         if role == "admin" or role == "owner":
             event_dict = new_event.model_dump()
-            event_dict['date'] = datetime.utcnow()
             query = insert(event).values(**event_dict)
             await session.execute(query)
             await session.commit()
@@ -141,7 +155,6 @@ async def update_event(
             raise ValueError('403')
 
         event_dict = update_data.model_dump()
-        event_dict['date'] = datetime.utcnow()
         query = update(event).where(event.c.id == event_id).values(**event_dict)
         await session.execute(query)
         await session.commit()
@@ -274,7 +287,6 @@ async def event_disreg(
             raise ValueError('404u')
         if await get_event_by_id(event_id, session) == "Event not found":
             raise ValueError('404e')
-        print('here')
         if not await check_rec_event(user_id, event_id, session):
             raise ValueError('404eu')
 

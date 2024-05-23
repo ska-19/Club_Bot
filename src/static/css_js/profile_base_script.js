@@ -100,8 +100,6 @@ function saveUserInfo() {
         bio: document.getElementById('textarea').value
     };
 
-    console.log("userData:", userData);
-
     fetch(`/pages/profile_user/${userId}`, {
         method: 'PUT',
         headers: {

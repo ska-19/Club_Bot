@@ -128,7 +128,6 @@ async def get_balance(
         else:
             raise HTTPException(status_code=404, detail=error404c)
     except Exception as e:
-        print(e)
         raise HTTPException(status_code=500, detail=error)
 
 

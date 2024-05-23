@@ -10,9 +10,10 @@ from src.user_profile.router import update_profile
 from src.user_profile.inner_func import get_user_by_id
 from src.user_profile.router import get_user
 from src.user_profile.schemas import UserUpdate
+from src.events.schemas import EventReg, EventUpdate
 from src.user_club.router import get_clubs_by_user, get_balance, get_users_in_club
 from src.user_club.inner_func import get_role
-from src.events.router import get_event_club
+from src.events.router import get_event_club, get_check_rec, reg_event, event_disreg, get_event, update_event
 from src.achievement.router import get_achievement_by_user
 
 router = APIRouter(
@@ -36,14 +37,14 @@ async def get_profile_user(
         session: AsyncSession = Depends(get_async_session)
 ):
     user_data = dict(user_info['data'])
-    achievements = await get_achievement_by_user(user_data['id'], session)
     calc_exp = lambda x: (math.floor((-5 + math.sqrt(25 + 20 * x)) / 10), math.floor(
         10 * (x - 5 * (math.floor((-5 + math.sqrt(25 + 20 * x)) / 10)) * (
                 (math.floor((-5 + math.sqrt(25 + 20 * x)) / 10)) + 1)) / (
                 (math.floor((-5 + math.sqrt(25 + 20 * x)) / 10)) + 1)))
     user_data['full_xp'] = calc_exp(user_data['xp'])[0]
     user_data['xp_percent'] = calc_exp(user_data['xp'])[1]
-    user_data['achievement'] = achievements['data']
+    # achievements = await get_achievement_by_user(user_data['id'], session)
+    # user_data['achievement'] = achievements['data']
     return templates.TemplateResponse("profile_user.html", {"request": request, "user_info": user_data})
 
 
@@ -77,6 +78,9 @@ async def get_main_user(
     event_data = await get_event_club(club_info['id'], session)
     event_info = event_data['data']
     events = [dict(event) for event in event_info]
+    for event in events:
+        event_id = event['id']
+        event['reg'] = await get_check_rec(event_id, user_data['id'], session)
     club_info['xp'] = 0
     user_x_club_info = {
         'role': user_x_club_info_role,
@@ -90,14 +94,39 @@ async def get_main_user(
         "events": events
     })
 
+
+@router.post("/main_user/{user_id}")
+async def register_event(
+        event_reg: EventReg,
+        session: AsyncSession = Depends(get_async_session)
+):
+    reg = await reg_event(event_reg, session)
+    return {"message": "Event Reg successfully", "reg_event": reg}
+
+
 @router.put("/main_user/{user_id}")
-async def update_main_user(
+async def update_main_event(
         user_id: int,
+        event_update: EventUpdate,
+        session: AsyncSession = Depends(get_async_session)
+):
+    event_id = event_update.club_id
+    user_clubs = await get_clubs_by_user(user_id, session)
+    club_info = dict(user_clubs['data'][0])
+    event_update.club_id = club_info['id']
+    ev = await get_event(event_id, session)
+    event_update.host_id = ev['data'].get('host_id')
+    event = await update_event(event_id, event_update, session)
+    return {"message": "Event updated successfully", "event": event}
+
+
+@router.delete("/main_user/{user_id}")
+async def deregister_event(
         EventReg: EventReg,
         session: AsyncSession = Depends(get_async_session)
 ):
-    user = await reg_event(EventReg, session)
-    return {"message": "Profile updated successfully", "user": user}
+    disreg = await event_disreg(EventReg.user_id, EventReg.event_id, session)
+    return {"message": "Event Disreg successfully", "disreg_event": disreg}
 
 
 # Функции для взаимодействия со страницами "О клубе"
