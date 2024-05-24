@@ -83,25 +83,9 @@ function uploadAvatar() {
 
 //кнопка "Изменить"
 function editForm() {
-    console.log("Success");
-    var inputs = document.querySelectorAll("input, textarea");
-    inputs.forEach(function (input) {
-        input.readOnly = false;
-    });
-
-    var editBtn = document.querySelector(".editBtn");
-    editBtn.style.display = "none";
-
-    var saveBtn = document.querySelector(".saveBtn");
-    saveBtn.style.display = "inline-block";
-
-    saveBtn.onclick = function () {
-        inputs.forEach(function (input) {
-            input.readOnly = true;
-        });
-        editBtn.style.display = "inline-block";
-        saveBtn.style.display = "none";
-    };
+    document.querySelector('.editBtn').style.display = 'none';
+    document.querySelector('.saveBtn').style.display = 'inline';
+    document.querySelectorAll('input, textarea').forEach(input => input.removeAttribute('readonly'));
 }
 
 //Кнопка "Сохранить"
@@ -115,8 +99,6 @@ function saveUserInfo() {
         education: document.getElementById('Education').value,
         bio: document.getElementById('textarea').value
     };
-
-    console.log("userData:", userData);
 
     fetch(`/pages/profile_user/${userId}`, {
         method: 'PUT',
@@ -138,11 +120,4 @@ function saveUserInfo() {
     .catch(error => {
         console.error('Error:', error);
     });
-}
-
-
-function editForm() {
-    document.querySelector('.editBtn').style.display = 'none';
-    document.querySelector('.saveBtn').style.display = 'inline';
-    document.querySelectorAll('input, textarea').forEach(input => input.removeAttribute('readonly'));
 }

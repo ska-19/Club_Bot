@@ -109,7 +109,7 @@ async def get_users_in_event_xlsx(
             raise ValueError('404ec')
 
         join = event_reg.join(user, event_reg.c.user_id == user.c.id)
-        query = select(user, event_reg.c.confirm, event_reg.c.reg_date).select_from(join).where(
+        query = select(user, event_reg.c.reg_date).select_from(join).where(
             event_reg.c.event_id == event_id)
 
         result = await session.execute(query)
@@ -169,7 +169,7 @@ async def get_users_in_club_events_xlsx(
                 .join(event_reg, event.c.id == event_reg.c.event_id)
                 .join(user, event_reg.c.user_id == user.c.id))
 
-        query = (select(event.c.name, event.c.date, event_reg.c.confirm, event_reg.c.reg_date, user)
+        query = (select(event.c.name, event.c.date, event_reg.c.reg_date, user)
                  .select_from(join)
                  .where(event.c.club_id == club_id))
 

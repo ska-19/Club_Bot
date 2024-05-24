@@ -36,9 +36,33 @@
 {% for user in users %}
 <div class="card"
      style="margin-top: 5px;left: 20px;height: 30px; width: 350px; justify-content: center;display: flex">
-    <h1 style="font-size: 14px; color: #7a9a8a;position: relative; z-index: 2">
+    <h1 style="text-align: left; width: 50%; font-size: 14px; color: #7a9a8a;position: relative; z-index: 2">
         {{ user.username }} {{ user.role }}
     </h1>
+
+
+    {% if user_info.role == "admin" and user.role == "member" %}
+    <button type="button" class="Kick" id="Kick_{{ user.id }}" style="margin-top: 5px;height: 20px; width: 80px;"
+            onclick="Kick('{{user.id}}')">Выгнать
+    </button>
+
+
+    {% elif user_info.role == "owner" and user.role == "member" %}
+    <button type="button" class="Promote" id="Promote_{{ user.id }}" style="font-size: 10px;margin-top: 5px;height: 20px; width: 80px;"
+            onclick="Promote('{{user.id}}')">Повысить
+    </button>
+    <button type="button" class="Kick" id="Kick_{{ user.id }}" style="margin-top: 5px;height: 20px; width: 80px;"
+            onclick="Kick('{{user.id}}')">Выгнать
+    </button>
+
+    {% elif user_info.role == "owner" and user.role == "admin" %}
+    <button type="button" class="Demote" id="Demote_{{ user.id }}" style="margin-top: 5px;height: 20px; width: 80px;"
+            onclick="Demote('{{user.id}}')">Понизить
+    </button>
+    <button type="button" class="Kick" id="Kick_{{ user.id }}" style="margin-top: 5px;height: 20px; width: 80px;"
+            onclick="Kick('{{user.id}}')">Выгнать
+    </button>
+    {% endif %}
 </div>
 {% endfor %}
 {% endblock %}

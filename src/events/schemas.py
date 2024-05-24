@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 
 class EventCreate(BaseModel):
+    name: str
     club_id: int
     host_id: int
     name: str
@@ -11,6 +12,7 @@ class EventCreate(BaseModel):
     sinopsis: str
     contact: str
     speaker: str
+    reward: int
 
 
 class EventUpdate(BaseModel):
@@ -26,5 +28,8 @@ class EventUpdate(BaseModel):
 class EventReg(BaseModel):
     user_id: int
     event_id: int
-    confirm: bool
-    reg_date: date
+    # confirm: bool
+
+
+class Data(BaseModel):
+    users: dict

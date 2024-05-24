@@ -52,7 +52,7 @@ async def create_user(
         data = await get_user_by_id(user_dict['id'], session)
         if data != "User not found":
             raise ValueError
-
+        #TODO: Зач столько полей в схеме если все равно их руками выставляешь?
         user_dict['is_active'] = True
         user_dict['is_superuser'] = False
         user_dict['is_verified'] = False
@@ -151,7 +151,7 @@ async def get_user_attr(
         await session.rollback()
 
 
-@router.post("/update_user")
+@router.post("/update_user") #TODO: мб переписать логику чтобы если какого - то поля в дате не было то оно приравнивалось к старому
 async def update_profile(
         user_id: int,
         update_data: UserUpdate,
@@ -167,7 +167,6 @@ async def update_profile(
 
     """
     try:
-        print("SUKA")
         data = await get_user_by_id(user_id, session)
         if data == "User not found":
             raise ValueError
