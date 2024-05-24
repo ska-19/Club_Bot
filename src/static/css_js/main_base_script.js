@@ -77,7 +77,8 @@ function Save(eventId) {
     const userId = urlParts[urlParts.length - 1];
     const EventData = {
         club_id: eventId,
-        host_id: 12345,
+        host_id: 1,
+        name: "",
         date: document.getElementById(`Date_${eventId}`).value,
         sinopsis: document.getElementById(`textarea_${eventId}`).value,
         contact: document.getElementById(`Speaker_${eventId}`).value,

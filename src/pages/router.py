@@ -11,8 +11,9 @@ from src.user_profile.inner_func import get_user_by_id
 from src.user_profile.router import get_user
 from src.user_profile.schemas import UserUpdate
 from src.events.schemas import EventReg, EventUpdate
-from src.user_club.router import get_clubs_by_user, get_balance, get_users_in_club
+from src.user_club.router import get_clubs_by_user, get_balance, get_users_in_club, disjoin_club, role_update
 from src.user_club.inner_func import get_role
+from src.user_club.schemas import User
 from src.events.router import get_event_club, get_check_rec, reg_event, event_disreg, get_event, update_event
 from src.achievement.router import get_achievement_by_user
 
@@ -76,8 +77,7 @@ async def get_main_user(
     user_x_club_info_role = await get_role(user_data['id'], club_info['id'], session)
     user_x_club_info_balance = await get_balance(user_data['id'], club_info['id'], session)
     event_data = await get_event_club(club_info['id'], session)
-    event_info = event_data['data']
-    events = [dict(event) for event in event_info]
+    events = [dict(event) for event in event_data['data']]
     for event in events:
         event_id = event['id']
         event['reg'] = await get_check_rec(event_id, user_data['id'], session)
@@ -116,16 +116,17 @@ async def update_main_event(
     event_update.club_id = club_info['id']
     ev = await get_event(event_id, session)
     event_update.host_id = ev['data'].get('host_id')
+    event_update.name = ev['data'].get('name')
     event = await update_event(event_id, event_update, session)
     return {"message": "Event updated successfully", "event": event}
 
 
 @router.delete("/main_user/{user_id}")
 async def deregister_event(
-        EventReg: EventReg,
+        event_reg: EventReg,
         session: AsyncSession = Depends(get_async_session)
 ):
-    disreg = await event_disreg(EventReg.user_id, EventReg.event_id, session)
+    disreg = await event_disreg(event_reg.user_id, event_reg.event_id, session)
     return {"message": "Event Disreg successfully", "disreg_event": disreg}
 
 
@@ -155,3 +156,25 @@ async def get_club_user(
         "club_info": club_info,
         "users": users
     })
+
+
+@router.put("/club_user/{user_id}")
+async def update_main_event(
+        update_role_user: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    update_user = await role_update(update_role_user, session)
+    return {"message": "Role update successfully", "event": update_user}
+
+
+@router.delete("/club_user/{user_id}")
+async def kick_club_user(
+        kick_user: User,
+        session: AsyncSession = Depends(get_async_session)
+):
+    clubs = await get_clubs_by_user(kick_user.user_id, session)
+    kick_user.club_id = clubs['data'][0]['id']
+    print(kick_user)
+    kicked_user = await disjoin_club(kick_user, session)
+    print(kicked_user)
+    return {"message": "Kick user successfully", "kick_user": kicked_user}

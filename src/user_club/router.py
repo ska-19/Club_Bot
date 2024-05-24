@@ -309,7 +309,7 @@ async def get_users_in_club(
             raise ValueError('404c')
 
         join = club_x_user.join(user, club_x_user.c.user_id == user.c.id)
-        query = select(user.c.username, club_x_user.c.role, club_x_user.c.date_joined).select_from(join).where(
+        query = select(user.c.id, user.c.username, user.c.name, user.c.surname, club_x_user.c.role, club_x_user.c.date_joined).select_from(join).where(
             club_x_user.c.club_id == club_id).order_by(role_order, user.c.xp)
 
         result = await session.execute(query)
@@ -330,7 +330,6 @@ async def get_users_in_club(
             raise HTTPException(status_code=404, detail=error404c)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
-
 
 @router.get("/get_users_with_role")
 async def get_users_with_role(
