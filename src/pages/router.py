@@ -146,6 +146,8 @@ async def get_club_user(
     club_info = dict(user_clubs['data'][0])
     users_in_club = await get_users_in_club(club_info['id'], session)
     users = users_in_club['data']
+    user_info_in_club = next((item for item in users if item['username'] == user_data['username']), None)
+    user_data['role'] = user_info_in_club['role']
     club_info['xp'] = 0
     return templates.TemplateResponse("club_user.html", {
         "request": request,
