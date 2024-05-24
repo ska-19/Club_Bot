@@ -1,7 +1,7 @@
 """db creation
 
 Revision ID: 9f4ba8d24daa
-Revises: fa1f58459641
+Revises: f152506022f6
 Create Date: 2024-05-02 17:46:07.183229
 
 """
