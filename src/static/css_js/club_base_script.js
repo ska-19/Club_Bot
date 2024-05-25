@@ -1,17 +1,14 @@
 function Demote(ChangedUserId) {
-    document.getElementById(`RegEvent_${eventId}`).style.display = 'none';
-    document.getElementById(`DisregEvent_${eventId}`).style.display = 'inline';
-
     const urlParts = window.location.href.split('/');
     const userId = urlParts[urlParts.length - 1];
-    const EventReg = {
-        user_id: userId, event_id: eventId
+    const UserData = {
+        user_id: ChangedUserId, club_id: 0
     }
-
+    console.log(UserData)
     fetch(`/pages/club_user/${userId}`, {
         method: 'PUT', headers: {
             'Content-Type': 'application/json',
-        }, body: JSON.stringify(EventReg),
+        }, body: JSON.stringify(UserData),
     })
         .then(response => {
             if (!response.ok) {
@@ -31,13 +28,14 @@ function Demote(ChangedUserId) {
 function Promote(ChangedUserId) {
     const urlParts = window.location.href.split('/');
     const userId = urlParts[urlParts.length - 1];
-    const EventReg = {
-        user_id: userId, event_id: eventId
+    const UserData = {
+        user_id: ChangedUserId, club_id: 0
     }
+    console.log(UserData)
     fetch(`/pages/club_user/${userId}`, {
         method: 'PUT', headers: {
             'Content-Type': 'application/json',
-        }, body: JSON.stringify(EventReg),
+        }, body: JSON.stringify(UserData),
     })
         .then(response => {
             if (!response.ok) {
