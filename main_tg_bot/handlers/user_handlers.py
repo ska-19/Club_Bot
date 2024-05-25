@@ -2,7 +2,7 @@ from aiogram.filters import Command, CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram import Router, types
 
-from keyboards.user_keyboards import get_main_kb
+from keyboards.user_keyboards import get_main_ikb
 
 from confige import BotConfig
 
@@ -28,7 +28,7 @@ async def cmd_start(message: types.Message, config: BotConfig, state: FSMContext
         is_admin = True
     await message.answer(
         text="👋🏻 <b>Привет!</b> \n\n",
-        reply_markup=get_main_kb(is_admin)
+        reply_markup=get_main_ikb(is_admin)
     )
     await state.clear()
 

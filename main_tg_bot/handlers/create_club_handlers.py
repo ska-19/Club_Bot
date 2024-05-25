@@ -2,10 +2,10 @@ from aiogram import Router, F
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import Message, ReplyKeyboardRemove
+from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery
 
 from keyboards.simple_kb import make_colum_keyboard
-from keyboards.user_keyboards import get_main_kb, get_back_button
+from keyboards.user_keyboards import get_main_ikb, get_back_button
 
 from database import requests as rq
 
@@ -17,13 +17,13 @@ class CreateClub(StatesGroup):
     enter_link_channel = State()
 
 @router.callback_query(F.data == "create_club")
-async def cmd_create(message: Message, state: FSMContext):
-    await message.answer(
+async def cmd_create(callback: CallbackQuery, state: FSMContext):
+    await callback.message.answer(
         text="🎩 <b>Давайте создадим клуб</b>\n\n"
              "Для начала укажите название:",
         reply_markup=get_back_button()
     )
-    await rq.set_user(message.from_user.id)
+    await rq.set_user(callback.message.from_user.id)
     await state.set_state(CreateClub.enter_name)
 
 

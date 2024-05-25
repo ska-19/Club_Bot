@@ -4,11 +4,10 @@ from aiogram.types import WebAppInfo
 
 def get_main_ikb(tg_id: int = 0) -> InlineKeyboardMarkup:
     """Get main keyboard."""
-    web_app = WebAppInfo(url=f'http://club-bot.onrender.com/pages/profile_user/{tg_id}')
+    web_app = WebAppInfo(url=f'https://club-bot.onrender.com/pages/profile_user/{tg_id}')
     ikb = [
-        [InlineKeyboardButton(text='ЗАПУСТИТЬ', web_app=web_app)]
+        [InlineKeyboardButton(text='ЗАПУСТИТЬ', web_app=web_app)],
         [InlineKeyboardButton(text='Создать клуб', callback_data='create_club')],
-
     ]
     ikeyboard = InlineKeyboardMarkup(inline_keyboard=ikb)
     return ikeyboard

@@ -7,7 +7,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.strategy import FSMStrategy
 
 from bot_instance import bot
-from handlers import user_handlers, questionnaire_handlers
+from handlers import user_handlers, create_club_handlers
 from confige import BotConfig
 
 from database.models import async_main
@@ -15,7 +15,7 @@ from database.models import async_main
 
 def register_routers(dp: Dispatcher) -> None:
     """Registers routers"""
-    dp.include_routers(user_handlers.router, questionnaire_handlers.router)
+    dp.include_routers(user_handlers.router, create_club_handlers.router)
 async def main() -> None:
     """Entry point of the program."""
 
@@ -34,6 +34,8 @@ async def main() -> None:
     dp["config"] = config
 
     register_routers(dp)
+
+    await bot.delete_webhook(drop_pending_updates=True)
 
     try:
         await dp.start_polling(bot, skip_updates=True)
