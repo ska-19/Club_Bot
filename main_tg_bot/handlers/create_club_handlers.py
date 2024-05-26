@@ -10,62 +10,84 @@ from keyboards.user_keyboards import get_main_ikb, get_back_button
 from database import requests as rq
 
 router = Router()
+
+
 class CreateClub(StatesGroup):
     enter_name = State()
     enter_dest = State()
     enter_bio = State()
     enter_link_channel = State()
 
+
 @router.callback_query(F.data == "create_club")
 async def cmd_create(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer(
         text="🎩 <b>Давайте создадим клуб</b>\n\n"
-             "Для начала укажите название:",
+             "Для начала укажите название клуба:",
         reply_markup=get_back_button()
     )
-    await rq.set_user(callback.message.from_user.id)
     await state.set_state(CreateClub.enter_name)
+    await callback.message.delete()
 
 
-
-@router.message(StateFilter("HobbiesQuest:choosing_hobbies"))
-async def quest_chosen_incorrectly_hobbies(message: Message):
+@router.message(CreateClub.enter_name)
+async def cmd_enter_name(message: Message, state: FSMContext):
+    await state.update_data(name=message.text)
     await message.answer(
-        text="😭 Я не понимаю такого ответа.\n\nПожалуйста, выберите один из вариантов "
-             "из списка:",
+        text="2️⃣Теперь укажите направление клуба в одно-два слова\n"
+             "например: 'финансы', 'программирование', 'танцы', 'спорт'",
+        reply_markup=get_back_button()
     )
+    await state.set_state(CreateClub.enter_dest)
+    await message.delete()
 
-@router.message(StateFilter("HobbiesQuest:tell_expectations"))
-async def quest_tell_expectations_incorrectly(message: Message):
+
+@router.message(CreateClub.enter_dest)
+async def cmd_enter_dest(message: Message, state: FSMContext):
+    await state.update_data(dest=message.text)
     await message.answer(
-        text="😇 Пожалуйста, опишите ваши ожидания от клуба, немного подробней!",
-        reply_markup=ReplyKeyboardRemove()
+        text="3️⃣Теперь укажите краткое описание клуба в одно-два предложения",
+        reply_markup=get_back_button()
     )
-
-#
-# @router.message(HobbiesQuest.choosing_stay_in_touch, F.text.in_(available_stay_in_touch))
-# async def quest_chosen(message: Message, state: FSMContext):
-#     # await state.update_data(chosen_stay_in_touch=message.text.lower())
-#     chosen_stay_in_touch = message.text.lower()
-#     for i in range(len(available_stay_in_touch)):
-#         if available_stay_in_touch[i].lower() == chosen_stay_in_touch:
-#             await state.update_data(chosen_stay_in_touch=i)
-#     user_data = await state.get_data()
-#     await message.answer(
-#         text="🎉 <b>Вы прошли все вопросы! Спасибо за ответы!</b> ❤️\n\n"
-#              "Создателям очень важно собрать как можно больше ответов, чтобы воплотить в жизнь свой замысел!\n\n"
-#              "Вы можете помочь нам! Заодно поучаствовать в <b>розыгрыше призов</b>, опросив своего хорошего друга!\n"
-#              "Ещё раз нажав на /quest\n\n\n"
-#              "p.s. Как вы могли заметить вопросы простые и их не много)\n"
-#              "Уверены, что вы знаете увлечения своих друзей "
-#              "и сможете заполнить анкету ещё раз, даже если их нет рядом.",
-#
-#         reply_markup=get_main_kb()
-#     )
-#     await rq.set_user_tell_questionnaire(message.from_user.id, user_data),
-#     await state.clear()
+    await state.set_state(CreateClub.enter_bio)
+    await message.delete()
 
 
-# @router.message(HobbiesQuest.choosing_stay_in_touch)
-# async def quest_chosen_incorrectly(message: Message):
-#     await send_error_message(message, available_stay_in_touch)
+@router.message(CreateClub.enter_bio)
+async def cmd_enter_bio(message: Message, state: FSMContext):
+    await state.update_data(bio=message.text)
+    await message.answer(
+        text="4️⃣Теперь укажите ссылку на канал клуба\n\n"
+             "Если у вас нет канала, можете указать ссылку на ваш профиль в соц. сети",
+        reply_markup=get_back_button()
+    )
+    await state.set_state(CreateClub.enter_link_channel)
+    await message.delete()
+
+
+
+@router.message(CreateClub.enter_link_channel)
+async def cmd_enter_link_channel(message: Message, state: FSMContext):
+    await state.update_data(link_channel=message.text)
+    club_data = await state.get_data()
+    await rq.set_club(message.from_user.id, club_data)
+    await message.answer(
+        text="🎉 <b>Клуб успешно создан!</b>\n\n"
+             f"Название: {club_data['name']}\n"
+             f"Направление: {club_data['dest']}\n"
+             f"Описание: {club_data['bio']}\n"
+             f"Ссылка на канал: {club_data['link_channel']}\n\n"
+             "Для управления клубом используйте кнопки в профиле клуба.",
+        reply_markup=get_main_ikb({'tg_id': message.from_user.id})
+    )
+    await state.clear()
+    await message.delete()
+
+@router.callback_query(F.data == "back")
+async def cmd_back(callback: CallbackQuery, state: FSMContext):
+    await callback.message.answer(
+        text="<b>Вы прервали создание клуба</b>",
+        reply_markup=get_main_ikb({'tg_id': callback.from_user.id})
+    )
+    await state.clear()
+

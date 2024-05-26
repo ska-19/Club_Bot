@@ -8,7 +8,6 @@ from confige import BotConfig
 
 import io
 from sqlalchemy import select
-from database.models import Questionnaire, async_session
 from aiogram.types import BufferedInputFile
 import pandas as pd
 
@@ -26,9 +25,17 @@ async def cmd_start(message: types.Message, config: BotConfig, state: FSMContext
     is_admin = False
     if message.from_user.id in config.admin_ids:
         is_admin = True
+    # if message.from_user.bot:
+    #     return
+    user_data = {
+        "tg_id": message.from_user.id,
+        "username": message.from_user.username,
+        "name": message.from_user.first_name,
+        "surname": message.from_user.last_name
+    }
     await message.answer(
         text="👋🏻 <b>Привет!</b> \n\n",
-        reply_markup=get_main_ikb(is_admin)
+        reply_markup=get_main_ikb(user_data, is_admin)
     )
     await state.clear()
 
