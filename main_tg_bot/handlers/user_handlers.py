@@ -11,6 +11,8 @@ from sqlalchemy import select
 from aiogram.types import BufferedInputFile
 import pandas as pd
 
+from database import request as rq
+
 router = Router()
 
 
@@ -33,6 +35,7 @@ async def cmd_start(message: types.Message, config: BotConfig, state: FSMContext
         "name": message.from_user.first_name,
         "surname": message.from_user.last_name
     }
+    await rq.set_user(user_data)
     await message.answer(
         text="👋🏻 <b>Привет!</b> \n\n",
         reply_markup=get_main_ikb(user_data, is_admin)
