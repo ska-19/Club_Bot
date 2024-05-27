@@ -7,7 +7,7 @@ from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery
 from keyboards.simple_kb import make_colum_keyboard
 from keyboards.user_keyboards import get_main_ikb, get_back_button
 
-from database import requests as rq
+from database import request as rq
 
 router = Router()
 
@@ -65,7 +65,6 @@ async def cmd_enter_bio(message: Message, state: FSMContext):
     await message.delete()
 
 
-
 @router.message(CreateClub.enter_link_channel)
 async def cmd_enter_link_channel(message: Message, state: FSMContext):
     await state.update_data(link_channel=message.text)
@@ -82,6 +81,7 @@ async def cmd_enter_link_channel(message: Message, state: FSMContext):
     )
     await state.clear()
     await message.delete()
+
 
 @router.callback_query(F.data == "back")
 async def cmd_back(callback: CallbackQuery, state: FSMContext):
