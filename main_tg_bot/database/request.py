@@ -20,7 +20,7 @@ async def set_user(user_data):
     headers = {
         "Content-Type": "application/json"
     }
-    url = URL+'/user_profile/create_user'
+    url = str(URL)+'/user_profile/create_user'
 
     response = requests.post(url, json=rq_user_data, headers=headers)
     return response
@@ -42,7 +42,7 @@ async def set_club(tg_id, club_data):
     headers = {
         "Content-Type": "application/json"
     }
-    url = URL+'/club/create_cub'
+    url = str(URL)+'/club/create_cub'
 
     response = requests.post(url, json=rq_club_data, headers=headers)
     return response
