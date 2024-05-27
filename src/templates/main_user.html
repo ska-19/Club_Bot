@@ -42,25 +42,66 @@
 <!--события-->
 <div class="form-container" style="margin-top: 30px">
     <form class="form" id="form">
-        <h1 style="font-size: 15px;position: relative; z-index: 2">Событие</h1>
+        <h1 id="Name_{{event.id}}" style="font-size: 15px;position: relative; z-index: 2">{{ event.name }}</h1>
         <div style="display: flex">
             <div class="form-group" style="width: 60%">
-                <label for="Date of Birth">Дата</label>
-                <input required="" name="Date" id="Date of Birth" type="text" style="width: 115px"
+                <label for="Date_{{event.id}}">Дата</label>
+                <input required="" name="Date" id="Date_{{event.id}}" type="text" style="width: 115px"
                        value="{{event.date}}" readonly>
             </div>
             <div class="form-group">
-                <label for="City">Спикер</label>
-                <input required="" name="Speaker" id="City" type="text" style="width: 125px" value="{{event.speaker}}"
+                <label for="Speaker_{{event.id}}">Спикер</label>
+                <input required="" name="Speaker" id="Speaker_{{event.id}}" type="text" style="width: 125px"
+                       value="{{event.speaker}}"
                        readonly>
             </div>
         </div>
         <div class="form-group">
-            <label for="textarea">О событии</label>
-            <textarea required="" cols="50" rows="10" id="textarea" name="textarea"
+            <label for="textarea_{{event.id}}">О событии</label>
+            <textarea required="" cols="50" rows="10" id="textarea_{{event.id}}" name="textarea"
                       style="width: 280px; height: 80px" readonly>{{ event.sinopsis }}</textarea>
         </div>
-        <button type="button" class="JoinEvent">Участвовать</button>
+        {% if user_x_club_info.role == "member" %}
+
+
+        <!-- У участников только кнопка для участия в событии -->
+        {% if event.reg == true %}
+        <button type="button" class="DisregEvent" id="DisregEvent_{{ event.id }}" onclick="Disreg('{{event.id}}')">Не
+            участвовать
+        </button>
+        <button type="button" class="RegEvent" id="RegEvent_{{ event.id }}" style="display: none"
+                onclick="Reg('{{event.id}}')">Участвовать
+        </button>
+        {% else %}
+        <button type="button" class="RegEvent" id="RegEvent_{{ event.id }}" onclick="Reg('{{event.id}}')">
+            Участвовать
+        </button>
+        <button type="button" class="DisregEvent" id="DisregEvent_{{ event.id }}" style="display: none"
+                onclick="Disreg('{{event.id}}')">Не участвовать
+        </button>
+        {% endif %}
+
+
+        {% else %}
+        <!-- У админов/владельца кнопки для редактирования и завершения события -->
+        <div style="display: flex; justify-content: center">
+            <!-- "Изменить" -->
+            <div class="block5" style="width: 50%; text-align: center">
+                <button type="button" class="EditEvent" id="EditEvent_{{ event.id }}"
+                        onclick="Edit('{{event.id}}')">Изменить
+                </button>
+                <button type="button" class="SaveEvent" id="SaveEvent_{{ event.id }}" style="display: none"
+                        onclick="Save('{{event.id}}')">Сохранить
+                </button>
+            </div>
+            <!-- "Завершить событие" -->
+            <div class="block6" style="width: 50%; text-align: center;">
+                <button type="button" class="EndEvent" id="EndEvent_{{ event.id }}"
+                        onclick="End('{{event.id}}')">Завершить
+                </button>
+            </div>
+        </div>
+        {% endif %}
     </form>
 </div>
 {% endfor %}

@@ -79,7 +79,7 @@ async def get_all_event_club(
         session: AsyncSession = Depends(get_async_session)
 ):
     try:
-        query = select(event).where(event.c.club_id == club_id)
+        query = select(event).where(event.c.club_id == club_id).order_by(event.c.date)
         result = await session.execute(query)
         data = result.mappings().all()
 
