@@ -10,13 +10,19 @@ from src.events.inner_func import *
 from src.user_profile.inner_func import get_user_by_id
 # from src.user_club.schemas import UpdateBalance
 # from src.user_club.router import update_balance, get_users_with_role
-# from src.user_profile.router import update_xp
+from src.user_profile.models import user
 
 
 router = APIRouter(
     prefix="/events",
     tags=["events"]
 )
+
+error404s = {
+    "status": "error",
+    "data": "Users not found",
+    "details": None
+}
 
 
 @router.get("/check_rec")
@@ -395,5 +401,37 @@ async def end_event(
         await delete_event(event_id, session)
     except ValueError:
         raise HTTPException(status_code=404, detail=error404e)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+
+
+@router.get("/get_users_by_event")
+async def get_users_by_event(
+        event_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    try:
+        if await get_event_by_id(event_id, session) == "Event not found":
+            raise ValueError('404e')
+
+        join = event_reg.join(user, event_reg.c.user_id == user.c.id)
+        query = select(user.c.id, user.c.username, user.c.name, user.c.surname, event_reg.c.reg_date).select_from(join).where(event_reg.c.event_id == event_id).order_by(user.c.surname)
+
+        result = await session.execute(query)
+        data = result.mappings().all()
+
+        if not data:
+            raise ValueError('404s')
+
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
+    except ValueError as e:
+        if str(e) == '404s':
+            raise HTTPException(status_code=404, detail=error404s)
+        else:
+            raise HTTPException(status_code=404, detail=error404e)
     except Exception:
         raise HTTPException(status_code=500, detail=error)

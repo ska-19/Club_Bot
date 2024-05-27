@@ -201,8 +201,9 @@ async def get_search_user(
     user_data = dict(user_info['data'])
     clubs_data = clubs['data']
     main_club = await get_main_club(user_id, session)
-    main_club_with_data = await get_club(main_club['data']['club_id'], session)
-    main_club_data = main_club_with_data['data']
+    main_club_data = main_club['data']
+    # main_club_with_data = await get_club(main_club['data']['club_id'], session)
+    # main_club_data = main_club_with_data['data']
     if found_uid.uid != "havent tried searching" and found_uid.uid != "":
         found_club = await search(found_uid.uid, session)
         found_club_data = found_club['data']

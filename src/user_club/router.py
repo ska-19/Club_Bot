@@ -492,7 +492,8 @@ async def get_main_club(
         if await get_user_by_id(user_id, session) == "User not found":
             raise ValueError('404u')
 
-        query = select(club_x_user).where(
+        join = club_x_user.join(club, club_x_user.c.club_id == club.c.id)
+        query = select(club).select_from(join).where(
             (club_x_user.c.user_id == user_id) &
             (club_x_user.c.is_main == True)
         )
