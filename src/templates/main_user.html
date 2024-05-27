@@ -16,6 +16,7 @@
 
 
 {% block user_status %}
+<!-- "Перейти в профиль" -->
 <a href="/pages/profile_user/{{user_info.id}}" style="text-decoration: none">
     <button class="Btn" style="height: 60px; width: 160px; justify-content: center">
         <h1 style="bottom: 7px;font-size: 14px; position: relative; z-index: 2">
@@ -27,8 +28,14 @@
 {% endblock %}
 
 
-{% block clubs %}
-<!--позже будет окно с различными клубами "Сменить клуб"-->
+{% block href_search %}
+<!--"Сменить клуб"-->
+<a href="/pages/search_user/{{user_info.id}}" style="text-decoration: none">
+    <button class="Btn" style="height: 60px; width: 160px; justify-content: center">
+        <h1 style="bottom: 5px;font-size: 14px; position: relative; z-index: 2">
+            Сменить клуб</h1>
+    </button>
+</a>
 {% endblock %}
 
 

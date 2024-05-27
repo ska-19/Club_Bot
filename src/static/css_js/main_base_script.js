@@ -107,5 +107,5 @@ function Save(eventId) {
 }
 
 function End(eventId) {
-
+    
 }

@@ -1,0 +1,82 @@
+{% extends "search_base.html" %}
+
+
+{% block found %}
+{% if found_club.id > 0 %}
+<div class="form-container" style="margin-top: 30px">
+    <form class="form">
+        <h1 id="Name_{{found_club.id}}" style="font-size: 15px;position: relative; z-index: 2">{{ found_club.name }}</h1>
+        <div style="display: flex; justify-content: center">
+            <!-- "Вступить в клуб" -->
+            <div class="block1" style="width: 100%; text-align: center">
+                <button type="button" class="JoinClub" id="JoinClub_{{ found_club.id }}"
+                        onclick="JoinClub('{{found_club.id}}')">Вступить
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+Клуб найден {{ found_club.name }}
+{% elif found_club == -1 %}
+Клуб не найден
+{% endif %}
+{% endblock %}
+
+
+{% block main_club %}
+<div class="form-container" style="margin-top: 30px">
+    <form class="form">
+        <h1 id="Name_{{main_club.id}}" style="font-size: 15px;position: relative; z-index: 2">{{ main_club.name }}</h1>
+        <div style="display: flex; justify-content: center">
+            <!-- "Покинуть клуб" -->
+            <div class="block1" style="width: 100%; text-align: center">
+                <button type="button" class="LeaveClub" id="LeaveClub_{{ main_club.id }}"
+                        onclick="LeaveClub('{{main_club.id}}')">Покинуть
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+{% block href_main %}
+<a href="/pages/main_user/{{user_info.id}}" style="text-decoration: none">
+    <button class="btn_GoToTheClub" type="button" style="margin-top: 20px">
+        <strong>На главную</strong>
+        <div id="container-stars">
+            <div id="stars"></div>
+        </div>
+        <div id="glow">
+            <div class="circle"></div>
+            <div class="circle"></div>
+        </div>
+    </button>
+</a>
+{% endblock %}
+
+
+{% block clubs_info %}
+{% for club in clubs %}
+<!-- Клубы пользователя -->
+<div class="form-container" style="margin-top: 10px">
+    <form class="form">
+        <h1 id="Name_{{club.id}}" style="font-size: 15px;position: relative; z-index: 2">{{ club.name }}</h1>
+        <div style="display: flex; justify-content: center">
+            <!-- "Выбрать другой главный глуб" -->
+            <div class="block2" style="width: 50%; text-align: center">
+                <button type="button" class="ChangeMainClub" id="ChangeMainClub_{{ club.id }}"
+                        onclick="ChangeMainClub('{{club.id}}')">Перейти
+                </button>
+            </div>
+            <!-- "Покинуть клуб" -->
+            <div class="block3" style="width: 50%; text-align: center">
+                <button type="button" class="LeaveClub" id="LeaveClub_{{ club.id }}"
+                        onclick="LeaveClub('{{club.id}}')">Покинуть
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endfor %}
+{% endblock %}

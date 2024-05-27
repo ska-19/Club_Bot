@@ -68,7 +68,7 @@ async def create_club(
         id = result.fetchone()[0]
         userjoin = UserJoin(club_id=id, user_id=owner, role='owner')
         await join_to_the_club(userjoin, session)
-        uid = 'CL' + str(id) + '0' + str(owner) + '3'
+        uid = 'CL' + str(id) + '0' + str(owner) + 'N'
 
         stmt = update(club).where(club.c.id == id).values(uid=uid)
         await session.execute(stmt)
@@ -76,7 +76,7 @@ async def create_club(
 
         return {
             "status": "success",
-            "data": club_dict,  # TODO: how return ClubRead schemas
+            "data": club_dict,
             "details": None
         }
     except ValueError as e:
@@ -87,7 +87,7 @@ async def create_club(
                 "status": "error",
                 "data": "User not found",
                 "details": None
-                 })
+            })
     except Exception:
         raise HTTPException(status_code=500, detail=error)
     finally:
@@ -122,8 +122,8 @@ async def get_club(
         raise HTTPException(status_code=500, detail=error)
 
 
-@router.get("/get_channel_link")  #TODO: а в чем разница с кодом выше???
-async def get_club(
+@router.get("/get_channel_link")
+async def get_club_link(
         club_id: int,
         session: AsyncSession = Depends(get_async_session)):
     """ Получает ссылку на канал клуба по его id
@@ -222,7 +222,11 @@ async def search(
     try:
         data = await get_club_by_uid(club_uid, session)
         if data == "Club not found":
-            raise ValueError('404')
+            return {
+                "status": "succes",
+                "data": {"id": -1},
+                "details": None
+            }
         return {
             "status": "success",
             "data": data,

@@ -28,3 +28,7 @@ class ClubUpdate(BaseModel):
     comfort_time: str
     channel_link: str
     date_created: date
+
+
+class FoundUid(BaseModel):
+    uid: str = "havent tried searching"

@@ -7,14 +7,16 @@ from fastapi.responses import RedirectResponse
 
 from src.database import get_async_session
 from src.user_profile.router import update_profile
-from src.user_profile.inner_func import get_user_by_id
 from src.user_profile.router import get_user
 from src.user_profile.schemas import UserUpdate
+from src.club.schemas import FoundUid
+from src.club.router import search, get_club
 from src.events.schemas import EventReg, EventUpdate
-from src.user_club.router import get_clubs_by_user, get_balance, get_users_in_club, disjoin_club, role_update
-from src.user_club.inner_func import get_role
-from src.user_club.schemas import User
 from src.events.router import get_event_club, get_check_rec, reg_event, event_disreg, get_event, update_event
+from src.user_club.router import get_clubs_by_user, get_balance, get_users_in_club, disjoin_club, role_update, \
+    get_main_club, new_main, join_to_the_club
+from src.user_club.inner_func import get_role
+from src.user_club.schemas import User, UserJoin
 from src.achievement.router import get_achievement_by_user
 
 router = APIRouter(
@@ -178,3 +180,65 @@ async def kick_club_user(
     kick_user.club_id = clubs['data'][0]['id']
     kicked_user = await disjoin_club(kick_user, session)
     return {"message": "Kick user successfully", "kick_user": kicked_user}
+
+
+# Функции для поиска других клубов
+@router.get("/search_base")
+def get_search_base(request: Request):
+    return templates.TemplateResponse("search_base.html", {"request": request})
+
+
+@router.get("/search_user/{user_id}")
+async def get_search_user(
+        request: Request,
+        user_id: int,
+        user_info=Depends(get_user),
+        found_uid: FoundUid = Depends(),
+        session: AsyncSession = Depends(get_async_session)
+):
+    #TODO пусть get_main_club отдает еще инфу о клубе
+    clubs = await get_clubs_by_user(user_id, session)
+    user_data = dict(user_info['data'])
+    clubs_data = clubs['data']
+    main_club = await get_main_club(user_id, session)
+    main_club_with_data = await get_club(main_club['data']['club_id'], session)
+    main_club_data = main_club_with_data['data']
+    if found_uid.uid != "havent tried searching" and found_uid.uid != "":
+        found_club = await search(found_uid.uid, session)
+        found_club_data = found_club['data']
+    else:
+        found_club_data = {"id": 0}
+    return templates.TemplateResponse("search_user.html", {
+        "request": request,
+        "user_info": user_data,
+        "found_club": found_club_data,
+        "main_club": main_club_data,
+        "clubs": clubs_data,
+    })
+
+@router.post("/search_user/{user_id}")
+async def join_club(
+        join_data: UserJoin,
+        session: AsyncSession = Depends(get_async_session)
+):
+    join = await join_to_the_club(join_data, session)
+    #TODO сделать главным
+    return {"message": "Event Reg successfully", "join_to_the_club": join}
+
+
+@router.put("/search_user/{user_id}")
+async def change_main_club(
+        user_join: UserJoin,
+        session: AsyncSession = Depends(get_async_session)
+):
+    event = await update_event(event_id, event_update, session)
+    return {"message": "Event updated successfully", "event": event}
+
+
+@router.delete("/search_user/{user_id}")
+async def leave_club(
+        user_club: User,
+        session: AsyncSession = Depends(get_async_session)
+):
+    disreg = await event_disreg(event_reg.user_id, event_reg.event_id, session)
+    return {"message": "Event Disreg successfully", "disreg_event": disreg}
