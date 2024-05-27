@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select, insert, update, delete
+from sqlalchemy import select, case, insert, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
@@ -128,7 +128,6 @@ async def get_balance(
         else:
             raise HTTPException(status_code=404, detail=error404c)
     except Exception as e:
-        print(e)
         raise HTTPException(status_code=500, detail=error)
 
 
@@ -150,11 +149,10 @@ async def disjoin_club(
     """
     try:
         data_dict = data.dict()
-        if await get_user_by_id(data_dict['user_id '], session) == "User not found":  # TODO: вот здесь падает
+        if await get_user_by_id(data_dict['user_id'], session) == "User not found":  # TODO: вот здесь падает
             raise ValueError('404u')
         if await get_club_by_id(data_dict['club_id'], session) == "Club not found":
             raise ValueError('404c')
-
         if await check_rec(data_dict['user_id'], data_dict['club_id'], session):
             raise ValueError('404')
 
@@ -300,12 +298,18 @@ async def get_users_in_club(
 
     """
     try:
+        role_order = case(
+            (club_x_user.c.role == 'owner', 1),
+            (club_x_user.c.role == 'admin', 2),
+            (club_x_user.c.role == 'member', 3),
+        )
+
         if await get_club_by_id(club_id, session) == "Club not found":
             raise ValueError('404c')
 
         join = club_x_user.join(user, club_x_user.c.user_id == user.c.id)
-        query = select(user.c.username, club_x_user.c.role, club_x_user.c.date_joined).select_from(join).where(
-            club_x_user.c.club_id == club_id)
+        query = select(user.c.id, user.c.username, user.c.name, user.c.surname, club_x_user.c.role, club_x_user.c.date_joined).select_from(join).where(
+            club_x_user.c.club_id == club_id).order_by(role_order, user.c.xp)
 
         result = await session.execute(query)
         data = result.mappings().all()
@@ -325,7 +329,6 @@ async def get_users_in_club(
             raise HTTPException(status_code=404, detail=error404c)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
-
 
 @router.get("/get_users_with_role")
 async def get_users_with_role(

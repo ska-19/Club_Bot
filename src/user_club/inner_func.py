@@ -85,7 +85,6 @@ async def check_rec(
             (club_x_user.c.club_id == club_id))
         result = await session.execute(query)
         data = result.mappings().first()
-        print(data)
         if not data:
             return True
         else:

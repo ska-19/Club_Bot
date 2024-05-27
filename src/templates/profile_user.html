@@ -2,8 +2,10 @@
 
 
 {% block level %}
-<div class="experience-level">
-    Level {{ user_info.xp }}
+<div class="experience-fill" style="width: {{ user_info.xp_percent }}%">
+    <div class="experience-level">
+        Level {{ user_info.full_xp }}
+    </div>
 </div>
 {% endblock %}
 
@@ -24,8 +26,8 @@
 
 {% block dob %}
 <div class="form-group" style="width: 60%">
-    <label for="Date of Birth">День рождения</label>
-    <input required="" name="Date of Birth" id="Date of Birth" type="text" style="width: 115px"
+    <label for="DateOfBirth">День рождения</label>
+    <input required="" name="Date of Birth" id="DateOfBirth" type="text" style="width: 115px"
            value="{{ user_info.dob }}" readonly>
 </div>
 {% endblock %}
