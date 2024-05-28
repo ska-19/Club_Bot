@@ -44,10 +44,18 @@ async def get_profile_user(
         10 * (x - 5 * (math.floor((-5 + math.sqrt(25 + 20 * x)) / 10)) * (
                 (math.floor((-5 + math.sqrt(25 + 20 * x)) / 10)) + 1)) / (
                 (math.floor((-5 + math.sqrt(25 + 20 * x)) / 10)) + 1)))
+    print(1)
     user_data['full_xp'] = calc_exp(user_data['xp'])[0]
     user_data['xp_percent'] = calc_exp(user_data['xp'])[1]
     # achievements = await get_achievement_by_user(user_data['id'], session)
     # user_data['achievement'] = achievements['data']
+    user_clubs = await get_main_club(user_data['id'], session)
+    print(1)
+    if user_clubs['status'] == "success":
+        user_data['exist_clubs'] = 1
+    else:
+         user_data['exist_clubs'] = 0
+    print(user_data)
     return templates.TemplateResponse("profile_user.html", {"request": request, "user_info": user_data})
 
 
@@ -79,13 +87,15 @@ async def get_main_user(
     user_x_club_info_role = await get_role(user_data['id'], club_info['id'], session)
     user_x_club_info_balance = await get_balance(user_data['id'], club_info['id'], session)
     event_data = await get_event_club(club_info['id'], session)
-    if event_data['status'] == "success":
+    if event_data['data'] != "Event not found":
+        user_data['exist_events'] = 1
         events = [dict(event) for event in event_data['data']]
         for event in events:
             event_id = event['id']
             event['reg'] = await get_check_rec(event_id, user_data['id'], session)
     else:
-        events = {}
+        user_data['exist_events'] = 0
+        events = []
     club_info['xp'] = 0
     user_x_club_info = {
         'role': user_x_club_info_role,
@@ -203,13 +213,21 @@ async def get_search_user(
 ):
     user_data = dict(user_info['data'])
     main_club = await get_main_club(user_data['id'], session)
-    main_club_data = dict(main_club['data'])
+    if main_club['status'] == "success":
+        user_data['exist_main_club'] = 1
+        main_club_data = dict(main_club['data'])
+    else:
+        user_data['exist_main_club'] = 0
+        main_club_data = {}
     user_clubs = await get_clubs_by_user(user_data['id'], session)
-    user_x_club_info_role = await get_role(user_data['id'], main_club_data['id'], session)
-    user_data['role'] = user_x_club_info_role
-    clubs_data = user_clubs['data']
+    if user_clubs['status'] == 'success' and len(user_clubs['data']) > 1:
+        clubs_data_with_main = user_clubs['data']
+        user_data['exist_clubs'] = 1
+        clubs_data = [club for club in clubs_data_with_main if club["name"] != main_club_data["name"]]
+    else:
+        clubs_data = []
+        user_data['exist_clubs'] = 0
     uid_last_search = user_data['links']  # последний поисковой запрос данного юзера, изначально ""
-    print(uid_last_search)
     if uid_last_search == "":
         found_club_data = {"id": 0}
     else:
@@ -229,7 +247,7 @@ async def join_club(
         join_data: UserJoin,
         session: AsyncSession = Depends(get_async_session)
 ):
-    await join_to_the_club(join_data, session)
+    join = await join_to_the_club(join_data, session)
     new_main_club = await new_main(join_data.user_id, join_data.club_id, session)
     return {"message": "Event Reg successfully", "new join club": new_main_club}
 
@@ -240,9 +258,7 @@ async def found_club(
         last_search: FoundUid,
         session: AsyncSession = Depends(get_async_session)
 ):
-    print(1)
-    print(user_id)
-    print(last_search.uid)
+    print(last_search)
     update_last_search = await update_links_profile(user_id, last_search, session)
     return {"message": "Event updated successfully", "new last search": update_last_search}
 

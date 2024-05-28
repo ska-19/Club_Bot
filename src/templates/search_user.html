@@ -7,27 +7,36 @@
     <div class="form">
         <div class="card" style="left: 50%;transform: translate(-50%, 0%);width: 250px">
             <h1 id="Name_{{found_club.id}}" style="font-size: 16px;position: relative;text-align: center; z-index: 2">
-                {{ main_club.name }}</h1>
+                {{ found_club.name }}</h1>
         </div>
         <div style="display: flex; justify-content: center">
             <!-- "Покинуть клуб" -->
             <div class="block1" style="width: 100%; text-align: center">
                 <button type="button" class="JoinClub" id="JoinClub_{{ found_club.id }}"
-                        onclick="JoinClub('{{found_club.id}}')">Покинуть
+                        onclick="JoinClub('{{found_club.id}}')">Присоединиться
                 </button>
             </div>
         </div>
     </div>
 </div>
-Клуб найден {{ found_club.name }}
-{% elif found_club == -1 %}
-Клуб не найден
+{% elif found_club.id == -1 %}
+<div style="margin-top: 30px"></div>
+<div class="card"
+     style="left: 90px;height: 40px; width: 210px; justify-content: center;display: flex">
+    <h1 style="font-size: 18px; position: relative; z-index: 2">Клуб не найден</h1>
+</div>
 {% endif %}
+<div style="margin-top: 45px"></div>
 {% endblock %}
 
 
 {% block main_club %}
-<div class="form-container" style="margin-top: 30px">
+{% if user_info.exist_main_club == 1 %}
+<div class="card"
+     style="left: 70px;height: 40px; width: 250px; justify-content: center;display: flex">
+    <h1 style="font-size: 18px; position: relative; z-index: 2">Текущий клуб</h1>
+</div>
+<div class="form-container" style="margin-top: 15px">
     <div class="form">
         <div class="card" style="left: 50%;transform: translate(-50%, 0%);width: 250px">
             <h1 id="Name_{{main_club.id}}" style="font-size: 16px;position: relative;text-align: center; z-index: 2">
@@ -43,6 +52,7 @@
         </div>
     </div>
 </div>
+{% endif %}
 {% endblock %}
 
 
@@ -63,6 +73,11 @@
 
 
 {% block clubs_info %}
+{% if user_info.exist_clubs != 0 %}
+<div class="card"
+     style="margin-top: 50px;left: 50px;height: 50px; width: 290px; justify-content: center;display: flex">
+    <h1 style="font-size: 19px; position: relative; z-index: 2">Другие клубы</h1>
+</div>
 {% for club in clubs %}
 <!-- Клубы пользователя -->
 <div class="form-container" style="margin-top: 10px">
@@ -88,4 +103,6 @@
     </form>
 </div>
 {% endfor %}
+{% else %}
+{% endif %}
 {% endblock %}

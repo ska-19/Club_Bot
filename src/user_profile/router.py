@@ -215,7 +215,7 @@ async def update_links_profile(
         if data == "User not found":
             raise ValueError
         stmt = update(user).where(user.c.id == user_id).values(
-            links=update_data.links
+            links=update_data.uid
         )
         await session.execute(stmt)
         await session.commit()

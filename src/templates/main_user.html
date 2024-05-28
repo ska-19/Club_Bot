@@ -45,6 +45,11 @@
 
 
 {% block content %}
+{% if user_info.exist_events == 1 %}
+<div class="card"
+     style="left: 50px;height: 50px; width: 290px; justify-content: center;display: flex">
+    <h1 style="font-size: 19px; position: relative; z-index: 2">СОБЫТИЯ</h1>
+</div>
 {% for event in events %}
 <!--события-->
 <div class="form-container" style="margin-top: 30px">
@@ -112,4 +117,5 @@
     </form>
 </div>
 {% endfor %}
+{% endif %}
 {% endblock %}
