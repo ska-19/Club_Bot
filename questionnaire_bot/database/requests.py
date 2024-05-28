@@ -1,5 +1,5 @@
 from database.models import Questionnaire, async_session
-from sqlalchemy import select, desc
+from sqlalchemy import select, desc, distinct
 
 
 async def set_user(tg_id):
@@ -8,6 +8,12 @@ async def set_user(tg_id):
         if not user:
             session.add(Questionnaire(tg_id=tg_id, questionnaire_counter=0))
         await session.commit()
+
+
+async def get_user(tg_id):
+    async with async_session() as session:
+        user = await session.scalar(select(Questionnaire).where(Questionnaire.tg_id == tg_id))
+        return user
 
 
 async def set_user_choosing_questionnaire(tg_id, user_questionnaire_data):
@@ -49,3 +55,10 @@ async def set_user_tell_questionnaire(tg_id, user_questionnaire_data):
         questionnaire.choosing_stay_in_touch = user_questionnaire_data['chosen_stay_in_touch']
 
         await session.commit()
+
+
+async def get_users():
+    async with async_session() as session:
+        users_tg_id = await session.execute(select(distinct(Questionnaire.tg_id)))
+        return users_tg_id.scalars().all()
+

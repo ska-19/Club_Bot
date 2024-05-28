@@ -27,10 +27,30 @@ def get_main_ikb() -> InlineKeyboardMarkup:
     ikeyboard = InlineKeyboardMarkup(inline_keyboard=ikb)
     return ikeyboard
 
+
 def get_back_button() -> InlineKeyboardMarkup:
     """Get back button."""
     ikb = [
         [InlineKeyboardButton(text="Назад", callback_data="back")],
+    ]
+    ikeyboard = InlineKeyboardMarkup(inline_keyboard=ikb)
+    return ikeyboard
+
+
+def get_ask_for_take_part_ikb() -> InlineKeyboardMarkup:
+    ikb = [
+        [InlineKeyboardButton(text="Принять участие", callback_data="take_part")],
+        [InlineKeyboardButton(text="Отказаться", callback_data="decline")],
+    ]
+    ikeyboard = InlineKeyboardMarkup(inline_keyboard=ikb)
+    return ikeyboard
+
+
+def get_ask_for_meeting_ikb() -> InlineKeyboardMarkup:
+    ikb = [
+        [InlineKeyboardButton(text="Уже встретились!", callback_data="meeting_done")],
+        [InlineKeyboardButton(text="Познакомились, встретимся позже)", callback_data="meeting_later")],
+        [InlineKeyboardButton(text="Собеседник не отвечает :c", callback_data="meeting_notdone")],
     ]
     ikeyboard = InlineKeyboardMarkup(inline_keyboard=ikb)
     return ikeyboard
