@@ -7,7 +7,7 @@ from fastapi.responses import RedirectResponse
 
 from src.database import get_async_session
 from src.user_profile.router import update_profile
-from src.user_profile.router import get_user
+from src.user_profile.router import get_user, update_links_profile
 from src.user_profile.schemas import UserUpdate
 from src.club.schemas import FoundUid
 from src.club.router import search, get_club
@@ -207,6 +207,7 @@ async def get_search_user(
     user_data['role'] = user_x_club_info_role
     clubs_data = user_clubs['data']
     uid_last_search = user_data['links']  # последний поисковой запрос данного юзера, изначально ""
+    print(uid_last_search)
     if uid_last_search == "":
         found_club_data = {"id": 0}
     else:
@@ -233,13 +234,14 @@ async def join_club(
 
 @router.put("/search_user/{user_id}/1")
 async def found_club(
-        request: Request,
         user_id: int,
         last_search: FoundUid,
         session: AsyncSession = Depends(get_async_session)
 ):
-    # TODO сюда функция, по обновлению линки, линка - last_search, user_id тоже есть
-    update_last_search = 1
+    print(1)
+    print(user_id)
+    print(last_search.uid)
+    update_last_search = await update_links_profile(user_id, last_search, session)
     return {"message": "Event updated successfully", "new last search": update_last_search}
 
 
