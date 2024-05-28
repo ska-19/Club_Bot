@@ -4,17 +4,20 @@
 {% block found %}
 {% if found_club.id > 0 %}
 <div class="form-container" style="margin-top: 30px">
-    <form class="form">
-        <h1 id="Name_{{found_club.id}}" style="font-size: 15px;position: relative; z-index: 2">{{ found_club.name }}</h1>
+    <div class="form">
+        <div class="card" style="left: 50%;transform: translate(-50%, 0%);width: 250px">
+            <h1 id="Name_{{found_club.id}}" style="font-size: 16px;position: relative;text-align: center; z-index: 2">
+                {{ main_club.name }}</h1>
+        </div>
         <div style="display: flex; justify-content: center">
-            <!-- "Вступить в клуб" -->
+            <!-- "Покинуть клуб" -->
             <div class="block1" style="width: 100%; text-align: center">
                 <button type="button" class="JoinClub" id="JoinClub_{{ found_club.id }}"
-                        onclick="JoinClub('{{found_club.id}}')">Вступить
+                        onclick="JoinClub('{{found_club.id}}')">Покинуть
                 </button>
             </div>
         </div>
-    </form>
+    </div>
 </div>
 Клуб найден {{ found_club.name }}
 {% elif found_club == -1 %}
@@ -25,8 +28,11 @@
 
 {% block main_club %}
 <div class="form-container" style="margin-top: 30px">
-    <form class="form">
-        <h1 id="Name_{{main_club.id}}" style="font-size: 15px;position: relative; z-index: 2">{{ main_club.name }}</h1>
+    <div class="form">
+        <div class="card" style="left: 50%;transform: translate(-50%, 0%);width: 250px">
+            <h1 id="Name_{{main_club.id}}" style="font-size: 16px;position: relative;text-align: center; z-index: 2">
+                {{ main_club.name }}</h1>
+        </div>
         <div style="display: flex; justify-content: center">
             <!-- "Покинуть клуб" -->
             <div class="block1" style="width: 100%; text-align: center">
@@ -35,7 +41,7 @@
                 </button>
             </div>
         </div>
-    </form>
+    </div>
 </div>
 {% endblock %}
 
@@ -61,7 +67,10 @@
 <!-- Клубы пользователя -->
 <div class="form-container" style="margin-top: 10px">
     <form class="form">
-        <h1 id="Name_{{club.id}}" style="font-size: 15px;position: relative; z-index: 2">{{ club.name }}</h1>
+        <div class="card" style="left: 50%;transform: translate(-50%, 0%);width: 250px">
+            <h1 id="Name_{{club.id}}" style="font-size: 16px;position: relative;text-align: center; z-index: 2">
+                {{ club.name }}</h1>
+        </div>
         <div style="display: flex; justify-content: center">
             <!-- "Выбрать другой главный глуб" -->
             <div class="block2" style="width: 50%; text-align: center">

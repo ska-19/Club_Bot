@@ -74,10 +74,11 @@ async def get_main_user(
         session: AsyncSession = Depends(get_async_session)
 ):
     user_data = dict(user_info['data'])
-    user_clubs = await get_clubs_by_user(user_data['id'], session)
-    club_info = dict(user_clubs['data'][0])
+    club_info_data = await get_main_club(user_data['id'], session)
+    club_info = dict(club_info_data['data'])
     user_x_club_info_role = await get_role(user_data['id'], club_info['id'], session)
     user_x_club_info_balance = await get_balance(user_data['id'], club_info['id'], session)
+    #TODO посмотри, мы не дожлны возвращать ошибку, если нет событий у клуба, но сам клуб есть
     event_data = await get_event_club(club_info['id'], session)
     events = [dict(event) for event in event_data['data']]
     for event in events:
@@ -113,9 +114,9 @@ async def update_main_event(
         session: AsyncSession = Depends(get_async_session)
 ):
     event_id = event_update.club_id
-    user_clubs = await get_clubs_by_user(user_id, session)
-    club_info = dict(user_clubs['data'][0])
-    event_update.club_id = club_info['id']
+    main_club_data = await get_main_club(user_id, session)
+    main_club = dict(main_club_data['data'])
+    event_update.club_id = main_club['id']
     ev = await get_event(event_id, session)
     event_update.host_id = ev['data'].get('host_id')
     event_update.name = ev['data'].get('name')
@@ -145,17 +146,17 @@ async def get_club_user(
         session: AsyncSession = Depends(get_async_session)
 ):
     user_data = dict(user_info['data'])
-    user_clubs = await get_clubs_by_user(user_data['id'], session)
-    club_info = dict(user_clubs['data'][0])
-    users_in_club = await get_users_in_club(club_info['id'], session)
+    main_club_data = await get_main_club(user_data['id'], session)
+    main_club = dict(main_club_data['data'])
+    users_in_club = await get_users_in_club(main_club['id'], session)
     users = users_in_club['data']
     user_info_in_club = next((item for item in users if item['username'] == user_data['username']), None)
     user_data['role'] = user_info_in_club['role']
-    club_info['xp'] = 0
+    main_club['xp'] = 0
     return templates.TemplateResponse("club_user.html", {
         "request": request,
         "user_info": user_data,
-        "club_info": club_info,
+        "club_info": main_club,
         "users": users
     })
 
@@ -165,8 +166,9 @@ async def update_role(
         update_user: User,
         session: AsyncSession = Depends(get_async_session)
 ):
-    clubs = await get_clubs_by_user(update_user.user_id, session)
-    update_user.club_id = clubs['data'][0]['id']
+    main_club_data = await get_main_club(update_user.user_id, session)
+    main_club = dict(main_club_data['data'])
+    update_user.club_id = main_club['id']
     new_role_user = await role_update(update_user.user_id, update_user.club_id, session)
     return {"message": "Update role user successfully", "update_user": new_role_user}
 
@@ -176,8 +178,10 @@ async def kick_club_user(
         kick_user: User,
         session: AsyncSession = Depends(get_async_session)
 ):
-    clubs = await get_clubs_by_user(kick_user.user_id, session)
-    kick_user.club_id = clubs['data'][0]['id']
+    main_club_data = await get_main_club(kick_user.user_id, session)
+    main_club = dict(main_club_data['data'])
+
+    kick_user.club_id = main_club['id']
     kicked_user = await disjoin_club(kick_user, session)
     return {"message": "Kick user successfully", "kick_user": kicked_user}
 
@@ -193,22 +197,21 @@ async def get_search_user(
         request: Request,
         user_id: int,
         user_info=Depends(get_user),
-        found_uid: FoundUid = Depends(),
         session: AsyncSession = Depends(get_async_session)
 ):
-    #TODO пусть get_main_club отдает еще инфу о клубе
-    clubs = await get_clubs_by_user(user_id, session)
     user_data = dict(user_info['data'])
-    clubs_data = clubs['data']
-    main_club = await get_main_club(user_id, session)
-    main_club_data = main_club['data']
-    # main_club_with_data = await get_club(main_club['data']['club_id'], session)
-    # main_club_data = main_club_with_data['data']
-    if found_uid.uid != "havent tried searching" and found_uid.uid != "":
-        found_club = await search(found_uid.uid, session)
-        found_club_data = found_club['data']
-    else:
+    main_club = await get_main_club(user_data['id'], session)
+    main_club_data = dict(main_club['data'])
+    user_clubs = await get_clubs_by_user(user_data['id'], session)
+    user_x_club_info_role = await get_role(user_data['id'], main_club_data['id'], session)
+    user_data['role'] = user_x_club_info_role
+    clubs_data = user_clubs['data']
+    uid_last_search = user_data['links']  # последний поисковой запрос данного юзера, изначально ""
+    if uid_last_search == "":
         found_club_data = {"id": 0}
+    else:
+        search_club = await search(uid_last_search, session)
+        found_club_data = search_club['data']
     return templates.TemplateResponse("search_user.html", {
         "request": request,
         "user_info": user_data,
@@ -217,23 +220,36 @@ async def get_search_user(
         "clubs": clubs_data,
     })
 
+
 @router.post("/search_user/{user_id}")
 async def join_club(
         join_data: UserJoin,
         session: AsyncSession = Depends(get_async_session)
 ):
-    join = await join_to_the_club(join_data, session)
-    #TODO сделать главным
-    return {"message": "Event Reg successfully", "join_to_the_club": join}
+    await join_to_the_club(join_data, session)
+    new_main_club = await new_main(join_data.user_id, join_data.club_id, session)
+    return {"message": "Event Reg successfully", "new join club": new_main_club}
 
 
-@router.put("/search_user/{user_id}")
-async def change_main_club(
-        user_join: UserJoin,
+@router.put("/search_user/{user_id}/1")
+async def found_club(
+        request: Request,
+        user_id: int,
+        last_search: FoundUid,
         session: AsyncSession = Depends(get_async_session)
 ):
-    event = await update_event(event_id, event_update, session)
-    return {"message": "Event updated successfully", "event": event}
+    # TODO сюда функция, по обновлению линки, линка - last_search, user_id тоже есть
+    update_last_search = 1
+    return {"message": "Event updated successfully", "new last search": update_last_search}
+
+
+@router.put("/search_user/{user_id}/2")
+async def change_main_club(
+        changed_main_club: User,
+        session: AsyncSession = Depends(get_async_session)
+):
+    new_main_club = await new_main(changed_main_club.user_id, changed_main_club.club_id, session)
+    return {"message": "Event updated successfully", "new main club": new_main_club}
 
 
 @router.delete("/search_user/{user_id}")
@@ -241,5 +257,5 @@ async def leave_club(
         user_club: User,
         session: AsyncSession = Depends(get_async_session)
 ):
-    disreg = await event_disreg(event_reg.user_id, event_reg.event_id, session)
-    return {"message": "Event Disreg successfully", "disreg_event": disreg}
+    disjoin = await disjoin_club(user_club, session)
+    return {"message": "Event Disreg successfully", "leave from club": disjoin}

@@ -5,8 +5,8 @@ const searchClub = () => {
     const found_uid = {
         uid: search_club
     }
-    fetch(`/pages/search_user/${userId}`, {
-        method: 'GET', headers: {
+    fetch(`/pages/search_user/${userId}/1`, {
+        method: 'PUT', headers: {
             'Content-Type': 'application/json',
         }, body: JSON.stringify(found_uid),
     })
@@ -18,7 +18,6 @@ const searchClub = () => {
         })
         .then(data => {
             console.log('Success:', data);
-            window.location.reload();
         })
         .catch(error => {
             console.error('Error:', error);
@@ -32,7 +31,7 @@ function ChangeMainClub(ClubId) {
         user_id: userId, club_id: ClubId
     }
     //TODO возможно переход на сёрч_юзер надо
-    fetch(`/pages/main_user/${userId}`, {
+    fetch(`/pages/search_user/${userId}/2`, {
         method: 'PUT', headers: {
             'Content-Type': 'application/json',
         }, body: JSON.stringify(ClubData),
@@ -100,7 +99,7 @@ function JoinClub(ClubId) {
         .then(data => {
             console.log('Success:', data);
             window.location.reload();
-            window.location.redirect = `/pages/main_user/${userId}`; //TODO чета такое
+            window.location.href = `/pages/main_user/${userId}`; //TODO чета такое
         })
         .catch(error => {
             console.error('Error:', error);
