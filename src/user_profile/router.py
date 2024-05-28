@@ -6,8 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
 from src.user_profile.models import user
-from src.user_profile.schemas import UserUpdate, UserCreate, UserCUpdate, UserLUpdate
+from src.user_profile.schemas import UserUpdate, UserCreate, UserCUpdate
 from src.user_profile.inner_func import get_user_by_id
+from src.club.schemas import FoundUid
 
 router = APIRouter(
     prefix="/user_profile",
@@ -197,7 +198,7 @@ async def update_create_profile(
 @router.post("/update_links_user")
 async def update_links_profile(
         user_id: int,
-        update_data: UserLUpdate,
+        update_data: FoundUid,
         session: AsyncSession = Depends(get_async_session)):
     """Обновляет данные пользователя (ттолько линкс, пока костыль)
 
