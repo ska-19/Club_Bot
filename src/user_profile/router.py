@@ -230,7 +230,8 @@ async def update_links_profile(
         }
     except ValueError:
         raise HTTPException(status_code=404, detail=error404)
-    except Exception:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()

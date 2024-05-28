@@ -8,7 +8,7 @@ from src.database import get_async_session
 from src.club.models import club
 from src.club.schemas import ClubUpdate, ClubCreate
 from src.user_profile.inner_func import get_user_by_id
-from src.user_club.router import join_to_the_club
+from src.user_club.router import join_to_the_club, new_main
 from src.user_club.schemas import UserJoin
 from src.club.inner_func import get_club_by_id, check_leg_name, get_club_by_uid
 
@@ -68,6 +68,7 @@ async def create_club(
         id = result.fetchone()[0]
         userjoin = UserJoin(club_id=id, user_id=owner, role='owner')
         await join_to_the_club(userjoin, session)
+        await new_main(owner, id, session)
         uid = 'CL' + str(id) + '0' + str(owner) + 'N'
 
         stmt = update(club).where(club.c.id == id).values(uid=uid)
@@ -110,14 +111,16 @@ async def get_club(
     try:
         data = await get_club_by_id(club_id, session)
         if data == "Club not found":
-            raise ValueError
+            return {
+                "status": "fail",
+                "data": data,
+                "details": None
+            }
         return {
             "status": "success",
             "data": data,
             "details": None
         }
-    except ValueError:
-        raise HTTPException(status_code=404, detail=error404)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
 
@@ -223,7 +226,7 @@ async def search(
         data = await get_club_by_uid(club_uid, session)
         if data == "Club not found":
             return {
-                "status": "succes",
+                "status": "success",
                 "data": {"id": -1},
                 "details": None
             }

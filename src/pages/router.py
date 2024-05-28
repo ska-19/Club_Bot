@@ -220,13 +220,23 @@ async def get_search_user(
         user_data['exist_main_club'] = 0
         main_club_data = {}
     user_clubs = await get_clubs_by_user(user_data['id'], session)
-    if user_clubs['status'] == 'success' and len(user_clubs['data']) > 1:
-        clubs_data_with_main = user_clubs['data']
-        user_data['exist_clubs'] = 1
-        clubs_data = [club for club in clubs_data_with_main if club["name"] != main_club_data["name"]]
-    else:
+    if user_clubs['status'] == 'fail':
         clubs_data = []
         user_data['exist_clubs'] = 0
+    else:
+        clubs_data_with_main = user_clubs['data']
+        user_data['exist_clubs'] = 1
+        if user_data['exist_main_club'] == 0:
+            clubs_data = [club for club in clubs_data_with_main if club["name"] != main_club_data["name"]]
+        else:
+            clubs_data = [club for club in clubs_data_with_main]
+    # if user_clubs['status'] == 'success' and len(user_clubs['data']) > 1:
+    #     clubs_data_with_main = user_clubs['data']
+    #     user_data['exist_clubs'] = 1
+    #     clubs_data = [club for club in clubs_data_with_main if club["name"] != main_club_data["name"]]
+    # else:
+    #     clubs_data = []
+    #     user_data['exist_clubs'] = 0
     uid_last_search = user_data['links']  # последний поисковой запрос данного юзера, изначально ""
     if uid_last_search == "":
         found_club_data = {"id": 0}
