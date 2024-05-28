@@ -78,12 +78,14 @@ async def get_main_user(
     club_info = dict(club_info_data['data'])
     user_x_club_info_role = await get_role(user_data['id'], club_info['id'], session)
     user_x_club_info_balance = await get_balance(user_data['id'], club_info['id'], session)
-    #TODO посмотри, мы не дожлны возвращать ошибку, если нет событий у клуба, но сам клуб есть
     event_data = await get_event_club(club_info['id'], session)
-    events = [dict(event) for event in event_data['data']]
-    for event in events:
-        event_id = event['id']
-        event['reg'] = await get_check_rec(event_id, user_data['id'], session)
+    if event_data['status'] == "success":
+        events = [dict(event) for event in event_data['data']]
+        for event in events:
+            event_id = event['id']
+            event['reg'] = await get_check_rec(event_id, user_data['id'], session)
+    else:
+        events = {}
     club_info['xp'] = 0
     user_x_club_info = {
         'role': user_x_club_info_role,
