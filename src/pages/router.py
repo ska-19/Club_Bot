@@ -81,6 +81,8 @@ async def get_main_user(
         user_info=Depends(get_user),
         session: AsyncSession = Depends(get_async_session)
 ):
+    blank_link = FoundUid(uid = "")
+    await update_links_profile(user_info['data']['id'], blank_link, session)
     user_data = dict(user_info['data'])
     club_info_data = await get_main_club(user_data['id'], session)
     club_info = dict(club_info_data['data'])
