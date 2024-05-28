@@ -39,7 +39,7 @@ class UserUpdate(BaseModel):
         arbitrary_types_allowed = True
 
 
-class UserUpdate(BaseModel):
+class UserCUpdate(BaseModel):
     username: str
     name: str
     surname: str
@@ -50,6 +50,26 @@ class UserUpdate(BaseModel):
     # course: str
     # faculty: str
     # links: str  # ссылки на соц сети
+    # bio: str  # о себе
+    # dob: date
+    # city: str
+    # education: str
+
+    class Config:
+        arbitrary_types_allowed = True
+
+
+class UserLUpdate(BaseModel):
+    # username: str
+    # name: str
+    # surname: str
+    # email: str
+    # tel: str
+    # photo: str  # ссылка на фото
+    # comfort_time: str  # удобное время для встреч
+    # course: str
+    # faculty: str
+    links: str  # ссылки на соц сети
     # bio: str  # о себе
     # dob: date
     # city: str
