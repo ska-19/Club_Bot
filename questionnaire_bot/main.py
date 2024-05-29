@@ -25,8 +25,8 @@ def register_routers(dp: Dispatcher) -> None:
 
 
 async def ask_for_take_part():
-    users_rc_ready = {}
-    user_rc_pair = {}
+    users_rc_ready.clear()
+    user_rc_pair.clear()
     users_tg_id = await rq.get_users()
     take_part_state.set_state(True)
     for user_tg_id in users_tg_id:
