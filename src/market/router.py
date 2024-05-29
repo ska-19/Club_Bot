@@ -25,6 +25,7 @@ async def add_product(
         session: AsyncSession = Depends(get_async_session)
 ):
     try:
+        print('a')
         if await get_user_by_id(new_data.admin_id, session) == "User not found":
             raise ValueError('404u')
         if await get_club_by_id(new_data.club_id, session) == "Club not found":
@@ -54,12 +55,16 @@ async def add_product(
             raise ValueError('404p')
     except ValueError as e:
         if str(e) == '404u':
+            print('market/add_product 404u')
             raise HTTPException(status_code=404, detail=error404u)
         if str(e) == '404c':
+            print('market/add_product 404c')
             raise HTTPException(status_code=404, detail=error404c)
         if str(e) == '404uc':
+            print('market/add_product 404uc')
             raise HTTPException(status_code=404, detail=error404uc)
         if str(e) == '404p':
+            print('market/add_product 404p')
             raise HTTPException(status_code=404, detail=error404p)
     finally:
         await session.rollback()

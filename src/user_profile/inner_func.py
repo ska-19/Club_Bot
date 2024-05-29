@@ -22,10 +22,8 @@ async def get_user_by_id(
         query = select(user).where(user.c.id == user_id)
         result = await session.execute(query)
         data = result.mappings().first()
-
         if not data:
-            data = "User not found"
-
+            return "User not found"
         return data
     except Exception:
         raise HTTPException(status_code=500, detail=error)

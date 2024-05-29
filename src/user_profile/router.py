@@ -52,7 +52,6 @@ async def create_user(
         data = await get_user_by_id(user_dict['id'], session)
         if data != "User not found":
             raise ValueError
-        #TODO: Зач столько полей в схеме если все равно их руками выставляешь?
         user_dict['is_active'] = True
         user_dict['is_superuser'] = False
         user_dict['is_verified'] = False
@@ -120,9 +119,9 @@ async def get_user(
 
 
 @router.get("/get_attr")
-async def get_user_attr(
+async def get_user_attr( #TODO: я бы дропал 404 если col не существует
         user_id: int,
-        col: str,
+        col: str, #TODO: переименовать в attr
         session: AsyncSession = Depends(get_async_session)):
     """Получает данные пользователя по его id и атрибуту
 
@@ -284,3 +283,36 @@ async def update_xp(
 #         raise HTTPException(status_code=500, detail=error)
 #     finally:
 #         await session.rollback()
+
+
+@router.post("/delete_user")
+async def delete_user(
+        user_id: int,
+        session: AsyncSession = Depends(get_async_session)):
+    """Удаляет пользователя
+
+        :param user_id:
+        :return:
+            200 + джейсон со всеми данными, если все хорошо.
+            404 если такого юзера нет.
+            500 если внутрення ошибка сервера.
+
+    """
+    try:
+        data = await get_user_by_id(user_id, session)
+        if data == "User not found":
+            raise ValueError("404")
+        stmt = user.delete().where(user.c.id == user_id)
+        await session.execute(stmt)
+        await session.commit()
+        return {
+            "status": "success",
+            "data": None,
+            "details": None
+        }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+    finally:
+        await session.rollback()

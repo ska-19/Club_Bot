@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class UserCreate(BaseModel):
+class UserCreate(BaseModel): #TODO: Почему нет поля для емейла?
     id: int  # tg id
     username: str  # tg username
     mentor: bool = False
