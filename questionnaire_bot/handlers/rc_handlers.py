@@ -40,6 +40,8 @@ class User_rc_pair:
         self.user_rc_pair = {}
 
     def __getitem__(self, item):
+        if item not in self.user_rc_pair.keys():
+            return None
         return self.user_rc_pair[item]
 
     def __setitem__(self, key, value):
