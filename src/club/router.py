@@ -59,6 +59,9 @@ async def create_club(
             raise ValueError('409')
 
         club_dict['date_joined'] = datetime.utcnow()
+        club_dict['links'] = ""
+        club_dict['comfort_time'] = ""
+        club_dict['photo'] = ""
         club_dict['uid'] = '0'
         owner = club_dict["owner"]
         stmt = insert(club).values(**club_dict).returning(club.c.id)
