@@ -68,9 +68,13 @@ async def create_event(
             raise ValueError('404uc')
         if role == "admin" or role == "owner":
             event_dict = new_event.model_dump()
-            query = insert(event).values(**event_dict)
-            await session.execute(query)
+            query = insert(event).values(**event_dict).returning(event.c.id)
+            result = await session.execute(query)
             await session.commit()
+
+            id = result.fetchone()[0]
+            RegEvent = EventReg(user_id=new_event.host_id, event_id=id)
+            await reg_event(RegEvent, session)
 
             return {
                 "status": "success",
