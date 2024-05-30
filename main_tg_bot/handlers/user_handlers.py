@@ -24,9 +24,9 @@ async def cmd_dice(message: types.Message):
 
 @router.message(CommandStart())
 async def cmd_start(message: types.Message, config: BotConfig, state: FSMContext):
-    is_admin = False
-    if message.from_user.id in config.admin_ids:
-        is_admin = True
+    is_admin = await rq.is_user_club_admin(message.from_user.id)
+    # if message.from_user.id in config.admin_ids:
+    #     is_admin = True
     # if message.from_user.bot:
     #     return
     user_data = {

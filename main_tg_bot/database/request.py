@@ -14,8 +14,8 @@ async def set_user(user_data):
     rq_user_data = {
         "id": int(user_data["tg_id"]),
         "username": str(user_data["username"]),
-        "name": '' if user_data["name"] is None or 'None' else str(user_data["name"]),
-        "surname": '' if user_data["surname"] is None or 'None' else str(user_data["surname"]),
+        "name": str('') if user_data["name"] is None or 'None' else str(user_data["name"]),
+        "surname": str('') if user_data["surname"] is None or 'None' else str(user_data["surname"]),
     }
 
     headers = {
@@ -52,3 +52,16 @@ async def set_club(tg_id, club_data):
     response = requests.post(url, json=rq_club_data, headers=headers)
     return response
 
+
+async def is_user_club_admin(tg_id):
+    headers = {
+        "Content-Type": "application/json"
+    }
+    url = f'{str(URL)}/join/get_clubs_by_user?user_id={str(tg_id)}'
+    response = requests.post(url=url, headers=headers)
+
+    if response.status_code == 200:
+        for club in response.json()['data']:
+            if club['owner'] == tg_id:
+                return True
+    return False

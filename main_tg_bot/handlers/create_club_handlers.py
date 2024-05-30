@@ -77,7 +77,7 @@ async def cmd_enter_link_channel(message: Message, state: FSMContext):
              f"Описание: {club_data['bio']}\n"
              f"Ссылка на канал: {club_data['channel_link']}\n\n"
              "Для управления клубом используйте кнопки в профиле клуба.",
-        reply_markup=get_main_ikb({'tg_id': message.from_user.id})
+        reply_markup=get_main_ikb({'tg_id': message.from_user.id}, is_admin=True)
     )
     await state.clear()
     await message.delete()
@@ -85,9 +85,10 @@ async def cmd_enter_link_channel(message: Message, state: FSMContext):
 
 @router.callback_query(F.data == "back")
 async def cmd_back(callback: CallbackQuery, state: FSMContext):
+    is_admin = await rq.is_user_club_admin(callback.message.from_user.id)
     await callback.message.answer(
         text="<b>Вы прервали создание клуба</b>",
-        reply_markup=get_main_ikb({'tg_id': callback.from_user.id})
+        reply_markup=get_main_ikb({'tg_id': callback.from_user.id}, is_admin=False)
     )
     await state.clear()
 
