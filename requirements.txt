@@ -7,7 +7,7 @@ aiosqlite==0.17.0
 alembic==1.13.1
 amqp==5.2.0
 annotated-types==0.6.0
-anyio==4.3.0
+anyio==3.*
 async-generator==1.10
 async-timeout==4.0.3
 asyncpg==0.29.0
