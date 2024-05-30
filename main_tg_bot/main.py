@@ -16,6 +16,8 @@ from database.models import async_main
 def register_routers(dp: Dispatcher) -> None:
     """Registers routers"""
     dp.include_routers(user_handlers.router, create_club_handlers.router)
+
+
 async def main() -> None:
     """Entry point of the program."""
 

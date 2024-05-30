@@ -2,7 +2,10 @@ from aiogram import Router, F
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery
+from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery, BufferedInputFile
+import requests
+from bot_instance import bot
+import io
 
 from keyboards.simple_kb import make_colum_keyboard
 from keyboards.user_keyboards import get_main_ikb, get_back_button
@@ -67,7 +70,7 @@ async def cmd_enter_bio(message: Message, state: FSMContext):
 
 @router.message(CreateClub.enter_link_channel)
 async def cmd_enter_link_channel(message: Message, state: FSMContext):
-    await state.update_data(link_channel=message.text)
+    await state.update_data(channel_link=message.text)
     club_data = await state.get_data()
     await rq.set_club(message.from_user.id, club_data)
     await message.answer(
@@ -75,9 +78,9 @@ async def cmd_enter_link_channel(message: Message, state: FSMContext):
              f"Название: {club_data['name']}\n"
              f"Направление: {club_data['dest']}\n"
              f"Описание: {club_data['bio']}\n"
-             f"Ссылка на канал: {club_data['link_channel']}\n\n"
+             f"Ссылка на канал: {club_data['channel_link']}\n\n"
              "Для управления клубом используйте кнопки в профиле клуба.",
-        reply_markup=get_main_ikb({'tg_id': message.from_user.id})
+        reply_markup=get_main_ikb({'tg_id': message.from_user.id}, is_admin=True)
     )
     await state.clear()
     await message.delete()
@@ -87,7 +90,39 @@ async def cmd_enter_link_channel(message: Message, state: FSMContext):
 async def cmd_back(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer(
         text="<b>Вы прервали создание клуба</b>",
-        reply_markup=get_main_ikb({'tg_id': callback.from_user.id})
+        reply_markup=get_main_ikb({'tg_id': callback.from_user.id}, is_admin=False)
     )
     await state.clear()
 
+
+@router.callback_query(F.data == "download_clu_data")
+async def cmd_download_clu_data(callback: CallbackQuery):
+    club_id = await rq.is_user_club_admin(callback.from_user.id)
+    if club_id == -1:
+        await callback.message.answer(
+            text="Вы не являетесь администратором клуба",
+            reply_markup=get_main_ikb({'tg_id': callback.from_user.id}, is_admin=False)
+        )
+        await callback.message.delete()
+        return
+    else:
+        await bot.send_message(chat_id=callback.from_user.id, text="📥 <b>Ожидайте файл с данными клуба</b>")
+    response = await rq.club_data_links(callback.from_user.id, club_id, 'club_data')
+    if response.status_code == 200:
+        filename = response.headers.get('content-disposition').split('filename=')[1].strip('""')
+        file_bytes = io.BytesIO(response.content)
+        file = BufferedInputFile(file_bytes.read(), filename=filename)
+        await bot.send_document(chat_id=callback.from_user.id, document=file)
+
+    response = await rq.club_data_links(callback.from_user.id, club_id, 'events_data')
+    if response.status_code == 200:
+        filename = response.headers.get('content-disposition').split('filename=')[1].strip('""')
+        file_bytes = io.BytesIO(response.content)
+        file = BufferedInputFile(file_bytes.read(), filename=filename)
+        await bot.send_document(chat_id=callback.from_user.id, document=file)
+    else:
+        await callback.message.answer(
+            text="Ошибка при загрузке статистки событий клуба",
+            reply_markup=get_main_ikb({'tg_id': callback.from_user.id}, is_admin=True)
+        )
+    await callback.message.delete()
