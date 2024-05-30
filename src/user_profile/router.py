@@ -8,6 +8,8 @@ from src.database import get_async_session
 from src.user_profile.models import user
 from src.user_profile.schemas import UserUpdate, UserCreate, UserCUpdate
 from src.user_profile.inner_func import get_user_by_id
+from src.user_club.router import get_clubs_by_user, disjoin_club
+from src.user_club.schemas import User
 from src.club.schemas import FoundUid
 
 router = APIRouter(
@@ -53,7 +55,6 @@ async def create_user(
         data = await get_user_by_id(user_dict['id'], session)
         if data != "User not found":
             raise ValueError
-        #TODO: Зач столько полей в схеме если все равно их руками выставляешь?
         user_dict['is_active'] = True
         user_dict['is_superuser'] = False
         user_dict['is_verified'] = False
@@ -121,9 +122,9 @@ async def get_user(
 
 
 @router.get("/get_attr")
-async def get_user_attr(
+async def get_user_attr( #TODO: я бы дропал 404 если col не существует
         user_id: int,
-        col: str,
+        col: str, #TODO: переименовать в attr
         session: AsyncSession = Depends(get_async_session)):
     """Получает данные пользователя по его id и атрибуту
 
@@ -369,3 +370,44 @@ async def update_xp(
 #         raise HTTPException(status_code=500, detail=error)
 #     finally:
 #         await session.rollback()
+
+
+@router.post("/delete_user")
+async def delete_user(
+        user_id: int,
+        session: AsyncSession = Depends(get_async_session)):
+    """Удаляет пользователя
+
+        :param user_id:
+        :return:
+            200 + джейсон со всеми данными, если все хорошо.
+            404 если такого юзера нет.
+            500 если внутрення ошибка сервера.
+
+    """
+    try:
+        data = await get_user_by_id(user_id, session)
+        if data == "User not found":
+            raise ValueError("404")
+        stmt = user.delete().where(user.c.id == user_id)
+        clubs = await get_clubs_by_user(user_id, session)
+        clubs_data = clubs['data']
+        # print(clubs_data)
+        for club in clubs_data:
+            user_data = User(user_id=user_id, club_id=club['id'])
+            await disjoin_club(user_data, session)
+
+        await session.execute(stmt)
+        await session.commit()
+        return {
+            "status": "success",
+            "data": None,
+            "details": None
+        }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404)
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail=error)
+    finally:
+        await session.rollback()

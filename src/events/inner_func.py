@@ -8,56 +8,9 @@ from src.user_club.router import update_balance, get_users_with_role
 from src.user_club.schemas import UpdateBalance
 from src.user_profile.router import update_xp
 
-error = {
-    "status": "error",
-    "data": None,
-    "details": None
-}
-
-error404u = {
-    "status": "error",
-    "data": "User not found",
-    "details": None
-}
-
-error404e = {
-    "status": "error",
-    "data": "Event not found",
-    "details": None
-}
-
-error404c = {
-    "status": "error",
-    "data": "Club not found",
-    "details": None
-}
-
-error404uc = {
-    "status": "error",
-    "data": "This user not in this club",
-    "details": None
-}
-
-error403 = {
-    "status": "error",
-    "data": "Forbidden",
-    "details": None
-}
-
-error404eu = {
-    "status": "error",
-    "data": "User has not registration in this event",
-    "details": None
-}
-
-error409 = {
-    "status": "error",
-    "data": "User already registr in this event",
-    "details": None
-}
+from src.errors import *
 
 
-# внутреняя функция принимает для соблюдения преемственности с club
 async def get_event_by_id(
         event_id: int,
         session: AsyncSession = Depends(get_async_session)

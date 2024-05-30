@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select, insert, update
+from sqlalchemy import insert, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
@@ -51,6 +51,7 @@ async def create_club(
 
     """
     try:
+
         club_dict = new_club.dict()
         if await get_user_by_id(club_dict['owner'], session) == "User not found":
             raise ValueError('404u')
@@ -126,7 +127,6 @@ async def get_club(
         }
     except Exception:
         raise HTTPException(status_code=500, detail=error)
-
 
 @router.get("/get_channel_link")
 async def get_club_link(
@@ -211,6 +211,40 @@ async def update_club(
         await session.rollback()
 
 
+@router.post("/delete_club")
+async def delete_club(
+        club_id: int,
+        session: AsyncSession = Depends(get_async_session)):
+    """ Удаляет клуб по его id
+
+        :param club_id:
+        :return:
+            200 + джейсон со всеми данными, если все хорошо.
+            404 если такого клуба нет.
+            500 если внутрення ошибка сервера.
+
+    """
+    try:
+        data = await get_club_by_id(club_id, session)
+        if data == "Club not found":
+            raise ValueError("404")
+        query = delete(club).where(club.c.id == club_id)
+        await session.execute(query)
+        print('here')
+        await session.commit()
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+    finally:
+        await session.rollback()
+
+        
 @router.get('/search')
 async def search(
         club_uid: str,
@@ -242,3 +276,4 @@ async def search(
         raise HTTPException(status_code=404, detail=error404)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
+        

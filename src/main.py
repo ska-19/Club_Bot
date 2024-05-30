@@ -13,6 +13,7 @@ from src.statistics.router import router as router_statistics
 # from src.randomcofee.router import router as router_randomcofee
 from src.user_club.router import router as router_user_club
 from src.pages.router import router as router_pages
+from src.market.router import router as router_market
 
 
 app = FastAPI(
@@ -41,6 +42,7 @@ app.include_router(router_statistics)
 # app.include_router(router_quetionnaire)
 app.include_router(router_mentorship)
 app.include_router(router_reward)
+app.include_router(router_market)
 app.include_router(router_club)
 app.include_router(router_user_club)
 app.include_router(router_pages)

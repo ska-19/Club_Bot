@@ -5,9 +5,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database import get_async_session
 from src.user_club.models import club_x_user
 from src.user_profile.models import user
+from src.market.models import product
 from src.user_profile.inner_func import get_user_by_id
 from src.club.inner_func import get_club_by_id
-
 
 error = {
     "status": "error",
@@ -161,7 +161,7 @@ async def get_role(  # TODO: мб сделать ее внешней
             raise HTTPException(status_code=500, detail=error)
 
 
-async def get_users_by_dict(
+async def get_users_by_dict( #TODO: здесь норм что у тебя редифинишн?
         data,
         session: AsyncSession = Depends(get_async_session)
 ):
@@ -185,8 +185,26 @@ async def get_users_by_dict(
         return data
     except Exception:
         raise HTTPException(status_code=500, detail=error)
+        
+        
+async def get_user_balance(
+        user_id: int,
+        club_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    try:
+        query = select(club_x_user).where(
+            (club_x_user.c.user_id == user_id) &
+            (club_x_user.c.club_id == club_id))
+        result = await session.execute(query)
+        user_data = result.mappings().first()
+        if not user_data:
+            return "User not found"
+        return user_data['balance']
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
 
-
+        
 async def make_main(
         user_id: int,
         club_id: int,

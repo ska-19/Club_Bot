@@ -149,7 +149,7 @@ async def disjoin_club(
     """
     try:
         data_dict = data.dict()
-        if await get_user_by_id(data_dict['user_id'], session) == "User not found":  # TODO: вот здесь падает
+        if await get_user_by_id(data_dict['user_id'], session) == "User not found": #TODO: вот здесь падает
             raise ValueError('404u')
         if await get_club_by_id(data_dict['club_id'], session) == "Club not found":
             raise ValueError('404c')
