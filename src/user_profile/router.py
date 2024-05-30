@@ -162,13 +162,14 @@ async def update_create_profile(
 
     """
     try:
+        update_data = dict(update_data)
         data = await get_user_by_id(update_data['id'], session)
         if data == "User not found":
             raise ValueError
         stmt = update(user).where(user.c.id == update_data['id']).values(
-            username=update_data.username,
-            name=update_data.name,
-            surname=update_data.surname
+            username=update_data['username'],
+            name=update_data['name'],
+            surname=update_data['surname']
         )
         await session.execute(stmt)
         await session.commit()
@@ -183,7 +184,8 @@ async def update_create_profile(
         }
     except ValueError:
         raise HTTPException(status_code=404, detail=error404)
-    except Exception:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()
