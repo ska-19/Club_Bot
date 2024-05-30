@@ -24,7 +24,6 @@ async def cmd_dice(message: types.Message):
 
 @router.message(CommandStart())
 async def cmd_start(message: types.Message, config: BotConfig, state: FSMContext):
-    is_admin = await rq.is_user_club_admin(message.from_user.id)
     # if message.from_user.id in config.admin_ids:
     #     is_admin = True
     # if message.from_user.bot:
@@ -36,6 +35,7 @@ async def cmd_start(message: types.Message, config: BotConfig, state: FSMContext
         "surname": message.from_user.last_name
     }
     await rq.set_user(user_data)
+    is_admin = (await rq.is_user_club_admin(message.from_user.id) == -1)
     await message.answer(
         text="👋🏻 <b>Привет!</b> \n\n",
         reply_markup=get_main_ikb(user_data, is_admin)
