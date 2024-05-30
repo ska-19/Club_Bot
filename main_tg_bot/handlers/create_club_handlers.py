@@ -67,7 +67,7 @@ async def cmd_enter_bio(message: Message, state: FSMContext):
 
 @router.message(CreateClub.enter_link_channel)
 async def cmd_enter_link_channel(message: Message, state: FSMContext):
-    await state.update_data(link_channel=message.text)
+    await state.update_data(channel_link=message.text)
     club_data = await state.get_data()
     await rq.set_club(message.from_user.id, club_data)
     await message.answer(
@@ -75,7 +75,7 @@ async def cmd_enter_link_channel(message: Message, state: FSMContext):
              f"Название: {club_data['name']}\n"
              f"Направление: {club_data['dest']}\n"
              f"Описание: {club_data['bio']}\n"
-             f"Ссылка на канал: {club_data['link_channel']}\n\n"
+             f"Ссылка на канал: {club_data['channel_link']}\n\n"
              "Для управления клубом используйте кнопки в профиле клуба.",
         reply_markup=get_main_ikb({'tg_id': message.from_user.id})
     )

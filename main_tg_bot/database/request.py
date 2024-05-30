@@ -24,8 +24,10 @@ async def set_user(user_data):
 
     response = requests.post(url, json=rq_user_data, headers=headers)
 
-    # if response.status_code == 409:
-    #     response = requests.post(str(URL)+'/user_profile/update_user', json=rq_user_data, headers=headers)
+    if response.status_code == 409:
+        response = requests.post(str(URL)+'/user_profile/update_user',
+                                 json=rq_user_data,
+                                 headers=headers,)
     return response
 
 
