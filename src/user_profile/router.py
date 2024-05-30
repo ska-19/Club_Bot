@@ -154,8 +154,7 @@ async def get_user_attr(
 
 @router.post("/update_create_user")
 async def update_create_profile(
-        user_id: int,
-        update_data: UserCUpdate,
+        update_data: UserCreate,
         session: AsyncSession = Depends(get_async_session)):
     """Обновляет данные пользователя (для тг бота)
 
@@ -168,10 +167,10 @@ async def update_create_profile(
 
     """
     try:
-        data = await get_user_by_id(user_id, session)
+        data = await get_user_by_id(update_data['id'], session)
         if data == "User not found":
             raise ValueError
-        stmt = update(user).where(user.c.id == user_id).values(
+        stmt = update(user).where(user.c.id == update_data['id']).values(
             username=update_data.username,
             name=update_data.name,
             surname=update_data.surname
@@ -179,7 +178,7 @@ async def update_create_profile(
         await session.execute(stmt)
         await session.commit()
 
-        data = await get_user_by_id(user_id, session)
+        data = await get_user_by_id(update_data['id'], session)
         if data == "User not found":
             raise ValueError
         return {

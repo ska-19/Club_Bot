@@ -49,13 +49,13 @@ async def get_profile_user(
     user_data['xp_percent'] = calc_exp(user_data['xp'])[1]
     # achievements = await get_achievement_by_user(user_data['id'], session)
     # user_data['achievement'] = achievements['data']
-    user_data['exist_clubs'] = 0
-    # user_clubs = await get_main_club(user_data['id'], session)
-    # print(1)
-    # if user_clubs['status'] == "success":
-    #     user_data['exist_clubs'] = 1
-    # else:
-    #      user_data['exist_clubs'] = 0
+    # user_data['exist_clubs'] = 0
+    user_clubs = await get_main_club(user_data['id'], session)
+    print(1)
+    if user_clubs['status'] == "success":
+        user_data['exist_clubs'] = 1
+    else:
+         user_data['exist_clubs'] = 0
     print(user_data)
     return templates.TemplateResponse("profile_user.html", {"request": request, "user_info": user_data})
 
