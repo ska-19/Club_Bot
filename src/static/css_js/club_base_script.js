@@ -51,3 +51,7 @@ function Kick(ChangedUserId) {
             console.error('Error:', error);
         });
 }
+
+function GetStatistics(){
+
+}

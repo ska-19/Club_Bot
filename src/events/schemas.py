@@ -7,7 +7,6 @@ class EventCreate(BaseModel):
     name: str
     club_id: int
     host_id: int
-    name: str
     date: date
     sinopsis: str
     contact: str
@@ -23,6 +22,7 @@ class EventUpdate(BaseModel):
     sinopsis: str
     contact: str
     speaker: str
+    reward: int
 
 
 class EventReg(BaseModel):
