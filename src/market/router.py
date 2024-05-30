@@ -30,19 +30,18 @@ async def add_product(
             raise ValueError('404u')
         if await get_club_by_id(new_data.club_id, session) == "Club not found":
             raise ValueError('404c')
-        role = await get_role(new_data.admin_id, new_data.club_id, session)
-        if role == "User not in the club":
+        if await check_rec(new_data.user_id, new_data.club_id, session):
             raise ValueError('404uc')
+        role = await get_role(new_data.admin_id, new_data.club_id, session)
         if role == "admin" or role == "owner":
             product_dict = new_data.model_dump()
 
-            query = insert(product).values(name=product_dict['name'],
-                                          price=product_dict['price'],
-                                          description=product_dict['description'],
-                                          photo=product_dict['photo'],
-                                          quantity=product_dict['quantity'],
-                                          rating=product_dict['rating'],
-                                          club_id=new_data.club_id)
+            query = insert(product).values(
+                name=product_dict['name'],
+                price=product_dict['price'],
+                description=product_dict['description'],
+                quantity=product_dict['quantity'],
+                club_id=product_dict['club_id'])
             await session.execute(query)
             await session.commit()
 
@@ -80,19 +79,18 @@ async def update_product(
             raise ValueError('404u')
         if await get_club_by_id(new_data.club_id, session) == "Club not found":
             raise ValueError('404c')
-        role = await get_role(new_data.admin_id, new_data.club_id, session)
-        if role == "User not in the club":
+        if await check_rec(new_data.user_id, new_data.club_id, session):
             raise ValueError('404uc')
+        role = await get_role(new_data.admin_id, new_data.club_id, session)
         if role == "admin" or role == "owner":
             product_dict = new_data.model_dump()
 
-            query = update(product).where(product.c.id == new_data.id).values(name=product_dict['name'],
-                                          price=product_dict['price'],
-                                          description=product_dict['description'],
-                                          photo=product_dict['photo'],
-                                          quantity=product_dict['quantity'],
-                                          rating=product_dict['rating'],
-                                          club_id=new_data.club_id)
+            query = update(product).where(product.c.id == product_dict['id']).values(
+                name=product_dict['name'],
+                price=product_dict['price'],
+                description=product_dict['description'],
+                quantity=product_dict['quantity'],
+                club_id=product_dict['club_id'])
             await session.execute(query)
             await session.commit()
 
@@ -116,7 +114,6 @@ async def update_product(
         await session.rollback()
 
 
-
 @router.get("/get_product")
 async def get_product(
         product_id: int,
@@ -136,7 +133,6 @@ async def get_product(
             raise HTTPException(status_code=404, detail=error404r)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
-
 
 
 @router.post("/buy_product")
@@ -160,10 +156,7 @@ async def buy_product(
             raise ValueError('404pb')
 
         query = insert(user_x_product).values(user_id=user_id,
-                                              product_id=product_id,
-                                              count=count,
-                                              club_id=prod['club_id'],
-                                              date=datetime.utcnow())
+                                              product_id=product_id)
         await session.execute(query)
         await session.commit()
 
@@ -257,7 +250,6 @@ async def get_all_request(
         await session.rollback()
 
 
-
 @router.post("/accept_request")
 async def accept_request(
         admin_id: int,
@@ -332,9 +324,9 @@ async def reject_request_admin(
 
             prod = await get_product_by_id(data['product_id'], session)
             query = update(club_x_user).where((club_x_user.c.user_id == data['user_id']) &
-                                                (club_x_user.c.club_id == data['club_id'])).values(
-                    balance=club_x_user.c.balance + data['count'] * prod['price']
-                )
+                                              (club_x_user.c.club_id == data['club_id'])).values(
+                balance=club_x_user.c.balance + data['count'] * prod['price']
+            )
 
             return {
                 "status": "success",
@@ -362,7 +354,6 @@ async def reject_request_admin(
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()
-
 
 
 @router.post("/reject_request_user")
@@ -419,7 +410,6 @@ async def reject_request_user(
         await session.rollback()
 
 
-
 @router.post("/get_user_history")
 async def get_user_history(
         user_id: int,
@@ -451,7 +441,3 @@ async def get_user_history(
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()
-
-
-
-
