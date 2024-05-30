@@ -7,7 +7,7 @@ from pydantic import BaseModel
 class UserCreate(BaseModel):
     id: int  # tg id
     username: str  # tg username
-    mentor: bool = False
+    mentor: Optional[bool] = False
     name: str  # tg name
     surname: str  # tg surname
     # date_joined: datetime = datetime.utcnow
