@@ -8,7 +8,7 @@ function Reg(eventId) {
         user_id: userId, event_id: eventId
     }
 
-    fetch(`/pages/main_user/${userId}`, {
+    fetch(`/pages/main_user/${userId}/1`, {
         method: 'POST', headers: {
             'Content-Type': 'application/json',
         }, body: JSON.stringify(EventReg),
@@ -104,6 +104,56 @@ function Save(eventId) {
     .catch(error => {
         console.error('Error:', error);
     });
+}
+
+function Begin() {
+    document.getElementById(`CreateEventForm`).style.display = 'flex'
+    document.getElementById(`CloseEvent`).style.display = 'flex'
+    document.getElementById(`BeginEvent`).style.display = 'none'
+}
+
+function Close() {
+    document.getElementById(`SinopsisNewEvent`).value = ""
+    document.getElementById(`NameNewEvent`).value = ""
+    document.getElementById(`DateNewEvent`).value = ""
+    document.getElementById(`SpeakerNewEvent`).value = ""
+    document.getElementById(`CreateEventForm`).style.display = 'none'
+    document.getElementById(`CloseEvent`).style.display = 'none'
+    document.getElementById(`BeginEvent`).style.display = 'flex'
+}
+
+function CreateEvent() {
+    const urlParts = window.location.href.split('/');
+    const userId = urlParts[urlParts.length - 1];
+    const EventReg = {
+    club_id: userId,
+    host_id: 1,
+    name: document.getElementById(`NameNewEvent`).value,
+    date: document.getElementById(`DateNewEvent`).value,
+    sinopsis: document.getElementById(`SinopsisNewEvent`).value,
+    contact: document.getElementById(`SpeakerNewEvent`).value,
+    speaker: document.getElementById(`SpeakerNewEvent`).value,
+    reward: 100
+    }
+    fetch(`/pages/main_user/${userId}/2`, {
+        method: 'POST', headers: {
+            'Content-Type': 'application/json',
+        }, body: JSON.stringify(EventReg),
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+
 }
 
 function End(eventId) {

@@ -11,8 +11,9 @@ from src.user_profile.router import get_user, update_links_profile
 from src.user_profile.schemas import UserUpdate
 from src.club.schemas import FoundUid
 from src.club.router import search, get_club
-from src.events.schemas import EventReg, EventUpdate
-from src.events.router import get_event_club, get_check_rec, reg_event, event_disreg, get_event, update_event
+from src.events.schemas import EventReg, EventUpdate, EventCreate
+from src.events.router import get_event_club, get_check_rec, reg_event, event_disreg, get_event, update_event, \
+    create_event
 from src.user_club.router import get_clubs_by_user, get_balance, get_users_in_club, disjoin_club, role_update, \
     get_main_club, new_main, join_to_the_club
 from src.user_club.inner_func import get_role
@@ -54,7 +55,7 @@ async def get_profile_user(
     if user_clubs['status'] == "success":
         user_data['exist_clubs'] = 1
     else:
-         user_data['exist_clubs'] = 0
+        user_data['exist_clubs'] = 0
     print(user_data)
     return templates.TemplateResponse("profile_user.html", {"request": request, "user_info": user_data})
 
@@ -81,7 +82,7 @@ async def get_main_user(
         user_info=Depends(get_user),
         session: AsyncSession = Depends(get_async_session)
 ):
-    blank_link = FoundUid(uid = "")
+    blank_link = FoundUid(uid="")
     await update_links_profile(user_info['data']['id'], blank_link, session)
     user_data = dict(user_info['data'])
     club_info_data = await get_main_club(user_data['id'], session)
@@ -112,13 +113,24 @@ async def get_main_user(
     })
 
 
-@router.post("/main_user/{user_id}")
+@router.post("/main_user/{user_id}/1")
 async def register_event(
         event_reg: EventReg,
         session: AsyncSession = Depends(get_async_session)
 ):
     reg = await reg_event(event_reg, session)
     return {"message": "Event Reg successfully", "reg_event": reg}
+
+
+@router.post("/main_user/{user_id}/2")
+async def create_new_event(
+        event_cre: EventCreate,
+        session: AsyncSession = Depends(get_async_session)
+):
+    club = await get_main_club(event_cre.club_id, session)
+    event_cre.club_id = club['data']['id']
+    create = await create_event(event_cre, session)
+    return {"message": "Event Reg successfully", "New event!": create}
 
 
 @router.put("/main_user/{user_id}")
@@ -270,7 +282,6 @@ async def found_club(
         last_search: FoundUid,
         session: AsyncSession = Depends(get_async_session)
 ):
-    print(last_search)
     update_last_search = await update_links_profile(user_id, last_search, session)
     return {"message": "Event updated successfully", "new last search": update_last_search}
 

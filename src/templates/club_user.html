@@ -16,6 +16,23 @@
 {% endblock %}
 
 
+{% block buttons %}
+<div class="block2" style="margin-top: 20px">
+    <button class="card"
+            style="top: 30px;height: 60px; width: 100px; justify-content: center; vertical-align: center">
+        <h1 style="bottom: 5px;font-size: 12px; color: #7a9a8a;position: relative; z-index: 2">
+            Пригласить друга</h1>
+    </button>
+    {% if user_info.role == "admin" %}
+    <button class="card" onclick=GetStatistics()
+            style="top: 80px;height: 60px; width: 100px; justify-content: center; vertical-align: center">
+        <h1 style="bottom: 5px;font-size: 12px; color: #7a9a8a;position: relative; z-index: 2">
+            Получить статистику</h1>
+    </button>
+</div>
+{% endblock %}
+
+
 {% block href_main %}
 <a href="/pages/main_user/{{user_info.id}}" style="text-decoration: none">
     <button class="btn_GoToTheClub" type="button" style="margin-top: 20px">
@@ -48,7 +65,8 @@
 
 
     {% elif user_info.role == "owner" and user.role == "member" %}
-    <button type="button" class="Promote" id="Update_{{ user.user_id }}" style="font-size: 10px;margin-top: 5px;height: 20px; width: 80px;"
+    <button type="button" class="Promote" id="Update_{{ user.user_id }}"
+            style="font-size: 10px;margin-top: 5px;height: 20px; width: 80px;"
             onclick="Update('{{user.user_id}}')">Повысить
     </button>
     <button type="button" class="Kick" id="Kick_{{ user.user_id }}" style="margin-top: 5px;height: 20px; width: 80px;"
@@ -56,7 +74,8 @@
     </button>
 
     {% elif user_info.role == "owner" and user.role == "admin" %}
-    <button type="button" class="Demote" id="Update_{{ user.user_id }}" style="margin-top: 5px;height: 20px; width: 80px;"
+    <button type="button" class="Demote" id="Update_{{ user.user_id }}"
+            style="margin-top: 5px;height: 20px; width: 80px;"
             onclick="Update('{{user.user_id}}')">Понизить
     </button>
     <button type="button" class="Kick" id="Kick_{{ user.user_id }}" style="margin-top: 5px;height: 20px; width: 80px;"
