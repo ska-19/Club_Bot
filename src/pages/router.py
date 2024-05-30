@@ -191,10 +191,11 @@ async def get_club_user(
 
 @router.put("/club_user/{user_id}")
 async def update_role(
+        user_id: int,
         update_user: User,
         session: AsyncSession = Depends(get_async_session)
 ):
-    main_club_data = await get_main_club(update_user.user_id, session)
+    main_club_data = await get_main_club(user_id, session)
     main_club = dict(main_club_data['data'])
     update_user.club_id = main_club['id']
     new_role_user = await role_update(update_user.user_id, update_user.club_id, session)
@@ -203,12 +204,12 @@ async def update_role(
 
 @router.delete("/club_user/{user_id}")
 async def kick_club_user(
+        user_id: int,
         kick_user: User,
         session: AsyncSession = Depends(get_async_session)
 ):
-    main_club_data = await get_main_club(kick_user.user_id, session)
+    main_club_data = await get_main_club(user_id, session)
     main_club = dict(main_club_data['data'])
-
     kick_user.club_id = main_club['id']
     kicked_user = await disjoin_club(kick_user, session)
     return {"message": "Kick user successfully", "kick_user": kicked_user}
