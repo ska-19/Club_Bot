@@ -44,6 +44,15 @@
 {% endblock %}
 
 
+{% block channel %}
+<button class="Btn" onclick="href_channel('{{club_info.channel_link}}')"
+        style="z-index: 2;height: 80px; width: 115px; justify-content: center; vertical-align: center">
+    <h1 style="bottom: 5px;font-size: 15px; position: relative; z-index: 2">
+        В канал</h1>
+</button>
+{% endblock %}
+
+
 {% block content %}
 {% if user_x_club_info.role != "member" %}
 <div class="card"

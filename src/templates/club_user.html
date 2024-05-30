@@ -11,26 +11,16 @@
 {% endblock %}
 
 
-{% block bio_club %}
-{{ club_info.bio }}
+{% block uid_club %}
+<div class="card"
+     style="left: 70px;height: 40px; width: 250px; justify-content: center; display: flex">
+    <h1 style="font-size: 16px;position: relative; z-index: 2">Тэг: {{ club_info.uid }}</h1>
+</div>
 {% endblock %}
 
 
-{% block buttons %}
-<div class="block2" style="margin-top: 20px">
-    <button class="card"
-            style="top: 30px;height: 60px; width: 100px; justify-content: center; vertical-align: center">
-        <h1 style="bottom: 5px;font-size: 12px; color: #7a9a8a;position: relative; z-index: 2">
-            Пригласить друга</h1>
-    </button>
-    {% if user_info.role == "owner" %}
-    <button class="card" onclick=GetStatistics()
-            style="top: 80px;height: 60px; width: 100px; justify-content: center; vertical-align: center">
-        <h1 style="bottom: 5px;font-size: 12px; color: #7a9a8a;position: relative; z-index: 2">
-            Получить статистику</h1>
-    </button>
-    {% endif %}
-</div>
+{% block bio_club %}
+{{ club_info.bio }}
 {% endblock %}
 
 
@@ -53,35 +43,44 @@
 {% block club_users %}
 {% for user in users %}
 <div class="card"
-     style="margin-top: 5px;left: 20px;height: 30px; width: 350px; justify-content: center;display: flex">
-    <h1 style="text-align: left; width: 50%; font-size: 14px; color: #7a9a8a;position: relative; z-index: 2">
+     style="margin-top: 5px;left: 20px;height: 30px; width: 350px; flex-basis: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;">
+    <h1 style="font-size: 14px; color: #7a9a8a;flex-basis: 50%;display: flex;justify-content: center;align-items: center;position: relative; z-index: 2">
         {{ user.username }} {{ user.role }}
     </h1>
 
-
     {% if user_info.role == "admin" and user.role == "member" %}
-    <button type="button" class="Kick" id="Kick_{{ user.user_id }}" style="margin-top: 5px;height: 20px; width: 80px;"
+    <h1 style="flex-basis: 25%"></h1>
+    <button type="button" class="Kick" id="Kick_{{ user.user_id }}"
+            style="height: 20px; width: 80px;  flex-basis: 25%;display: flex;justify-content: center;align-items: center"
             onclick="Kick('{{user.user_id}}')">Выгнать
     </button>
 
-
     {% elif user_info.role == "owner" and user.role == "member" %}
     <button type="button" class="Promote" id="Update_{{ user.user_id }}"
-            style="font-size: 10px;margin-top: 5px;height: 20px; width: 80px;"
+            style="font-size: 10px;height: 20px; width: 80px;  flex-basis: 25%;display: flex;justify-content: center;align-items: center;"
             onclick="Update('{{user.user_id}}')">Повысить
     </button>
-    <button type="button" class="Kick" id="Kick_{{ user.user_id }}" style="margin-top: 5px;height: 20px; width: 80px;"
+    <button type="button" class="Kick" id="Kick_{{ user.user_id }}"
+            style="height: 20px; width: 80px;  flex-basis: 25%;display: flex;justify-content: center;align-items: center;"
             onclick="Kick('{{user.user_id}}')">Выгнать
     </button>
 
     {% elif user_info.role == "owner" and user.role == "admin" %}
     <button type="button" class="Demote" id="Update_{{ user.user_id }}"
-            style="margin-top: 5px;height: 20px; width: 80px;"
+            style="height: 20px; width: 80px;  flex-basis: 25%;display: flex;justify-content: center;align-items: center;"
             onclick="Update('{{user.user_id}}')">Понизить
     </button>
-    <button type="button" class="Kick" id="Kick_{{ user.user_id }}" style="margin-top: 5px;height: 20px; width: 80px;"
+    <button type="button" class="Kick" id="Kick_{{ user.user_id }}"
+            style="height: 20px; width: 80px;  flex-basis: 25%;display: flex;justify-content: center;align-items: center;"
             onclick="Kick('{{user.user_id}}')">Выгнать
     </button>
+    {% else %}
+    <h1 style="flex-basis: 25%"></h1>
+    <h1 style="flex-basis: 25%"></h1>
+
     {% endif %}
 </div>
 {% endfor %}

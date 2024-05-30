@@ -167,3 +167,8 @@ function End(eventId) {
     const userId = urlParts[urlParts.length - 1];
     window.location.href = `/pages/endevent_user/${userId}/${eventId}`
 }
+
+function href_channel(link) {
+    console.log(link)
+    window.location.href = link
+}
