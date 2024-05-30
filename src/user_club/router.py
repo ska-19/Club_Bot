@@ -9,7 +9,7 @@ from src.user_club.models import club_x_user
 from src.user_profile.models import user
 from src.club.models import club
 from src.user_club.schemas import UserJoin, UpdateRole, User, UpdateBalance
-from src.user_profile.inner_func import get_user_by_id
+from src.user_profile.inner_func import get_user_by_id, update_xp
 from src.club.inner_func import get_club_by_id
 from src.user_club.inner_func import get_role, get_rec_id, check_rec, get_users_by_dict, make_main, make_not_main, \
     error, error404u, error404c, error404uc, success
@@ -66,6 +66,8 @@ async def join_to_the_club(
         stmt = insert(club_x_user).values(**join_dict)
         await session.execute(stmt)
         await session.commit()
+
+        await update_xp(join_dict['user_id'], 25, session)
 
         return success
     except ValueError as e:
@@ -166,6 +168,8 @@ async def disjoin_club(
         stmt = delete(club_x_user).where(club_x_user.c.id == rec_id)
         await session.execute(stmt)
         await session.commit()
+
+        await update_xp(data_dict['user_id'], -25, session)
 
         return success
     except ValueError as e:

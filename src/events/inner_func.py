@@ -6,7 +6,7 @@ from src.database import get_async_session
 from src.events.models import event, event_reg
 from src.user_club.router import update_balance, get_users_with_role
 from src.user_club.schemas import UpdateBalance
-from src.user_profile.router import update_xp
+from src.user_profile.inner_func import update_xp
 
 from src.errors import *
 
