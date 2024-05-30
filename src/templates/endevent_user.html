@@ -1,0 +1,53 @@
+{% extends "endevent_base.html" %}
+
+
+{% block EndEvent %}
+<div class="card"
+     style="left: 50px;height: 50px; width: 290px; justify-content: center;display: flex">
+    <button type="button" class="EndEvent" id="EndEvent" onclick=EndEvent()>
+        Завершить событие
+    </button>
+</div>
+{% endblock %}
+
+
+{% block users_info %}
+<div class="card"
+     style="left: 50px;height: 50px; width: 290px; justify-content: center;display: flex">
+    <div class="block1">
+        <h1 style="bottom: 5px;font-size: 12px; color: #7a9a8a;position: relative; z-index: 2">
+           1 2
+        </h1>
+    </div>
+    <div class="block2">
+        <div class="checkbox-wrapper-35">
+            <input value="private" name="switch" id="switch" type="checkbox" class="switch">
+            <label for="switch">
+                <span class="switch-x-text">Человек </span>
+                <span class="switch-x-toggletext">
+                    <span class="switch-x-unchecked"><span class="switch-x-hiddenlabel">Unchecked: </span>Не участвовал</span>
+                    <span class="switch-x-checked"><span class="switch-x-hiddenlabel">Checked: </span>Участвовал</span>
+                </span>
+            </label>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block href_main %}
+<!-- "Перейти на главную" -->
+<a href="/pages/main_user/{{user_info.id}}" style="text-decoration: none">
+    <button class="btn_GoToTheClub" type="button" style="margin-top: 25px">
+        <strong>На главную</strong>
+        <div id="container-stars">
+            <div id="stars"></div>
+        </div>
+        <div id="glow">
+            <div class="circle"></div>
+            <div class="circle"></div>
+        </div>
+    </button>
+</a>
+{% endblock %}

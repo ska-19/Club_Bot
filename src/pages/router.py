@@ -13,7 +13,7 @@ from src.club.schemas import FoundUid
 from src.club.router import search, get_club
 from src.events.schemas import EventReg, EventUpdate, EventCreate
 from src.events.router import get_event_club, get_check_rec, reg_event, event_disreg, get_event, update_event, \
-    create_event
+    create_event, get_users_by_event, end_event
 from src.user_club.router import get_clubs_by_user, get_balance, get_users_in_club, disjoin_club, role_update, \
     get_main_club, new_main, join_to_the_club
 from src.user_club.inner_func import get_role
@@ -302,3 +302,22 @@ async def leave_club(
 ):
     disjoin = await disjoin_club(user_club, session)
     return {"message": "Event Disreg successfully", "leave from club": disjoin}
+
+# Функции для завершения событий
+@router.get("/endevent_base")
+def get_endevent_base(request: Request):
+    return templates.TemplateResponse("endevent_base.html", {"request": request})
+
+
+@router.get("/endevent_user/{user_id}/{event_id}")
+async def get_endevent_user(
+        request: Request,
+        users=Depends(get_users_by_event),
+        session: AsyncSession = Depends(get_async_session)
+):
+    print(users)
+    return templates.TemplateResponse("endevent_user.html", {
+        "request": request,
+        "users": users,
+        "user_id": user_id
+    })

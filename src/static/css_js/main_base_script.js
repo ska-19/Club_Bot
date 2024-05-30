@@ -157,5 +157,7 @@ function CreateEvent() {
 }
 
 function End(eventId) {
-    
+    const urlParts = window.location.href.split('/');
+    const userId = urlParts[urlParts.length - 1];
+    window.location.href = `/pages/endevent_user/${userId}/${eventId}`
 }
