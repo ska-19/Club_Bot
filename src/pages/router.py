@@ -11,7 +11,7 @@ from src.user_profile.router import get_user, update_links_profile
 from src.user_profile.schemas import UserUpdate
 from src.club.schemas import FoundUid
 from src.club.router import search, get_club
-from src.events.schemas import EventReg, EventUpdate, EventCreate
+from src.events.schemas import EventReg, EventUpdate, EventCreate, Data
 from src.events.router import get_event_club, get_check_rec, reg_event, event_disreg, get_event, update_event, \
     create_event, get_users_by_event, end_event
 from src.user_club.router import get_clubs_by_user, get_balance, get_users_in_club, disjoin_club, role_update, \
@@ -127,8 +127,9 @@ async def create_new_event(
         event_cre: EventCreate,
         session: AsyncSession = Depends(get_async_session)
 ):
-    club = await get_main_club(event_cre.club_id, session)
+    club = await get_main_club(event_cre.host_id, session)
     event_cre.club_id = club['data']['id']
+    print(event_cre)
     create = await create_event(event_cre, session)
     return {"message": "Event Reg successfully", "New event!": create}
 
@@ -303,6 +304,7 @@ async def leave_club(
     disjoin = await disjoin_club(user_club, session)
     return {"message": "Event Disreg successfully", "leave from club": disjoin}
 
+
 # Функции для завершения событий
 @router.get("/endevent_base")
 def get_endevent_base(request: Request):
@@ -312,12 +314,24 @@ def get_endevent_base(request: Request):
 @router.get("/endevent_user/{user_id}/{event_id}")
 async def get_endevent_user(
         request: Request,
+        user_id: int,
+        event_id: int,
         users=Depends(get_users_by_event),
         session: AsyncSession = Depends(get_async_session)
 ):
-    print(users)
+    users_data = users['data']
     return templates.TemplateResponse("endevent_user.html", {
         "request": request,
-        "users": users,
-        "user_id": user_id
+        "users": users_data,
+        "user_id": user_id,
+        "event_id": event_id
     })
+
+@router.put("/endevent_user/{user_id}/{event_id}")
+async def final_endevent(
+        event_id: int,
+        data: Data,
+        session: AsyncSession = Depends(get_async_session)
+):
+    final_end_event = await end_event(event_id, data, session)
+    return {"message": "Event updated successfully", "End event": final_end_event}

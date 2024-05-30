@@ -69,6 +69,8 @@ function Edit(eventId) {
     document.getElementById(`textarea_${eventId}`).removeAttribute('readonly')
     document.getElementById(`Date_${eventId}`).removeAttribute('readonly')
     document.getElementById(`Speaker_${eventId}`).removeAttribute('readonly')
+    document.getElementById(`Contact_${eventId}`).removeAttribute('readonly')
+    document.getElementById(`Reward_${eventId}`).removeAttribute('readonly')
 }
 
 function Save(eventId) {
@@ -77,33 +79,34 @@ function Save(eventId) {
     const userId = urlParts[urlParts.length - 1];
     const EventData = {
         club_id: eventId,
-        host_id: 1,
+        host_id: userId,
         name: "",
         date: document.getElementById(`Date_${eventId}`).value,
         sinopsis: document.getElementById(`textarea_${eventId}`).value,
-        contact: document.getElementById(`Speaker_${eventId}`).value,
-        speaker: document.getElementById(`Speaker_${eventId}`).value
+        contact: document.getElementById(`Contact_${eventId}`).value,
+        speaker: document.getElementById(`Speaker_${eventId}`).value,
+        reward: document.getElementById(`Reward_${eventId}`).value
     };
-    fetch(`/pages/main_user/${userId}`,{
+    fetch(`/pages/main_user/${userId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(EventData),
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Success:', data);
-        window.location.reload();
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
 }
 
 function Begin() {
@@ -117,6 +120,8 @@ function Close() {
     document.getElementById(`NameNewEvent`).value = ""
     document.getElementById(`DateNewEvent`).value = ""
     document.getElementById(`SpeakerNewEvent`).value = ""
+    document.getElementById(`RewardNewEvent`).value = ""
+    document.getElementById(`ContactNewEvent`).value = ""
     document.getElementById(`CreateEventForm`).style.display = 'none'
     document.getElementById(`CloseEvent`).style.display = 'none'
     document.getElementById(`BeginEvent`).style.display = 'flex'
@@ -126,15 +131,16 @@ function CreateEvent() {
     const urlParts = window.location.href.split('/');
     const userId = urlParts[urlParts.length - 1];
     const EventReg = {
-    club_id: userId,
-    host_id: 1,
-    name: document.getElementById(`NameNewEvent`).value,
-    date: document.getElementById(`DateNewEvent`).value,
-    sinopsis: document.getElementById(`SinopsisNewEvent`).value,
-    contact: document.getElementById(`SpeakerNewEvent`).value,
-    speaker: document.getElementById(`SpeakerNewEvent`).value,
-    reward: 100
+        club_id: 1,
+        host_id: userId,
+        name: document.getElementById(`NameNewEvent`).value,
+        date: document.getElementById(`DateNewEvent`).value,
+        sinopsis: document.getElementById(`SinopsisNewEvent`).value,
+        contact: document.getElementById(`ContactNewEvent`).value,
+        speaker: document.getElementById(`SpeakerNewEvent`).value,
+        reward: document.getElementById(`RewardNewEvent`).value
     }
+    console.log(EventReg)
     fetch(`/pages/main_user/${userId}/2`, {
         method: 'POST', headers: {
             'Content-Type': 'application/json',

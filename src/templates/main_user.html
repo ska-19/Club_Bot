@@ -73,6 +73,16 @@
                 <input required="" name="Speaker" id="SpeakerNewEvent" type="text" style="width: 125px">
             </div>
         </div>
+        <div style="display: flex">
+            <div class="form-group" style="width: 60%">
+                <label>Вознаграждение</label>
+                <input required="" name="Reward" id="RewardNewEvent" type="text" style="width: 115px">
+            </div>
+            <div class="form-group">
+                <label>Контакт</label>
+                <input required="" name="Contact" id="ContactNewEvent" type="text" style="width: 125px">
+            </div>
+        </div>
         <div class="form-group">
             <label>О событии</label>
             <textarea required="" cols="50" rows="10" name="textarea" id="SinopsisNewEvent"
@@ -108,6 +118,19 @@
                        readonly>
             </div>
         </div>
+        <div style="display: flex">
+            <div class="form-group" style="width: 60%">
+                <label for="Reward_{{event.id}}">Вознаграждение</label>
+                <input required="" name="Reward" id="Reward_{{event.id}}" type="text" style="width: 115px"
+                       value="{{event.reward}}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="Contact_{{event.id}}">Контакт</label>
+                <input required="" name="Contact" id="Contact_{{event.id}}" type="text" style="width: 125px"
+                       value="{{event.contact}}" readonly>
+            </div>
+        </div>
+
         <div class="form-group">
             <label for="textarea_{{event.id}}">О событии</label>
             <textarea required="" cols="50" rows="10" id="textarea_{{event.id}}" name="textarea"
@@ -157,6 +180,18 @@
                 <input required="" name="Speaker" id="Speaker_{{event.id}}" type="text" style="width: 125px"
                        value="{{event.speaker}}"
                        readonly>
+            </div>
+        </div>
+        <div style="display: flex">
+            <div class="form-group" style="width: 60%">
+                <label for="Reward_{{event.id}}">Вознаграждение</label>
+                <input required="" name="Reward" id="Reward_{{event.id}}" type="text" style="width: 115px"
+                       value="{{event.reward}}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="Contact_{{event.id}}">Контакт</label>
+                <input required="" name="Contact" id="Contact_{{event.id}}" type="text" style="width: 125px"
+                       value="{{event.contact}}" readonly>
             </div>
         </div>
         <div class="form-group">

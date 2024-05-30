@@ -188,6 +188,11 @@ strong {
 }
 
 .EndEvent {
+    font-size: 16px;
+    margin-top: 5px;
+    vertical-align: center;
+    display: inline-block;
+    height: 40px;
     padding: 10px 20px;
     border: none;
     background: rgba(145, 56, 0, 0.62);
@@ -201,15 +206,6 @@ strong {
     background: rgb(145, 56, 0);
 }
 
-.block1 {
-    text-align: left;
-    width: 70%;
-}
-
-.block2 {
-    width: 30%;
-}
-
 .checkbox-wrapper-35 .switch {
   display: none;
 }
@@ -219,14 +215,13 @@ strong {
   -webkit-align-items: center;
   -ms-flex-align: center;
   align-items: center;
-  color: rgb(255, 85, 85);
+  color: #7a9a8a;
   cursor: pointer;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   position: relative;
   -webkit-user-select: none;
@@ -236,34 +231,34 @@ strong {
 }
 
 .checkbox-wrapper-35 .switch + label::before,
-  .checkbox-wrapper-35 .switch + label::after {
+.checkbox-wrapper-35 .switch + label::after {
   content: '';
   display: block;
 }
 
 .checkbox-wrapper-35 .switch + label::before {
-  background-color: #05012c;
+  background-color: rgb(255, 85, 85);
   border-radius: 500px;
-  height: 15px;
+  height: 30px;
   margin-right: 8px;
   -webkit-transition: background-color 0.125s ease-out;
   transition: background-color 0.125s ease-out;
-  width: 25px;
+  width: 50px;
 }
 
 .checkbox-wrapper-35 .switch + label::after {
-  background-color: #fff;
-  border-radius: 13px;
-  box-shadow: 0 3px 1px 0 rgba(37, 34, 71, 0.05), 0 2px 2px 0 rgba(37, 34, 71, 0.1), 0 3px 3px 0 rgba(37, 34, 71, 0.05);
-  height: 13px;
-  left: 1px;
+  background-color: lightgray;
+  border-radius: 26px;
+  box-shadow: 0 4px 2px 0 rgba(37, 34, 71, 0.05), 0 4px 4px 0 rgba(37, 34, 71, 0.1), 0 6px 6px 0 rgba(37, 34, 71, 0.05);
+  height: 26px;
+  left: 2px;
   position: absolute;
-  top: 1px;
+  top: 2px;
   -webkit-transition: -webkit-transform 0.125s ease-out;
   transition: -webkit-transform 0.125s ease-out;
   transition: transform 0.125s ease-out;
   transition: transform 0.125s ease-out, -webkit-transform 0.125s ease-out;
-  width: 13px;
+  width: 26px;
 }
 
 .checkbox-wrapper-35 .switch + label .switch-x-text {
@@ -272,12 +267,11 @@ strong {
 }
 
 .checkbox-wrapper-35 .switch + label .switch-x-toggletext {
-  display: block;
   font-weight: bold;
   height: 15px;
   overflow: hidden;
   position: relative;
-  width: 25px;
+  width: 120px;
 }
 
 .checkbox-wrapper-35 .switch + label .switch-x-unchecked,
@@ -313,8 +307,8 @@ strong {
 }
 
 .checkbox-wrapper-35 .switch:checked + label::after {
-  -webkit-transform: translate3d(10px, 0, 0);
-  transform: translate3d(10px, 0, 0);
+  -webkit-transform: translate3d(20px, 0, 0);
+  transform: translate3d(20px, 0, 0);
 }
 
 .checkbox-wrapper-35 .switch:checked + label .switch-x-unchecked {

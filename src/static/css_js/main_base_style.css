@@ -168,7 +168,7 @@ nav {
 .form-container {
     margin-left: 10px;
     width: 370px;
-    height: 250px;
+    height: 290px;
     background: #ffffff;
     border: 2px solid transparent;
     padding: 6px 18px;
@@ -248,7 +248,6 @@ nav {
 
 .BeginEvent:hover {
     background: rgb(85, 255, 112);
-
 }
 
 .CloseEvent{
