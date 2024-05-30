@@ -8,6 +8,8 @@ from src.database import get_async_session
 from src.user_profile.models import user
 from src.user_profile.schemas import UserUpdate, UserCreate
 from src.user_profile.inner_func import get_user_by_id
+from src.user_club.router import get_clubs_by_user, disjoin_club
+from src.user_club.schemas import User
 
 router = APIRouter(
     prefix="/user_profile",
@@ -303,6 +305,13 @@ async def delete_user(
         if data == "User not found":
             raise ValueError("404")
         stmt = user.delete().where(user.c.id == user_id)
+        clubs = await get_clubs_by_user(user_id, session)
+        clubs_data = clubs['data']
+        # print(clubs_data)
+        for club in clubs_data:
+            user_data = User(user_id=user_id, club_id=club['id'])
+            await disjoin_club(user_data, session)
+
         await session.execute(stmt)
         await session.commit()
         return {
@@ -312,7 +321,8 @@ async def delete_user(
         }
     except ValueError:
         raise HTTPException(status_code=404, detail=error404)
-    except Exception:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()
