@@ -5,7 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database import get_async_session
 from src.club.models import club
 
-
 error = {
     "status": "error",
     "data": None,

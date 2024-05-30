@@ -59,7 +59,7 @@ async def join_to_the_club(
             raise ValueError('404c')
 
         if not await check_rec(join_dict['user_id'], join_dict['club_id'], session):
-            raise ValueError('409')
+            return
 
         join_dict['date_joined'] = datetime.utcnow()
         join_dict['is_main'] = False
@@ -73,8 +73,8 @@ async def join_to_the_club(
             raise HTTPException(status_code=404, detail=error404u)
         elif str(e) == '404c':
             raise HTTPException(status_code=404, detail=error404c)
-        else:
-            raise HTTPException(status_code=409, detail=error409)
+        # else:
+        #     raise HTTPException(status_code=409, detail=error409)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
     finally:
@@ -155,6 +155,12 @@ async def disjoin_club(
             raise ValueError('404c')
         if await check_rec(data_dict['user_id'], data_dict['club_id'], session):
             raise ValueError('404')
+
+        if await get_role(data_dict['user_id'], data_dict['club_id'], session) == 'owner':
+            return
+        main = await get_main_club(data_dict['user_id'], session)
+        if main['status'] == 'success' and main['data']['id'] == data_dict['club_id']:
+            return
 
         rec_id = await get_rec_id(data_dict['user_id'], data_dict['club_id'], session)
         stmt = delete(club_x_user).where(club_x_user.c.id == rec_id)
@@ -400,7 +406,11 @@ async def get_clubs_by_user(
         data = result.mappings().all()
 
         if not data:
-            raise ValueError('404s')
+            return {
+                "status": "fail",
+                "data": "Clubs not found",
+                "details": None
+            }
 
         clubs_ids = [item['club_id'] for item in data]
         query = select(club).where(club.c.id.in_(clubs_ids))
@@ -492,7 +502,8 @@ async def get_main_club(
         if await get_user_by_id(user_id, session) == "User not found":
             raise ValueError('404u')
 
-        query = select(club_x_user).where(
+        join = club_x_user.join(club, club_x_user.c.club_id == club.c.id)
+        query = select(club).select_from(join).where(
             (club_x_user.c.user_id == user_id) &
             (club_x_user.c.is_main == True)
         )
@@ -506,7 +517,11 @@ async def get_main_club(
             data = result.mappings().all()
 
         if not data:
-            raise ValueError('404')
+            return {
+                "status": "fail",
+                "data": "Club not found",
+                "details": None
+            }
 
         return {
             "status": "success",

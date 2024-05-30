@@ -6,8 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
 from src.user_profile.models import user
-from src.user_profile.schemas import UserUpdate, UserCreate
+from src.user_profile.schemas import UserUpdate, UserCreate, UserCUpdate
 from src.user_profile.inner_func import get_user_by_id
+from src.club.schemas import FoundUid
 
 router = APIRouter(
     prefix="/user_profile",
@@ -151,12 +152,97 @@ async def get_user_attr(
         await session.rollback()
 
 
-@router.post("/update_user") #TODO: мб переписать логику чтобы если какого - то поля в дате не было то оно приравнивалось к старому
+@router.post("/update_create_user")
+async def update_create_profile(
+        user_id: int,
+        update_data: UserCUpdate,
+        session: AsyncSession = Depends(get_async_session)):
+    """Обновляет данные пользователя (для тг бота)
+
+       :param user_id:
+       :param update_data:
+       :return:
+           200 + джейсон со всеми данными, если все хорошо.
+           404 если такого юзера нет.
+           500 если внутрення ошибка сервера.
+
+    """
+    try:
+        data = await get_user_by_id(user_id, session)
+        if data == "User not found":
+            raise ValueError
+        stmt = update(user).where(user.c.id == user_id).values(
+            username=update_data.username,
+            name=update_data.name,
+            surname=update_data.surname
+        )
+        await session.execute(stmt)
+        await session.commit()
+
+        data = await get_user_by_id(user_id, session)
+        if data == "User not found":
+            raise ValueError
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+    finally:
+        await session.rollback()
+
+
+@router.post("/update_links_user")
+async def update_links_profile(
+        user_id: int,
+        update_data: FoundUid,
+        session: AsyncSession = Depends(get_async_session)):
+    """Обновляет данные пользователя (ттолько линкс, пока костыль)
+
+       :param user_id:
+       :param update_data:
+       :return:
+           200 + джейсон со всеми данными, если все хорошо.
+           404 если такого юзера нет.
+           500 если внутрення ошибка сервера.
+
+    """
+    try:
+        data = await get_user_by_id(user_id, session)
+        if data == "User not found":
+            raise ValueError
+        stmt = update(user).where(user.c.id == user_id).values(
+            links=update_data.uid
+        )
+        await session.execute(stmt)
+        await session.commit()
+
+        data = await get_user_by_id(user_id, session)
+        if data == "User not found":
+            raise ValueError
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404)
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail=error)
+    finally:
+        await session.rollback()
+
+
+@router.post("/update_user")
 async def update_profile(
         user_id: int,
         update_data: UserUpdate,
         session: AsyncSession = Depends(get_async_session)):
-    """Обновляет данные пользователя
+    """Обновляет данные пользователя (для веб аппа)
 
        :param user_id:
        :param update_data:
