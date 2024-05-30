@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from aiogram.enums import ParseMode
 
-load_dotenv('.env')
+load_dotenv('../.env')
 token = os.getenv('TOKEN_API')
 
 bot = Bot(

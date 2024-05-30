@@ -4,8 +4,9 @@ import requests
 from dotenv import load_dotenv
 from aiogram.enums import ParseMode
 import os
+from datetime import datetime, date
 
-load_dotenv('.env')
+load_dotenv('../.env')
 URL = os.getenv('URL')
 
 
@@ -25,7 +26,7 @@ async def set_user(user_data):
     response = requests.post(url, json=rq_user_data, headers=headers)
 
     if response.status_code == 409:
-        response = requests.post(str(URL)+'/user_profile/update_user',
+        response = requests.post(str(URL)+'/user_profile/update_create_user',
                                  json=rq_user_data,
                                  headers=headers,)
     return response
@@ -37,19 +38,16 @@ async def set_club(tg_id, club_data):
 
     rq_club_data = {
         "owner": int(tg_id),
+        "name": str(club_data['name']),
         "dest": str(club_data['dest']),
-        "photo": str(''),
         "bio": str(club_data['bio']),
-        "links": str(''),
         "channel_link": str(club_data['channel_link']),
-        # comfort_time: str
-        # date_created: date
     }
 
     headers = {
         "Content-Type": "application/json"
     }
-    url = str(URL)+'/club/create_cub'
+    url = str(URL)+'/club/create_club'
 
     response = requests.post(url, json=rq_club_data, headers=headers)
     return response
