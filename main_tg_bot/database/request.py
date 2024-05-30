@@ -3,11 +3,12 @@ from bot_instance import URL
 
 
 async def set_user(user_data):
+    print(user_data)
     rq_user_data = {
         "id": int(user_data["tg_id"]),  # ToDo падает если tg_id > 10^8
         "username": str(user_data["username"]),
-        "name": str('') if user_data["name"] is None or 'None' else str(user_data["name"]),
-        "surname": str('') if user_data["surname"] is None or 'None' else str(user_data["surname"]),
+        "name": str('_') if str(user_data["name"]) == 'None' else str(user_data["name"]),
+        "surname": str('_') if str(user_data["name"]) == 'None' else str(user_data["surname"]),
         "mentor": False,
         "is_active": True,
         "is_superuser": False,
@@ -15,7 +16,6 @@ async def set_user(user_data):
     }
 
     headers = {
-        "accept": "application/json",
         "Content-Type": "application/json"
     }
     url = f'{str(URL)}/user_profile/create_user'
@@ -27,6 +27,8 @@ async def set_user(user_data):
         response = requests.post(url=f'{str(URL)}/user_profile/update_create_user',
                                  json=rq_user_data,
                                  headers=headers,)
+    print(response)
+    print(rq_user_data)
     return response
 
 
@@ -59,6 +61,8 @@ async def is_user_club_admin(tg_id):
     response = requests.get(url=url, headers=headers)
 
     if response.status_code == 200:
+        if response.json()['data'] == "Clubs not found":
+            return -1
         for club in response.json()['data']:
             if club['owner'] == tg_id:
                 return club['id']
