@@ -216,8 +216,10 @@ async def role_update(
         role = await get_role(user_id, club_id, session)
 
         if role == 'admin':
+            await update_xp(user_id, -50, session)
             stmt = update(club_x_user).where(club_x_user.c.id == rec_id).values(role='member')
         elif role == 'member':
+            await update_xp(user_id, 50, session)
             stmt = update(club_x_user).where(club_x_user.c.id == rec_id).values(role='admin')
 
         await session.execute(stmt)

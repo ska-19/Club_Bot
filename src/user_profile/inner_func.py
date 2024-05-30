@@ -71,3 +71,34 @@ async def update_xp(
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()
+
+
+async def get_user_attr(
+        user_id: int,
+        col: str,
+        session: AsyncSession = Depends(get_async_session)):
+    """Получает данные пользователя по его id и атрибуту
+
+        :param user_id:
+        :param col:
+        :return:
+            200 + джейсон со всеми данными, если все хорошо.
+            404 если такого юзера нет.
+            500 если внутрення ошибка сервера.
+
+    """
+    try:
+        data = await get_user_by_id(user_id, session)
+        if data == "User not found":
+            raise ValueError
+        return {
+            "status": "success",
+            "data": data[col],
+            "details": None
+        }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+    finally:
+        await session.rollback()

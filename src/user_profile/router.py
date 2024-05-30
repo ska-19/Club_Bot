@@ -115,38 +115,6 @@ async def get_user(
         raise HTTPException(status_code=500, detail=error)
 
 
-@router.get("/get_attr")
-async def get_user_attr( #TODO: я бы дропал 404 если col не существует
-        user_id: int,
-        col: str, #TODO: переименовать в attr
-        session: AsyncSession = Depends(get_async_session)):
-    """Получает данные пользователя по его id и атрибуту
-
-        :param user_id:
-        :param col:
-        :return:
-            200 + джейсон со всеми данными, если все хорошо.
-            404 если такого юзера нет.
-            500 если внутрення ошибка сервера.
-
-    """
-    try:
-        data = await get_user_by_id(user_id, session)
-        if data == "User not found":
-            raise ValueError
-        return {
-            "status": "success",
-            "data": data[col],
-            "details": None
-        }
-    except ValueError:
-        raise HTTPException(status_code=404, detail=error404)
-    except Exception:
-        raise HTTPException(status_code=500, detail=error)
-    finally:
-        await session.rollback()
-
-
 @router.post("/update_create_user")
 async def update_create_profile(
         update_data: UserCreate,

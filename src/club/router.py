@@ -7,8 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database import get_async_session
 from src.club.models import club
 from src.club.schemas import ClubUpdate, ClubCreate
-from src.user_profile.inner_func import get_user_by_id, update_xp
-from src.user_club.router import join_to_the_club, new_main
+from src.user_profile.inner_func import get_user_by_id, update_xp, get_user_attr
+from src.user_club.router import join_to_the_club, new_main, get_users_in_club
 from src.user_club.schemas import UserJoin
 from src.club.inner_func import get_club_by_id, check_leg_name, get_club_by_uid
 
@@ -277,5 +277,31 @@ async def search(
     except ValueError:
         raise HTTPException(status_code=404, detail=error404)
     except Exception:
+        raise HTTPException(status_code=500, detail=error)
+
+
+@router.get('/get_club_xp')
+async def get_club_xp(
+        club_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    try:
+        data = await get_club_by_id(club_id, session)
+        if data == "Club not found":
+            raise ValueError("404")
+        users = await get_users_in_club(club_id, session)
+        summ = 0
+        for user in users['data']:
+            xp = await get_user_attr(user['id'], 'xp', session)
+            summ += int(xp['data'])
+        return {
+            "status": "success",
+            "data": summ,
+            "details": None
+        }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404)
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail=error)
         
