@@ -4,15 +4,40 @@ from sqlalchemy import select, insert, update, delete
 from datetime import datetime
 
 from src.club.inner_func import get_club_by_id
-from src.events.schemas import EventCreate, EventUpdate, EventReg
+from src.events.schemas import EventCreate, EventUpdate, EventReg, Data
 from src.user_club.inner_func import check_rec, get_role
 from src.events.inner_func import *
 from src.user_profile.inner_func import get_user_by_id
+# from src.user_club.schemas import UpdateBalance
+# from src.user_club.router import update_balance, get_users_with_role
+from src.user_profile.models import user
+
 
 router = APIRouter(
     prefix="/events",
     tags=["events"]
 )
+
+error404s = {
+    "status": "error",
+    "data": "Users not found",
+    "details": None
+}
+
+
+@router.get("/check_rec")
+async def get_check_rec(
+        event_id: int,
+        user_id: int,
+        session: AsyncSession = Depends(get_async_session),
+):
+    try:
+        if not await check_rec_event(user_id=user_id, event_id=event_id, session=session):
+            return False
+        return True
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+
 
 
 @router.post("/create_event")
@@ -43,7 +68,6 @@ async def create_event(
             raise ValueError('404uc')
         if role == "admin" or role == "owner":
             event_dict = new_event.model_dump()
-            event_dict['date'] = datetime.utcnow()
             query = insert(event).values(**event_dict)
             await session.execute(query)
             await session.commit()
@@ -137,7 +161,6 @@ async def update_event(
             raise ValueError('403')
 
         event_dict = update_data.model_dump()
-        event_dict['date'] = datetime.utcnow()
         query = update(event).where(event.c.id == event_id).values(**event_dict)
         await session.execute(query)
         await session.commit()
@@ -188,11 +211,13 @@ async def reg_event(
         club_id = await get_club_id_by_event_id(data.event_id, session)
         if await check_rec(data.user_id, club_id, session):
             raise ValueError('404uc')
+        if await (check_rec_event(data.user_id, data.event_id, session)):
+            raise ValueError('409')
+
         event_dict = data.model_dump()
         event_dict['reg_date'] = datetime.utcnow()
         query = insert(event_reg).values(**event_dict)
         await session.execute(query)
-
         await session.commit()
 
         return {
@@ -207,6 +232,8 @@ async def reg_event(
             raise HTTPException(status_code=404, detail=error404e)
         if str(e) == '404uc':
             raise HTTPException(status_code=404, detail=error404uc)
+        if str(e) == '409':
+            raise HTTPException(status_code=409, detail=error409)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
     finally:
@@ -266,7 +293,6 @@ async def event_disreg(
             raise ValueError('404u')
         if await get_event_by_id(event_id, session) == "Event not found":
             raise ValueError('404e')
-        print('here')
         if not await check_rec_event(user_id, event_id, session):
             raise ValueError('404eu')
 
@@ -300,8 +326,8 @@ async def event_disreg(
         await session.rollback()
 
 
-
 from sqlalchemy.dialects import postgresql
+
 
 @router.post("/delete_event") #TODO: пофиксить удаление
 async def delete_event(
@@ -337,3 +363,75 @@ async def delete_event(
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()
+
+
+@router.post('/end_event')
+async def end_event(
+        event_id: int,
+        data: Data,
+        session: AsyncSession = Depends(get_async_session)
+):
+    """ завершает событие. выдает опыт и монеты участникам, которые пришли и админ составу, очищает event_reg и удаляет событие
+        список пользователлей должен поступать в формате json (смотри схему Data, на самом деле json в jsone с ключем k), где ключ - стинговое значение user_id, а значение - 0/1 в зависимости от посещения
+
+                 :param event_id
+                 :param data: json
+                 :return:
+                    200 + джейсон со всеми данными, если все хорошо.
+                    404 + error404e если события с таким id нет
+                    500 - внутренняя ошибка сервера
+
+          """
+    try:
+        users = data.dict()['users']
+        data = await get_event_by_id(event_id, session)
+
+        if data == "Event not found":
+            raise ValueError('404e')
+
+        reward = data['reward']
+        club_id = await get_club_id_by_event_id(event_id, session)
+        await adm_boost(event_id, session)
+        for user_id, perm in users.items():
+            if perm:
+                updatebalance = UpdateBalance(club_id=club_id, user_id=user_id, plus_balance=reward)
+                await update_balance(updatebalance, session)
+                await update_xp(int(user_id), 50, session)
+        await clean(event_id, session)
+        await delete_event(event_id, session)
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404e)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+
+
+@router.get("/get_users_by_event")
+async def get_users_by_event(
+        event_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    try:
+        if await get_event_by_id(event_id, session) == "Event not found":
+            raise ValueError('404e')
+
+        join = event_reg.join(user, event_reg.c.user_id == user.c.id)
+        query = select(user.c.id, user.c.username, user.c.name, user.c.surname, event_reg.c.reg_date).select_from(join).where(event_reg.c.event_id == event_id).order_by(user.c.surname)
+
+        result = await session.execute(query)
+        data = result.mappings().all()
+
+        if not data:
+            raise ValueError('404s')
+
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
+    except ValueError as e:
+        if str(e) == '404s':
+            raise HTTPException(status_code=404, detail=error404s)
+        else:
+            raise HTTPException(status_code=404, detail=error404e)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)

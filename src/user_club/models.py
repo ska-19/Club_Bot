@@ -14,5 +14,6 @@ club_x_user = Table(
     Column('user_id', Integer, ForeignKey('user.id'), nullable=False),
     Column('role', String(255), nullable=False),
     Column('date_joined', TIMESTAMP, nullable=False),
-    Column('balance', Integer, nullable=False)
+    Column('balance', Integer, nullable=False),
+    Column('is_main', Boolean, nullable=False)
 )

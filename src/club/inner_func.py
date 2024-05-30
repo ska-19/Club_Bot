@@ -5,7 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database import get_async_session
 from src.club.models import club
 
-
 error = {
     "status": "error",
     "data": None,
@@ -18,6 +17,22 @@ async def get_club_by_id(
         session: AsyncSession = Depends(get_async_session)):
     try:
         query = select(club).where(club.c.id == club_id)
+        result = await session.execute(query)
+        data = result.mappings().first()
+
+        if not data:
+            data = "Club not found"
+
+        return data
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+
+
+async def get_club_by_uid(
+        club_uid: str,
+        session: AsyncSession = Depends(get_async_session)):
+    try:
+        query = select(club).where(club.c.uid == club_uid)
         result = await session.execute(query)
         data = result.mappings().first()
 

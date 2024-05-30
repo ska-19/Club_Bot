@@ -2,8 +2,10 @@
 
 
 {% block level %}
-<div class="experience-level">
-    Level {{ user_info.xp }}
+<div class="experience-fill" style="width: {{ user_info.xp_percent }}%">
+    <div class="experience-level">
+        Level {{ user_info.full_xp }}
+    </div>
 </div>
 {% endblock %}
 
@@ -24,8 +26,8 @@
 
 {% block dob %}
 <div class="form-group" style="width: 60%">
-    <label for="Date of Birth">День рождения</label>
-    <input required="" name="Date of Birth" id="Date of Birth" type="text" style="width: 115px"
+    <label for="DateOfBirth">День рождения</label>
+    <input required="" name="Date of Birth" id="DateOfBirth" type="text" style="width: 115px"
            value="{{ user_info.dob }}" readonly>
 </div>
 {% endblock %}
@@ -57,6 +59,7 @@
 
 
 {% block href_main %}
+{% if user_info.exist_clubs == 1 %}
 <a href="/pages/main_user/{{user_info.id}}" style="text-decoration: none">
     <button class="btn_GoToTheClub" type="button" style="margin-top: 25px">
         <strong>На главную</strong>
@@ -69,4 +72,18 @@
         </div>
     </button>
 </a>
+{% else %}
+<a href="/pages/search_user/{{user_info.id}}" style="text-decoration: none">
+    <button class="btn_GoToTheClub" type="button" style="margin-top: 25px">
+        <strong>На главную</strong>
+        <div id="container-stars">
+            <div id="stars"></div>
+        </div>
+        <div id="glow">
+            <div class="circle"></div>
+            <div class="circle"></div>
+        </div>
+    </button>
+</a>
+{% endif %}
 {% endblock %}

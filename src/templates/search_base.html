@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css_js/search_base_style.css">
+    <title></title>
+</head>
+<body>
+
+<div class="container">
+
+
+    <!-- Поиск поле -->
+    <input id="input_search" type="text" placeholder="Введите тэг клуба" class="text-xl">
+
+
+    <!-- кнопка "искать" -->
+    <button onclick= "searchClub()" class="SearchClub">Найти</button>
+
+
+    <!-- Найденный клуб + "Вступить" -->
+    {% block found %}{% endblock %}
+
+
+    <!-- "Главный клуб" + Club_name + "перейти" + ссылка в main_user -->
+    {% block main_club %}{% endblock %}
+
+
+    <!-- Кнопка "На главную" -->
+    {% block href_main %}{% endblock %}
+
+
+    <!-- "Другие клубы" + Club_names + "перейти" + ссылка в main_user -->
+    {% block clubs_info %}{% endblock %}
+</div>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="/css_js/search_base_script.js"></script>
+</body>
+</html>

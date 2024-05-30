@@ -1,4 +1,3 @@
-
 body {
     margin: 0;
     padding: 0;
@@ -6,119 +5,87 @@ body {
     font-family: Arial, sans-serif;
 }
 
-.experience-bar { /* Шкала опыта*/
-    position: relative;
-    width: 40%;
-    height: 20px;
-    background-color: #4b4a65;
-    border-radius: 10px;
-    margin-top: 20px;
-    animation: gradient 5s ease infinite;
-    filter: drop-shadow(0px 0px 20px rgba(223, 185, 255, 0.68));
-}
-
-.experience-level { /* Текст у опыта */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 12px;
-    color: rgb(255, 255, 255);
-}
-
-.experience-fill { /* заполенение шкалы опыта*/
-    height: 100%;
-    border-radius: 10px;
-    background-color: #756bbc;
-}
-
 .container {
     background: #ededed;
     max-width: 390px;
 }
 
-.editBtn {
+.JoinClub {
     display: inline-block;
     padding: 10px 20px;
     border: none;
-    background: #ededed;
+    background: rgba(85, 255, 112, 0.62);
     border-radius: 10px;
     text-transform: uppercase;
     font-weight: 700;
-
     transition: background .2s linear;
 }
 
-.editBtn:hover {
-    background: lightgray;
+.JoinClub:hover {
+    background: rgb(85, 255, 112);
 }
 
-.saveBtn {
+.SearchClub {
+    display: inline-block;
     padding: 10px 20px;
     border: none;
-    background: #ededed;
+    background: rgba(117, 203, 255, 0.62);
     border-radius: 10px;
     text-transform: uppercase;
     font-weight: 700;
     transition: background .2s linear;
 }
 
-.saveBtn:hover {
-    background: lightgray;
+.SearchClub:hover {
+    background: rgb(117, 203, 255);
 }
 
-#avatar-container {
+.LeaveClub {
+    display: inline-block;
+    padding: 10px 20px;
+    border: none;
+    background: rgba(255, 85, 85, 0.62);
+    border-radius: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    transition: background .2s linear;
+}
+
+.LeaveClub:hover {
+    background: rgb(255, 85, 85);
+}
+
+.ChangeMainClub {
+    display: inline-block;
+    padding: 10px 20px;
+    border: none;
+    background: rgba(117, 203, 255, 0.62);
+    border-radius: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    transition: background .2s linear;
+}
+
+.ChangeMainClub:hover {
+    background: rgb(117, 203, 255);
+}
+
+.card {
     position: relative;
-    margin-left: 20px;
-    width: 120px;
-    height: 120px;
-    overflow: hidden;
-    display: inline-block;
+    border-radius: 20px;
     background-color: #ffffff;
-    border-radius: 50%;
     animation: gradient 5s ease infinite;
     filter: drop-shadow(0px 0px 20px rgba(223, 185, 255, 0.68));
-
-}
-
-#avatar-circle {
-    width: 100%;
-    height: 100%;
-    position: relative;
-}
-
-#avatar-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-    cursor: pointer;
-    display: none;
-}
-
-#choose-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #333;
-    font-size: 14px;
-    font-weight: bold;
-    text-align: center;
-}
-
-#avatar-input {
-    display: none;
 }
 
 .btn_GoToTheClub {
-    margin-left: 35px;
+    margin-left: 55px;
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 320px;
+    width: 280px;
     overflow: hidden;
-    height: 72px;
+    height: 50px;
     background-size: 300% 300%;
     backdrop-filter: blur(1rem);
     border-radius: 5rem;
@@ -280,37 +247,32 @@ strong {
     }
 }
 
-.card {
-    position: absolute;
-    width: 190px;
-    height: 160px;
-    border-radius: 30px;
-    background-color: #ffffff;
-    animation: gradient 5s ease infinite;
-    filter: drop-shadow(0px 0px 20px rgba(223, 185, 255, 0.68));
-    z-index: 1;
+.block1 {
+    width: 100%;
 }
 
-.block1 {
-    width: 45%;
+.block2 {
+    width: 33%;
+}
+
+.block3 {
+    width: 33%;
 }
 
 .form-container {
     margin-left: 10px;
     width: 370px;
-    height: 370px;
-    background-color: #ffffff;
-    border: 1px solid transparent;
-    padding: 32px 24px;
-    font-size: 11px;
+    height: 90px;
+    background: #ffffff;
+    border: 2px solid transparent;
+    padding: 6px 18px;
+    font-size: 9px;
     color: #7a9a8a;
     display: flex;
     flex-direction: column;
-    gap: 20px;
     box-sizing: border-box;
     border-radius: 30px;
     animation: gradient 5s ease infinite;
-    content: '';
     filter: drop-shadow(0px 0px 20px rgba(223, 185, 255, 0.68));
 }
 
@@ -319,26 +281,25 @@ strong {
     z-index: 2;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
 }
 
 .form-container .form-group {
     display: flex;
     flex-direction: column;
-    gap: 2px;
 }
 
 .form-container .form-group label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 2px;
     font-weight: 600;
     font-size: 12px;
 }
 
 .form-container .form-group input {
     width: 100%;
-    padding: 12px 16px;
-    border-radius: 8px;
+    padding: 4px 10px;
+    border-radius: 6px;
     font-family: inherit;
     background-color: transparent;
     border: 1px solid #7c7c7c;
@@ -346,10 +307,9 @@ strong {
 
 .form-container .form-group textarea {
     width: 100%;
-    padding: 12px 16px;
+    padding: 2px 24px;
     border-radius: 8px;
     resize: none;
-    height: 96px;
     border: 1px solid #7c7c7c;
     background-color: transparent;
     font-family: inherit;

@@ -7,7 +7,7 @@ from pydantic import BaseModel
 class UserCreate(BaseModel): #TODO: Почему нет поля для емейла?
     id: int  # tg id
     username: str  # tg username
-    mentor: bool = False
+    mentor: Optional[bool] = False
     name: str  # tg name
     surname: str  # tg surname
     # date_joined: datetime = datetime.utcnow
@@ -21,19 +21,59 @@ class UserCreate(BaseModel): #TODO: Почему нет поля для емей
 
 
 class UserUpdate(BaseModel):
-    name: str
-    surname: str
-    email: str
-    tel: str
-    photo: str  # ссылка на фото
-    comfort_time: str  # удобное время для встреч
-    course: str
-    faculty: str
-    links: str  # ссылки на соц сети
+    # name: str
+    # surname: str
+    # email: str
+    # tel: str
+    # photo: str  # ссылка на фото
+    # comfort_time: str  # удобное время для встреч
+    # course: str
+    # faculty: str
+    # links: str  # ссылки на соц сети
     bio: str  # о себе
     dob: date
     city: str
     education: str
+
+    class Config:
+        arbitrary_types_allowed = True
+
+
+class UserCUpdate(BaseModel):
+    username: str
+    name: str
+    surname: str
+    # email: str
+    # tel: str
+    # photo: str  # ссылка на фото
+    # comfort_time: str  # удобное время для встреч
+    # course: str
+    # faculty: str
+    # links: str  # ссылки на соц сети
+    # bio: str  # о себе
+    # dob: date
+    # city: str
+    # education: str
+
+    class Config:
+        arbitrary_types_allowed = True
+
+
+class UserLUpdate(BaseModel):
+    # username: str
+    # name: str
+    # surname: str
+    # email: str
+    # tel: str
+    # photo: str  # ссылка на фото
+    # comfort_time: str  # удобное время для встреч
+    # course: str
+    # faculty: str
+    links: str  # ссылки на соц сети
+    # bio: str  # о себе
+    # dob: date
+    # city: str
+    # education: str
 
     class Config:
         arbitrary_types_allowed = True
