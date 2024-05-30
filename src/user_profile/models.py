@@ -1,13 +1,13 @@
 from datetime import datetime
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
-from sqlalchemy import Table, Column, Integer, String, TIMESTAMP, ForeignKey, JSON, Boolean, Text, Date, JSON
+from sqlalchemy import Table, Column, Integer, String, TIMESTAMP, ForeignKey, JSON, Boolean, Text, Date, JSON, BIGINT
 
 from src.database import Base, metadata
 
 user = Table(
     'user', metadata,
-    Column('id', Integer, primary_key=True, autoincrement=False),  # tg id
+    Column('id', BIGINT, primary_key=True, autoincrement=False),  # tg id
     Column('username', String(255), nullable=False),  # tg username (handler)
     Column('mentor', Boolean, nullable=False, default=False),
     Column('email', String(255)),
