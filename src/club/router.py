@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database import get_async_session
 from src.club.models import club
 from src.club.schemas import ClubUpdate, ClubCreate
-from src.user_profile.inner_func import get_user_by_id
+from src.user_profile.inner_func import get_user_by_id, update_xp
 from src.user_club.router import join_to_the_club, new_main
 from src.user_club.schemas import UserJoin
 from src.club.inner_func import get_club_by_id, check_leg_name, get_club_by_uid
@@ -78,6 +78,8 @@ async def create_club(
         stmt = update(club).where(club.c.id == id).values(uid=uid)
         await session.execute(stmt)
         await session.commit()
+
+        await update_xp(owner, 200, session)
 
         return {
             "status": "success",
