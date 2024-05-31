@@ -271,16 +271,12 @@ async def get_all_request(
 
 @router.post("/accept_request")
 async def accept_request(
-        admin_id: int,
-        user_id: int,
-        product_id: int,
+        rec_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
     """ Одобряет заявку на покупку товара
 
-       :param admin_id:
-       :param user_id: int
-       :param product_id: int
+      :param rec_id: int
        :return:
            200 + success, если все хорошо.
            404 + error404u, если пользователь не найден.
@@ -289,9 +285,7 @@ async def accept_request(
            500 если внутрення ошибка сервера.
     """
     try:
-        if await get_user_by_id(admin_id, session) == "User not found":
-            raise ValueError('404u')
-        data = await get_rec_market(user_id, product_id, session)
+        data = await get_user_x_product_by_id(rec_id, session)
         if data == "Request not found":
             raise ValueError('404req')
         if data['status'] != 'request':
@@ -317,16 +311,12 @@ async def accept_request(
 
 @router.post("/reject_request_admin")
 async def reject_request_admin(
-        admin_id: int,
-        user_id: int,
-        product_id: int,
+        rec_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
     """ Отклоняет заявку на покупку товара со стороны администрации
 
-       :param admin_id:
-       :param user_id: int
-       :param product_id: int
+       :param rec_id: int
        :return:
            200 + success, если все хорошо.
            404 + error404u, если пользователь не найден.
@@ -335,9 +325,7 @@ async def reject_request_admin(
            500 если внутрення ошибка сервера.
     """
     try:
-        if await get_user_by_id(admin_id, session) == "User not found":
-            raise ValueError('404u')
-        data = await get_rec_market(user_id, product_id, session)
+        data = await get_user_x_product_by_id(rec_id, session)
         if data == "Request not found":
             raise ValueError('404req')
         if data['status'] != 'request':
@@ -347,25 +335,23 @@ async def reject_request_admin(
         await session.execute(stmt)
         await session.commit()
 
-        data = await get_product_by_id(product_id, session)
-        stmt = update(product).where(product.c.id == data['product_id']).values(quantity=data['quantity'] + 1)
+        data_product = await get_product_by_id(data['product_id'], session)
+        stmt = update(product).where(product.c.id == data['product_id']).values(quantity=data_product['quantity'] + 1)
         await session.execute(stmt)
         await session.commit()
 
         stmt = update(club_x_user).where(
-            (club_x_user.c.user_id == user_id) &
-            (club_x_user.c.club_id == data['club_id'])).values(
-            balance=club_x_user.c.balance + data['price'])
+            (club_x_user.c.user_id == data['user_id']) &
+            (club_x_user.c.club_id == data_product['club_id'])).values(
+            balance=club_x_user.c.balance + data_product['price'])
         await session.execute(stmt)
         await session.commit()
 
-        await update_xp(user_id, -75, session)
+        await update_xp(data['user_id'], -75, session)
 
         return success
 
     except ValueError as e:
-        if str(e) == '404u':
-            raise HTTPException(status_code=404, detail=error404u)
         if str(e) == '404req':
             raise HTTPException(status_code=404, detail=error404req)
         if str(e) == '403s':
@@ -378,14 +364,12 @@ async def reject_request_admin(
 
 @router.post("/reject_request_user")
 async def reject_request_user(
-        user_id: int,
-        product_id: int,
+        rec_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
     """ Отклоняет заявку на покупку товара со стороны пользователя
 
-       :param user_id: int
-       :param product_id: int
+       :param rec_id: int
        :return:
            200 + success, если все хорошо.
            404 + error404u, если пользователь не найден.
@@ -394,9 +378,7 @@ async def reject_request_user(
            500 если внутрення ошибка сервера.
         """
     try:
-        if await get_user_by_id(user_id, session) == "User not found":
-            raise ValueError('404u')
-        data = await get_rec_market(user_id, product_id, session)
+        data = await get_user_x_product_by_id(rec_id, session)
         if data == "Request not found":
             raise ValueError('404req')
         if data['status'] != 'request':
@@ -406,19 +388,19 @@ async def reject_request_user(
         await session.execute(stmt)
         await session.commit()
 
-        data = await get_product_by_id(product_id, session)
-        stmt = update(product).where(product.c.id == data['product_id']).values(quantity=data['quantity'] + 1)
+        data_product = await get_product_by_id(data['product_id'], session)
+        stmt = update(product).where(product.c.id == data['product_id']).values(quantity=data_product['quantity'] + 1)
         await session.execute(stmt)
         await session.commit()
 
         stmt = update(club_x_user).where(
-            (club_x_user.c.user_id == user_id) &
-            (club_x_user.c.club_id == data['club_id'])).values(
-            balance=club_x_user.c.balance + data['price'])
+            (club_x_user.c.user_id == data['user_id']) &
+            (club_x_user.c.club_id == data_product['club_id'])).values(
+            balance=club_x_user.c.balance + data_product['price'])
         await session.execute(stmt)
         await session.commit()
 
-        await update_xp(user_id, -100, session)
+        await update_xp(data['user_id'], -100, session)
 
         return success
     except ValueError as e:
