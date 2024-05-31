@@ -365,6 +365,8 @@ async def get_market_user(
     club_data = club['data']
     products = await get_items_by_club(club_id, session)
     products_data = products['data']
+    if products_data is None:
+        products_data = []
     return templates.TemplateResponse("market_user.html", {
         "request": request,
         "user_info": user_data,
@@ -379,7 +381,7 @@ async def create_product(
         add_prod: AddProduct,
         session: AsyncSession = Depends(get_async_session)
 ):
-    club = await get_main_club(event_cre.host_id, session)
+    club = await get_main_club(user_id, session)
     add_prod.club_id = club['data']['id']
     add_prod.user_id = user_id
     new_product = await add_product(add_prod, session)
@@ -440,45 +442,58 @@ async def get_history_user(
     us_hist_active_data = us_hist_active['data']
     us_hist_close = await get_user_history_close(user_id, session)
     us_hist_close_data = us_hist_close['data']
-    ad_hist_active = await get_admin_history_active(user_id, session)
+    ad_hist_active = await get_admin_history_active(club_data['id'], session)
     ad_hist_active_data = ad_hist_active['data']
-    ad_hist_close = await get_admin_history_close(user_id, session)
+    ad_hist_close = await get_admin_history_close(club_data['id'], session)
     ad_hist_close_data = ad_hist_close['data']
+    if us_hist_active_data is None:
+        us_hist_active_data = []
+    if ad_hist_active_data is None:
+        ad_hist_active_data = []
+    if us_hist_close_data is None:
+        us_hist_close_data = []
+    if ad_hist_close_data is None:
+        ad_hist_close_data = []
     return templates.TemplateResponse("history_user.html", {
         "request": request,
         "user_info": user_data,
         "club": club_data,
-        "us_hist_active": us_hist_active_data,
-        "us_hist_close": us_hist_close_data,
-        "ad_hist_active": ad_hist_active_data,
-        "ad_hist_close": ad_hist_close_data
+        "user_active_products": us_hist_active_data,
+        "user_closed_products": us_hist_close_data,
+        "admin_active_products": ad_hist_active_data,
+        "admin_closed_products": ad_hist_close_data
     })
 
 
 @router.post("/history_user/{user_id}")
 async def confirm_purchase(
+        user_id: int,
         prod: UpdateProduct,
         session: AsyncSession = Depends(get_async_session)
 ):
     prod_id = prod.id
-    adm_id = prod.user_id
-    accept = await accept_request(adm_id, user_id, prod_id, session)
+    adm_id = user_id
+    acc_user_id = prod.user_id
+    accept = await accept_request(adm_id, acc_user_id, prod_id, session)
     return {"message": "Event Reg successfully", "Accept request for user!": accept}
 
 
 @router.delete("/history_user/{user_id}/1")
 async def admin_cancel_purchase(
+        user_id: int,
         prod: UpdateProduct,
         session: AsyncSession = Depends(get_async_session)
 ):
     prod_id = prod.id
-    adm_id = prod.user_id
-    rej_admin = await reject_request_admin(adm_id, user_id, prod_id, session)
+    adm_id = user_id
+    rej_user_id = prod.user_id
+    rej_admin = await reject_request_admin(adm_id, rej_user_id, prod_id, session)
     return {"message": "Event Reg successfully", "Rejected request from admin!": rej_admin}
 
 
 @router.delete("/history_user/{user_id}/2")
 async def member_cancel_purchase(
+        user_id: int,
         prod: UpdateProduct,
         session: AsyncSession = Depends(get_async_session)
 ):

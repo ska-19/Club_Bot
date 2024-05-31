@@ -26,17 +26,86 @@
             <span class="site-name">Магазин</span>
         </div>
     </a>
-
     <a style="text-decoration: none; color: #000000;flex-basis: 43%">
         <div class="logo-container1">
             <span class="site-name">История</span>
         </div>
     </a>
 </nav>
-
 {% endblock %}
 
 
-{% block products %}
+{% block hist %}
+<div class="card"
+     style="left: 50px;height: 50px; width: 290px; justify-content: center;display: flex">
+    <h1 style="font-size: 19px; position: relative; z-index: 2">ИСТОРИЯ ПОКУПОК</h1>
+</div>
+{% if user_info.role == "member" %}
+{% for product in user_active_products %}
+<div class="form-container" id="form" style="margin-top: 30px">
+    <form class="form">
+        <div style="display: flex">
+            <div class="form-group" style="width: 60%">
+                <label>Товар</label>
+                <input required="" name="NameProduct" id="NameProduct_{{product.id}}" type="text" style="width: 115px"
+                       value="{{ product.name }}" readonly>
+            </div>
+            <div class="form-group">
+                <label>Цена</label>
+                <input required="" name="PriceProduct" id="PriceProduct_{{product.id}}" type="text" style="width: 85px"
+                       value="{{ product.price }}" readonly>
+            </div>
+        </div>
+        <div style="display: flex;justify-content: center">
+            <button type="button" class="RejUserProduct" id="RejUserProduct_{{ product.id }}"
+                    style="margin-top: 10px;width: 200px"
+                    onclick="reject_user('{{product.id}}')">Отменить покупку
+            </button>
+        </div>
+        <!-- У админов/владельца кнопки для редактирования и завершения события -->
+    </form>
+</div>
 
+{% endfor %}
+{% for product in user_closed_products %}
+
+{% endfor %}
+{% else %}
+{% for product in admin_active_products %}
+<div class="form-container" id="form" style="margin-top: 30px">
+    <form class="form">
+        <div style="display: flex">
+            <div class="form-group" style="width: 60px">
+                <label>Товар</label>
+                <input required="" name="NameProduct" id="NameProduct_{{product.id}}" type="text"
+                       value="{{ product.name }}" readonly>
+            </div>
+            <div class="form-group" style="margin-left: 30px;width: 60px">
+                <label>Цена</label>
+                <input required="" name="PriceProduct" id="PriceProduct_{{product.id}}" type="text"
+                       value="{{ product.price }}" readonly>
+            </div>
+            <div class="form-group" style="margin-left: 80px;width: 60px">
+                <label>Покупатель</label>
+                <input required="" name="BuyerProduct" id="BuyerProduct_{{product.id}}" type="text"
+                       value="{{ product.user_id }}" readonly>
+            </div>
+        </div>
+        <div style="display: flex">
+            <button type="button" class="RejAdminProduct" id="RejAdminProduct_{{ product.id }}"
+                    style="flex-basis: 45%" onclick="reject_admin('{{product.id}}')">Отменить
+            </button>
+            <div style="flex-basis: 10%"></div>
+            <button type="button" class="AcceptProduct" id="AcceptProduct_{{ product.id }}"
+                    style="flex-basis: 45%" onclick="accept('{{product.id}}')">Подтвердить
+            </button>
+        </div>
+        <!-- У админов/владельца кнопки для редактирования и завершения события -->
+    </form>
+</div>
+{% endfor %}
+{% for product in admin_closed_products %}
+
+{% endfor %}
+{% endif %}
 {% endblock %}
