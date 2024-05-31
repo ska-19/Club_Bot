@@ -8,8 +8,8 @@ from src.database import get_async_session
 from src.club.models import club
 from src.club.schemas import ClubUpdate, ClubCreate
 from src.user_profile.inner_func import get_user_by_id
-from src.user_club.router import join_to_the_club
-from src.user_club.schemas import UserJoin
+from src.user_club.router import join_to_the_club, get_users_in_club, disjoin_club
+from src.user_club.schemas import UserJoin, User
 from src.club.inner_func import get_club_by_id, check_leg_name
 
 router = APIRouter(
@@ -68,7 +68,7 @@ async def create_club(
         id = result.fetchone()[0]
         userjoin = UserJoin(club_id=id, user_id=owner, role='owner')
         await join_to_the_club(userjoin, session)
-
+        club_dict['id'] = id
         return {
             "status": "success",
             "data": club_dict,  # TODO: how return ClubRead schemas
@@ -117,7 +117,7 @@ async def get_club(
         raise HTTPException(status_code=500, detail=error)
 
 
-@router.get("/get_channel_link")  #TODO: а в чем разница с кодом выше???
+@router.get("/get_channel_link")
 async def get_club_link(
         club_id: int,
         session: AsyncSession = Depends(get_async_session)):
@@ -215,12 +215,18 @@ async def delete_club(
 
     """
     try:
+        print(club_id)
         data = await get_club_by_id(club_id, session)
         if data == "Club not found":
             raise ValueError("404")
+        usrs = await get_users_in_club(club_id, session)
+        usrs = usrs['data']
+        for u in usrs:
+            user = User(user_id=u['user_id'], club_id=club_id)
+            await disjoin_club(user, session)
         query = delete(club).where(club.c.id == club_id)
+
         await session.execute(query)
-        print('here')
         await session.commit()
         return {
             "status": "success",

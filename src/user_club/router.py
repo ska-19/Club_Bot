@@ -82,12 +82,15 @@ async def join_to_the_club(
     try:
         join_dict = join_data.dict()
         if await get_user_by_id(join_dict['user_id'], session) == "User not found":
+            print('a')
             raise ValueError('404u')
 
         if await get_club_by_id(join_dict['club_id'], session) == "Club not found":
+            print('b')
             raise ValueError('404c')
 
         if not await check_rec(join_dict['user_id'], join_dict['club_id'], session):
+            print('c')
             raise ValueError('409')
 
         join_dict['date_joined'] = datetime.utcnow()
@@ -206,7 +209,7 @@ async def disjoin_club(
 
 
 @router.post("/role_update")
-async def role_update(
+async def role_update( #бросает 404 я не понимаю почему
         new_role: UpdateRole,
         session: AsyncSession = Depends(get_async_session)
 ):
@@ -222,16 +225,22 @@ async def role_update(
 
     """
     try:
+        #print('zxc')
         new_role_dict = new_role.dict()
         if await get_user_by_id(new_role_dict['user_id'], session) == "User not found":
+            #print('a')
             raise ValueError('404u')
 
         if await get_club_by_id(new_role_dict['club_id'], session) == "Club not found":
+            #print('b')
             raise ValueError('404c')
 
         if await check_rec(new_role_dict['user_id'], new_role_dict['club_id'], session):
+            #print('c')
             raise ValueError('404uc')
+        #print('here')
         rec_id = await get_rec_id(new_role_dict['user_id'], new_role_dict['club_id'], session)
+        #print('here')
         stmt = update(club_x_user).where(club_x_user.c.id == rec_id).values(role=new_role.role) #TODO: вот это не работает
         await session.execute(stmt)
         await session.commit()
@@ -326,15 +335,14 @@ async def get_users_in_club(
             raise ValueError('404c')
 
         join = club_x_user.join(user, club_x_user.c.user_id == user.c.id)
-        query = select(user.c.username, club_x_user.c.role, club_x_user.c.date_joined).select_from(join).where(
+        query = select(user.c.username,user.c.id, club_x_user.c.role, club_x_user.c.date_joined).select_from(join).where(
             club_x_user.c.club_id == club_id)
 
         result = await session.execute(query)
         data = result.mappings().all()
 
         if not data:
-            raise ValueError('404s')
-
+            raise ValueError('404s') # в теории же в клубе всегда хотя бы владелец есть, иначе овер странно
         return {
             "status": "success",
             "data": data,
@@ -418,8 +426,12 @@ async def get_clubs_by_user(
         result = await session.execute(query)
         data = result.mappings().all()
 
-        if not data:
-            raise ValueError('404s')
+        if not data:  #TODO: юзер может не быть ни в одном клубе зачем здесь еррор
+            return {
+                "status": "success",
+                "data": [],
+                "details": None
+            }
 
         clubs_ids = [item['club_id'] for item in data]
         query = select(club).where(club.c.id.in_(clubs_ids))

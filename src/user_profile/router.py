@@ -304,14 +304,14 @@ async def delete_user(
         data = await get_user_by_id(user_id, session)
         if data == "User not found":
             raise ValueError("404")
-        stmt = user.delete().where(user.c.id == user_id)
         clubs = await get_clubs_by_user(user_id, session)
+        print(clubs)
         clubs_data = clubs['data']
         # print(clubs_data)
         for club in clubs_data:
             user_data = User(user_id=user_id, club_id=club['id'])
             await disjoin_club(user_data, session)
-
+        stmt = user.delete().where(user.c.id == user_id)
         await session.execute(stmt)
         await session.commit()
         return {
