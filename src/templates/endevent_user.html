@@ -21,6 +21,7 @@
             {{ user.name }} {{ user.surname }}
         </h1>
         <div style="display: flex; padding: 10px; margin-left: 25px">
+            <!-- Возле каждого участника можно поставить галочку, участвовал ли он в событии -->
             <div class="checkbox-wrapper-35">
                 <input value="private" name="switch" id="switch_{{user.id}}" type="checkbox" class="switch"
                        style="z-index: 3" data-user_id="{{ user.id }}">
@@ -40,7 +41,6 @@
 
 
 {% block href_main %}
-<!-- "Перейти на главную" -->
 <a href="/pages/main_user/{{user_id}}" style="text-decoration: none">
     <button class="btn_GoToTheClub" type="button" style="margin-top: 25px">
         <strong>На главную</strong>

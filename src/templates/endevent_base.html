@@ -7,7 +7,6 @@
     <title></title>
 </head>
 <body>
-
 <div class="container">
 
 
@@ -15,12 +14,14 @@
     {% block EndEvent %}{% endblock %}
 
 
-    <!-- "Другие клубы" + Club_names + "перейти" + ссылка в main_user -->
+    <!-- Пользователи, которые отметились на событии, админ может выбрать тех, кто действительно посетил событие -->
     {% block users_info %}{% endblock %}
 
 
     <!-- Кнопка "На главную" -->
     {% block href_main %}{% endblock %}
+
+
 </div>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="/css_js/endevent_base_script.js"></script>

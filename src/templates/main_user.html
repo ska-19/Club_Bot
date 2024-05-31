@@ -2,6 +2,7 @@
 
 
 {% block club_name %}
+<!-- Ссылка в клуб -->
 <a href="/pages/club_user/{{user_info.id}}" style="text-decoration: none; color: #000000">
     <div class="logo-container">
         <span class="site-name">{{ club_info.name }}</span>
@@ -22,14 +23,14 @@
         <h1 style="bottom: 7px;font-size: 14px; position: relative; z-index: 2">
             {{ user_info.surname }}</h1>
         <h1 style="bottom: 7px; font-size: 10px; position: relative; z-index: 2">
-            {{ user_x_club_info.role }}</h1>
+            {{ user_info.role }}</h1>
     </button>
 </a>
 {% endblock %}
 
 
 {% block href_search %}
-<!--"Сменить клуб"-->
+<!--"Сменить клуб", а также поиск других клубов -->
 <a href="/pages/search_user/{{user_info.id}}" style="text-decoration: none">
     <button class="Btn" style="height: 60px; width: 160px; justify-content: center">
         <h1 style="bottom: 5px;font-size: 14px; position: relative; z-index: 2">
@@ -40,11 +41,12 @@
 
 
 {% block money %}
-{{ user_x_club_info.balance }}
+{{ user_info.balance }}
 {% endblock %}
 
 
 {% block market %}
+<!-- Магазин клуба -->
 <button class="Btn" onclick="href_market('{{user_info.id}}')"
         style="z-index: 2;height: 80px; width: 115px; justify-content: center; vertical-align: center">
     <h1 style="bottom: 5px;font-size: 15px; position: relative; z-index: 2">
@@ -54,6 +56,7 @@
 
 
 {% block channel %}
+<!-- Ссылка на канал клуба (предполагается, что админ оставит ссылку на telegram канал клуба) -->
 <button class="Btn" onclick="href_channel('{{club_info.channel_link}}')"
         style="z-index: 2;height: 80px; width: 115px; justify-content: center; vertical-align: center">
     <h1 style="bottom: 5px;font-size: 15px; position: relative; z-index: 2">
@@ -63,7 +66,9 @@
 
 
 {% block content %}
-{% if user_x_club_info.role != "member" %}
+<!-- Ссылка на канал клуба (предполагается, что админ оставит ссылку на telegram канал клуба) -->
+{% if user_info.role != "member" %}
+<!-- Если на странице админ, то он может создавать события -->
 <div class="card"
      style="left: 50px;height: 50px; width: 290px; justify-content: center;display: flex">
     <button type="button" class="BeginEvent" id="BeginEvent" onclick=Begin()>
@@ -106,7 +111,6 @@
             <textarea required="" cols="50" rows="10" name="textarea" id="SinopsisNewEvent"
                       style="width: 280px; height: 80px"></textarea>
         </div>
-        <!-- У админов/владельца кнопки для редактирования и завершения события -->
         <div style="display: flex; justify-content: center">
             <!-- "Создать событие" -->
             <div style="width: 70%; text-align: center">
@@ -117,9 +121,8 @@
         </div>
     </form>
 </div>
-
+<!-- Также админ может редактировать и завершать текущие события клуба -->
 {% for event in events %}
-<!--события-->
 <div class="form-container" style="margin-top: 30px">
     <form class="form" id="form">
         <h1 id="Name_{{event.id}}" style="font-size: 15px;position: relative; z-index: 2">{{ event.name }}</h1>
@@ -148,17 +151,13 @@
                        value="{{event.contact}}" readonly>
             </div>
         </div>
-
         <div class="form-group">
             <label for="textarea_{{event.id}}">О событии</label>
             <textarea required="" cols="50" rows="10" id="textarea_{{event.id}}" name="textarea"
                       style="width: 280px; height: 80px" readonly>{{ event.sinopsis }}</textarea>
         </div>
-
-
-        <!-- У админов/владельца кнопки для редактирования и завершения события -->
+        <!-- У админов кнопки для редактирования и завершения события -->
         <div style="display: flex; justify-content: center">
-            <!-- "Изменить" -->
             <div class="block5" style="width: 50%; text-align: center">
                 <button type="button" class="EditEvent" id="EditEvent_{{ event.id }}"
                         onclick="Edit('{{event.id}}')">Изменить
@@ -167,7 +166,6 @@
                         onclick="Save('{{event.id}}')">Сохранить
                 </button>
             </div>
-            <!-- "Завершить событие" -->
             <div class="block6" style="width: 50%; text-align: center;">
                 <button type="button" class="EndEvent" id="EndEvent_{{ event.id }}"
                         onclick="End('{{event.id}}')">Завершить
@@ -177,13 +175,14 @@
     </form>
 </div>
 {% endfor %}
-{% elif user_info.exist_events == 1 and user_x_club_info.role == "member" %}
+<!-- Если страницу посетил участник клуба, то у него может не быть событий в клубе -->
+{% elif user_info.exist_events == 1 and user_info.role == "member" %}
 <div class="card"
      style="left: 50px;height: 50px; width: 290px; justify-content: center;display: flex">
     <h1 style="font-size: 19px; position: relative; z-index: 2">СОБЫТИЯ</h1>
 </div>
 {% for event in events %}
-<!--события-->
+<!-- В каждом событии участник может участвовать и в любой момент отказаться от участния -->
 <div class="form-container" style="margin-top: 30px">
     <form class="form" id="form">
         <h1 id="Name_{{event.id}}" style="font-size: 15px;position: relative; z-index: 2">{{ event.name }}</h1>
@@ -227,6 +226,7 @@
         <button type="button" class="RegEvent" id="RegEvent_{{ event.id }}" style="display: none"
                 onclick="Reg('{{event.id}}')">Участвовать
         </button>
+        <!-- Или же кнопка для отказа от участия в событии -->
         {% else %}
         <button type="button" class="RegEvent" id="RegEvent_{{ event.id }}" onclick="Reg('{{event.id}}')">
             Участвовать
@@ -238,6 +238,7 @@
     </form>
 </div>
 {% endfor %}
+<!-- Если событий нет, то участник увидит эту информацию -->
 {% else %}
 <div class="card"
      style="left: 50px;height: 50px; width: 290px; justify-content: center;display: flex">

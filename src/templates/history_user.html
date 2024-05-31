@@ -3,6 +3,7 @@
 
 {% block nav %}
 <nav style="justify-content: center">
+    <!-- Кнопка "Назад" -->
     <button class="button" style="flex-basis: 14%" onclick="href_main('{{user_info.id}}')">
         <div class="button-box">
     <span class="button-elem">
@@ -20,12 +21,14 @@
       </svg>
     </span>
         </div>
+        <!-- Кнопка "Магазин" -->
     </button>
     <a href="/pages/market_user/{{user_info.id}}" style="text-decoration: none; color: #000000; flex-basis: 43%">
         <div class="logo-container">
             <span class="site-name">Магазин</span>
         </div>
     </a>
+    <!-- Кнопка "История" -->
     <a style="text-decoration: none; color: #000000;flex-basis: 43%">
         <div class="logo-container1">
             <span class="site-name">История</span>
@@ -36,10 +39,13 @@
 
 
 {% block hist %}
+<!-- "История покупок" -->
 <div class="card"
      style="left: 50px;height: 50px; width: 290px; justify-content: center;display: flex">
     <h1 style="font-size: 19px; position: relative; z-index: 2">ИСТОРИЯ ПОКУПОК</h1>
 </div>
+<!-- Если историю открыл обычный пользователь, то он ждёт подтверждения своих покупок от админа -->
+<!-- Ему доступна информация о текущих покупках, также он может отменить каждую из них -->
 {% if user_info.role == "member" %}
 {% for product in user_active_products %}
 <div class="form-container" id="form" style="margin-top: 30px">
@@ -57,17 +63,18 @@
                        value="{{ product.price }}" readonly>
             </div>
         </div>
+        <!-- Кнопка отмены покупки -->
         <div style="display: flex;justify-content: center">
             <button type="button" class="RejUserProduct" id="RejUserProduct_{{ product.id_1 }}"
                     style="margin-top: 10px;width: 200px"
                     onclick="reject_user('{{product.id_1}}')">Отменить покупку
             </button>
         </div>
-        <!-- У админов/владельца кнопки для редактирования и завершения события -->
     </form>
 </div>
-
+<!-- Далее история его предыдущих покупок, а также их статус (состоялась покупка или нет) -->
 {% endfor %}
+<!-- Чтобы посмотреть историю предыдущих покупок, нужно нажать кнопочку -->
 <button class="card" id="BtnHistory" onclick="checkHist()"
         style="margin-top: 30px;left: 50px;height: 50px; width: 290px; justify-content: center;display: flex">
     <h1 style="font-size: 19px; position: relative; z-index: 2">ЗАВЕРШЕННЫЕ ПОКУПКИ</h1>
@@ -98,11 +105,12 @@
                            value="{{ hist_product.status }}" readonly>
                 </div>
             </div>
-            <!-- У админов/владельца кнопки для редактирования и завершения события -->
         </form>
     </div>
     {% endfor %}
 </div>
+<!-- Если историю открыл админ, то он видит все покупки участников клуба -->
+<!-- Он может подтверждать покупки или же отклонять их -->
 {% else %}
 {% for product in admin_active_products %}
 <div class="form-container" id="form" style="margin-top: 30px">
@@ -125,18 +133,21 @@
             </div>
         </div>
         <div style="display: flex">
+            <!-- Кнопка отмены покупки админом -->
             <button type="button" class="RejAdminProduct" id="RejAdminProduct_{{ product.id_1 }}"
                     style="flex-basis: 45%" onclick="reject_admin('{{product.id_1}}')">Отменить
             </button>
+            <!-- Кнопка подтверждения покупки админом -->
             <div style="flex-basis: 10%"></div>
             <button type="button" class="AcceptProduct" id="AcceptProduct_{{ product.id_1 }}"
                     style="flex-basis: 45%" onclick="accept('{{product.id_1}}')">Подтвердить
             </button>
         </div>
-        <!-- У админов/владельца кнопки для редактирования и завершения события -->
     </form>
 </div>
+<!-- Также админ может посмотреть историю всех покупок в клубе -->
 {% endfor %}
+<!-- Чтобы посмотреть историю предыдущих покупок, нужно нажать кнопочку -->
 <button class="card" id="BtnHistory" onclick="checkHist()"
         style="margin-top: 30px;left: 50px;height: 50px; width: 290px; justify-content: center;display: flex">
     <h1 style="font-size: 19px; position: relative; z-index: 2">ЗАВЕРШЕННЫЕ ПОКУПКИ</h1>
@@ -170,7 +181,6 @@
                     <label style="margin-top: 5px;font-size: 20px">Статус: {{ hist_product.status }}</label>
                 </div>
             </div>
-            <!-- У админов/владельца кнопки для редактирования и завершения события -->
         </form>
     </div>
     {% endfor %}

@@ -3,6 +3,7 @@
 
 {% block nav %}
 <nav style="justify-content: center">
+    <!-- Кнопка "Назад" -->
     <button class="button" style="flex-basis: 14%" onclick="href_main('{{user_info.id}}')">
         <div class="button-box">
     <span class="button-elem">
@@ -20,13 +21,14 @@
       </svg>
     </span>
         </div>
+        <!-- Кнопка "Магазин" -->
     </button>
     <a style="text-decoration: none; color: #000000; flex-basis: 43%">
         <div class="logo-container1">
             <span class="site-name">Магазин</span>
         </div>
     </a>
-
+    <!-- Кнопка "История" -->
     <a href="/pages/history_user/{{user_info.id}}" style="text-decoration: none; color: #000000;flex-basis: 43%">
         <div class="logo-container">
             <span class="site-name">История</span>
@@ -37,6 +39,7 @@
 
 
 {% block products %}
+<!-- Если в магазине админ, то он может создавать новые товары клуба -->
 {% if user_info.role != "member" %}
 <div class="card"
      style="left: 50px;height: 50px; width: 290px; justify-content: center;display: flex">
@@ -70,17 +73,17 @@
                 <input required="" name="QuantityNewProduct" id="QuantityNewProduct" type="text" style="width: 115px">
             </div>
         </div>
-        <!-- У админов/владельца кнопки для редактирования и завершения события -->
         <div style="display: flex; justify-content: center">
-            <!-- "Создать событие" -->
+            <!-- "Создать товар" -->
             <div style="width: 70%; text-align: center">
                 <button type="button" class="CreateProduct"
-                        onclick="CreateProduct()">Создать событие
+                        onclick="CreateProduct()">Создать товар
                 </button>
             </div>
         </div>
     </form>
 </div>
+<!-- Если в магазине админ, то он может каждый товар редактировать или удалять -->
 {% for product in products %}
 {% if product.quantity != -1 %}
 <div class="form-container" id="CreateProductForm_{{product.id}}" style="margin-top: 30px;">
@@ -167,7 +170,8 @@
                        style="width: 115px"
                        value="{{product.quantity}}" readonly>
             </div>
-            <button type="button" class="BuyProduct" id="BuyProduct_{{ product.id }}" style="margin-top: 10px;width: 200px"
+            <button type="button" class="BuyProduct" id="BuyProduct_{{ product.id }}"
+                    style="margin-top: 10px;width: 200px"
                     onclick="Buy('{{product.id}}')">Купить
             </button>
         </div>
