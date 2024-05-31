@@ -377,7 +377,11 @@ async def get_users_with_role(
         data = result.mappings().all()
 
         if not data:
-            raise ValueError('404s')
+            return {
+                "status": "fail",
+                "data": None,
+                "details": None
+            }
 
         data = await get_users_by_dict(data, session)
 
@@ -386,11 +390,8 @@ async def get_users_with_role(
             "data": data,
             "details": None
         }
-    except ValueError as e:
-        if str(e) == '404s':
-            raise HTTPException(status_code=404, detail=error404s)
-        else:
-            raise HTTPException(status_code=404, detail=error404c)
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404c)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
 
