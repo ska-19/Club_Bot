@@ -24,7 +24,7 @@ user_x_product = Table(
     Column('user_id', BIGINT, ForeignKey('user.id'), nullable=False),
     Column('product_id', Integer, ForeignKey('product.id'), nullable=False),
     # Column('club_id', Integer, ForeignKey('club.id'), nullable=False),
-    # Column('date', TIMESTAMP, nullable=False),
+    Column('date', TIMESTAMP, nullable=False),
     # Column('count', Integer, nullable=False),
     Column('status', Text, nullable=False, default='request'),
 )

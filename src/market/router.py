@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
 from src.market.models import product, user_x_product
+from src.user_profile.inner_func import update_xp
 from src.market.schemas import AddProduct, UpdateProduct
 from src.market.inner_func import *
 from src.user_club.inner_func import check_rec, get_role
@@ -18,6 +19,12 @@ router = APIRouter(
     tags=["market"]
 )
 
+success = {
+    "status": "success",
+    "data": None,
+    "details": None
+}
+
 
 @router.post("/add_product")
 async def add_product(
@@ -26,13 +33,13 @@ async def add_product(
 ):
     try:
         print('a')
-        if await get_user_by_id(new_data.admin_id, session) == "User not found":
+        if await get_user_by_id(new_data.user_id, session) == "User not found":
             raise ValueError('404u')
         if await get_club_by_id(new_data.club_id, session) == "Club not found":
             raise ValueError('404c')
         if await check_rec(new_data.user_id, new_data.club_id, session):
             raise ValueError('404uc')
-        role = await get_role(new_data.admin_id, new_data.club_id, session)
+        role = await get_role(new_data.user_id, new_data.club_id, session)
         if role == "admin" or role == "owner":
             product_dict = new_data.model_dump()
 
@@ -75,13 +82,16 @@ async def update_product(
         session: AsyncSession = Depends(get_async_session)
 ):
     try:
-        if await get_user_by_id(new_data.admin_id, session) == "User not found":
+        if await get_user_by_id(new_data.user_id, session) == "User not found":
             raise ValueError('404u')
-        if await get_club_by_id(new_data.club_id, session) == "Club not found":
+        data = await get_product_by_id(new_data.id, session)
+        if await get_club_by_id(data['club_id'], session) == "Club not found":
             raise ValueError('404c')
-        if await check_rec(new_data.user_id, new_data.club_id, session):
+        if await check_rec(new_data.user_id, data['club_id'], session):
             raise ValueError('404uc')
-        role = await get_role(new_data.admin_id, new_data.club_id, session)
+        if await get_product_by_id(new_data.id, session) == "Product not found":
+            raise ValueError('404pr')
+        role = await get_role(new_data.user_id, data['club_id'], session)
         if role == "admin" or role == "owner":
             product_dict = new_data.model_dump()
 
@@ -89,8 +99,7 @@ async def update_product(
                 name=product_dict['name'],
                 price=product_dict['price'],
                 description=product_dict['description'],
-                quantity=product_dict['quantity'],
-                club_id=product_dict['club_id'])
+                quantity=product_dict['quantity'])
             await session.execute(query)
             await session.commit()
 
@@ -108,8 +117,8 @@ async def update_product(
             raise HTTPException(status_code=404, detail=error404c)
         if str(e) == '404uc':
             raise HTTPException(status_code=404, detail=error404uc)
-        if str(e) == '404p':
-            raise HTTPException(status_code=404, detail=error404p)
+        if str(e) == '404pr':
+            raise HTTPException(status_code=404, detail=error404pr)
     finally:
         await session.rollback()
 
@@ -129,8 +138,8 @@ async def get_product(
             "details": None
         }
     except ValueError as e:
-        if str(e) == '404p':
-            raise HTTPException(status_code=404, detail=error404r)
+        if str(e) == '404pr':
+            raise HTTPException(status_code=404, detail=error404pr)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
 
@@ -139,7 +148,6 @@ async def get_product(
 async def buy_product(
         product_id: int,
         user_id: int,
-        count: int,
         session: AsyncSession = Depends(get_async_session)
 ):
     try:
@@ -148,60 +156,49 @@ async def buy_product(
         if await get_product_by_id(product_id, session) == "Product not found":
             raise ValueError('404pr')
         prod = await get_product_by_id(product_id, session)
-        if await check_rec(user_id, prod['club_id'], session):
-            raise ValueError('404uc')
-        if not await check_transaction_count(user_id, product_id, count, session):
-            raise ValueError('404pc')
-        if not await check_transaction_balance(user_id, product_id, count, session):
+        if not await check_transaction_balance(user_id, product_id, session):
             raise ValueError('404pb')
 
-        query = insert(user_x_product).values(user_id=user_id,
-                                              product_id=product_id)
-        await session.execute(query)
+        stmt = insert(user_x_product).values(
+            user_id=user_id,
+            product_id=product_id,
+            status='request',
+            date=datetime.utcnow())
+
+        await session.execute(stmt)
         await session.commit()
 
-        usr = await get_user_by_id(user_id, session)
-        query = update(club_x_user).where((club_x_user.c.user_id == user_id) &
-                                          (club_x_user.c.club_id == prod['club_id'])).values(
-            balance=usr['balance'] - prod['price'] * count
+        stmt = update(club_x_user).where(
+            (club_x_user.c.user_id == user_id) &
+            (club_x_user.c.club_id == prod['club_id'])).values(
+            balance=club_x_user.c.balance - prod['price'])
+        await session.execute(stmt)
+        await session.commit()
+
+        stmt = update(product).where(product.c.id == product_id).values(
+            quantity=prod['quantity'] - 1
         )
-        await session.execute(query)
+        await session.execute(stmt)
         await session.commit()
 
-        query = update(product).where(product.c.id == product_id).values(
-            count=prod['count'] - count
-        )
-        await session.execute(query)
-        await session.commit()
+        await update_xp(user_id, 100, session)
 
-        return {
-            "status": "success",
-            "data": {'user_id': user_id,
-                     'product_id': product_id,
-                     'count': count,
-                     'date': datetime.utcnow(),
-                     'status': 'request'},
-            "details": None
-        }
+        return success
 
     except ValueError as e:
         if str(e) == '404u':
             raise HTTPException(status_code=404, detail=error404u)
         if str(e) == '404pr':
             raise HTTPException(status_code=404, detail=error404pr)
-        if str(e) == '404uc':
-            raise HTTPException(status_code=404, detail=error404uc)
         if str(e) == '404pb':
             raise HTTPException(status_code=404, detail=error404pb)
-        if str(e) == '404pc':
-            raise HTTPException(status_code=404, detail=error404pc)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()
 
 
-@router.post("/get_all_request")
+@router.get("/get_all_request")
 async def get_all_request(
         admin_id: int,
         club_id: int,
@@ -246,52 +243,36 @@ async def get_all_request(
             raise HTTPException(status_code=404, detail=error404p)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
-    finally:
-        await session.rollback()
 
 
 @router.post("/accept_request")
 async def accept_request(
         admin_id: int,
-        user_x_product_id: int,
+        user_id: int,
+        product_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
     try:
         if await get_user_by_id(admin_id, session) == "User not found":
             raise ValueError('404u')
-        data = await get_user_x_product_by_id(user_x_product_id, session)
+        data = await get_rec_market(user_id, product_id, session)
         if data == "Request not found":
             raise ValueError('404req')
-        role = await get_role(admin_id, data['club_id'], session)
-        if role == "User not in the club":
-            raise ValueError('404uc')
-        if role == "admin" or role == "owner":
-            query = update(user_x_product).where(user_x_product.c.id == user_x_product_id).values(status='accept')
-            await session.execute(query)
-            await session.commit()
+        if data['status'] != 'request':
+            raise ValueError('403s')
 
-            return {
-                "status": "success",
-                "data": {'user_id': data['user_id'],
-                         'product_id': data['product_id'],
-                         'count': data['count'],
-                         'date': data['date'],
-                         'status': 'accept'},
-                "details": None
-            }
-        else:
-            raise ValueError('404p')
+        stmt = update(user_x_product).where(user_x_product.c.id == data['id']).values(status='accept')
+        await session.execute(stmt)
+        await session.commit()
+
+        return success
     except ValueError as e:
         if str(e) == '404u':
             raise HTTPException(status_code=404, detail=error404u)
-        if str(e) == '404up':
+        if str(e) == '404req':
             raise HTTPException(status_code=404, detail=error404req)
-        if str(e) == '404c':
-            raise HTTPException(status_code=404, detail=error404c)
-        if str(e) == '404uc':
-            raise HTTPException(status_code=404, detail=error404uc)
-        if str(e) == '404p':
-            raise HTTPException(status_code=404, detail=error404p)
+        if str(e) == '403s':
+            raise HTTPException(status_code=403, detail=error403)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
     finally:
@@ -301,55 +282,46 @@ async def accept_request(
 @router.post("/reject_request_admin")
 async def reject_request_admin(
         admin_id: int,
-        user_x_product_id: int,
+        user_id: int,
+        product_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
     try:
         if await get_user_by_id(admin_id, session) == "User not found":
             raise ValueError('404u')
-        data = await get_user_x_product_by_id(user_x_product_id, session)
+        data = await get_rec_market(user_id, product_id, session)
         if data == "Request not found":
             raise ValueError('404req')
-        role = await get_role(admin_id, data['club_id'], session)
-        if role == "User not in the club":
-            raise ValueError('404uc')
-        if role == "admin" or role == "owner":
-            query = update(user_x_product).where(user_x_product.c.id == user_x_product_id).values(status='reject')
-            await session.execute(query)
-            await session.commit()
+        if data['status'] != 'request':
+            raise ValueError('403s')
 
-            query = update(product).where(product.c.id == data['product_id']).values(count=data['count'])
-            await session.execute(query)
-            await session.commit()
+        stmt = update(user_x_product).where(user_x_product.c.id == data['id']).values(status='reject')
+        await session.execute(stmt)
+        await session.commit()
 
-            prod = await get_product_by_id(data['product_id'], session)
-            query = update(club_x_user).where((club_x_user.c.user_id == data['user_id']) &
-                                              (club_x_user.c.club_id == data['club_id'])).values(
-                balance=club_x_user.c.balance + data['count'] * prod['price']
-            )
+        data = await get_product_by_id(product_id, session)
+        stmt = update(product).where(product.c.id == data['product_id']).values(quantity=data['quantity'] + 1)
+        await session.execute(stmt)
+        await session.commit()
 
-            return {
-                "status": "success",
-                "data": {'user_id': data['user_id'],
-                         'product_id': data['product_id'],
-                         'count': data['count'],
-                         'date': data['date'],
-                         'status': 'admin_reject'},
-                "details": None
-            }
-        else:
-            raise ValueError('404p')
+        stmt = update(club_x_user).where(
+            (club_x_user.c.user_id == user_id) &
+            (club_x_user.c.club_id == data['club_id'])).values(
+            balance=club_x_user.c.balance + data['price'])
+        await session.execute(stmt)
+        await session.commit()
+
+        await update_xp(user_id, -75, session)
+
+        return success
+
     except ValueError as e:
         if str(e) == '404u':
             raise HTTPException(status_code=404, detail=error404u)
-        if str(e) == '404up':
+        if str(e) == '404req':
             raise HTTPException(status_code=404, detail=error404req)
-        if str(e) == '404c':
-            raise HTTPException(status_code=404, detail=error404c)
-        if str(e) == '404uc':
-            raise HTTPException(status_code=404, detail=error404uc)
-        if str(e) == '404p':
-            raise HTTPException(status_code=404, detail=error404p)
+        if str(e) == '403s':
+            raise HTTPException(status_code=403, detail=error403)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
     finally:
@@ -359,49 +331,42 @@ async def reject_request_admin(
 @router.post("/reject_request_user")
 async def reject_request_user(
         user_id: int,
-        user_x_product_id: int,
+        product_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
     try:
         if await get_user_by_id(user_id, session) == "User not found":
             raise ValueError('404u')
-        data = await get_user_x_product_by_id(user_x_product_id, session)
+        data = await get_rec_market(user_id, product_id, session)
         if data == "Request not found":
             raise ValueError('404req')
-        if data['user_id'] != user_id:
-            raise ValueError('403u')
         if data['status'] != 'request':
             raise ValueError('403s')
-        query = update(user_x_product).where(user_x_product.c.id == user_x_product_id).values(status='reject')
-        await session.execute(query)
+
+        stmt = update(user_x_product).where(user_x_product.c.id == data['id']).values(status='reject')
+        await session.execute(stmt)
         await session.commit()
 
-        query = update(product).where(product.c.id == data['product_id']).values(count=data['count'])
-        await session.execute(query)
+        data = await get_product_by_id(product_id, session)
+        stmt = update(product).where(product.c.id == data['product_id']).values(quantity=data['quantity'] + 1)
+        await session.execute(stmt)
         await session.commit()
 
-        prod = await get_product_by_id(data['product_id'], session)
-        query = update(club_x_user).where((club_x_user.c.user_id == data['user_id']) &
-                                          (club_x_user.c.club_id == data['club_id'])).values(
-            balance=club_x_user.c.balance + data['count'] * prod['price']
-        )
+        stmt = update(club_x_user).where(
+            (club_x_user.c.user_id == user_id) &
+            (club_x_user.c.club_id == data['club_id'])).values(
+            balance=club_x_user.c.balance + data['price'])
+        await session.execute(stmt)
+        await session.commit()
 
-        return {
-            "status": "success",
-            "data": {'user_id': data['user_id'],
-                     'product_id': data['product_id'],
-                     'count': data['count'],
-                     'date': data['date'],
-                     'status': 'user_reject'},
-            "details": None
-        }
+        await update_xp(user_id, -100, session)
+
+        return success
     except ValueError as e:
         if str(e) == '404u':
             raise HTTPException(status_code=404, detail=error404u)
-        if str(e) == '404up':
+        if str(e) == '404req':
             raise HTTPException(status_code=404, detail=error404req)
-        if str(e) == '403u':
-            raise HTTPException(status_code=403, detail=error403u)
         if str(e) == '403s':
             raise HTTPException(status_code=403, detail=error403)
     except Exception:
@@ -410,21 +375,40 @@ async def reject_request_user(
         await session.rollback()
 
 
-@router.post("/get_user_history")
-async def get_user_history(
-        user_id: int,
+@router.post('/delete_item')
+async def delete_product(
+        product_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
     try:
-        if await get_user_by_id(user_id, session) == "User not found":
-            raise ValueError('404u')
-        query = select(user_x_product).where(user_x_product.c.user_id == user_id)
+        if await get_product_by_id(product_id, session) == "Product not found":
+            raise ValueError('404pr')
+        stmt = update(product).where(product.c.id == product_id).values(quantity=-1)
+        await session.execute(stmt)
+        await session.commit()
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404pr)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+    finally:
+        await session.rollback()
+
+
+@router.get('/get_item_by_club')
+async def get_items_by_club(
+        club_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    try:
+        if await get_club_by_id(club_id, session) == "Club not found":
+            raise ValueError('404c')
+        query = select(product).where(product.c.club_id == club_id)
         result = await session.execute(query)
         data = result.mappings().all()
 
         if not data:
             return {
-                "status": "success",
+                "status": "fail",
                 "data": None,
                 "details": None
             }
@@ -434,10 +418,144 @@ async def get_user_history(
             "data": data,
             "details": None
         }
-    except ValueError as e:
-        if str(e) == '404u':
-            raise HTTPException(status_code=404, detail=error404u)
+
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404c)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
-    finally:
-        await session.rollback()
+
+
+@router.get("/get_user_history_active")
+async def get_user_history_active(
+        user_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    try:
+        if await get_user_by_id(user_id, session) == "User not found":
+            raise ValueError('404u')
+
+        join = user_x_product.join(product, user_x_product.c.product_id == product.c.id)
+        query = select(product, user_x_product).select_from(join).where(
+            (user_x_product.c.user_id == user_id) &
+            (user_x_product.c.status == 'request')).order_by(user_x_product.c.date)
+        result = await session.execute(query)
+        data = result.mappings().all()
+
+        if not data:
+            return {
+                "status": "fail",
+                "data": None,
+                "details": None
+            }
+
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404u)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+
+
+@router.get("/get_user_history_close")
+async def get_user_history_close(
+        user_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    try:
+        if await get_user_by_id(user_id, session) == "User not found":
+            raise ValueError('404u')
+
+        join = user_x_product.join(product, user_x_product.c.product_id == product.c.id)
+        query = select(product, user_x_product).select_from(join).where(
+            (user_x_product.c.user_id == user_id) &
+            (user_x_product.c.status != 'request')).order_by(desc(user_x_product.c.date))
+        result = await session.execute(query)
+        data = result.mappings().all()
+
+        if not data:
+            return {
+                "status": "fail",
+                "data": None,
+                "details": None
+            }
+
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404u)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+
+
+@router.get("/get_admin_history_active")
+async def get_admin_history_active(
+        club_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    try:
+        if await get_club_by_id(club_id, session) == "Club not found":
+            raise ValueError('404c')
+
+        join = user_x_product.join(product, user_x_product.c.product_id == product.c.id)
+        query = select(product, user_x_product).select_from(join).where(
+            (product.c.club_id == club_id) &
+            (user_x_product.c.status == 'request')).order_by(user_x_product.c.date)
+        result = await session.execute(query)
+        data = result.mappings().all()
+
+        if not data:
+            return {
+                "status": "fail",
+                "data": None,
+                "details": None
+            }
+
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404c)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+
+
+@router.get("/get_admin_history_close")
+async def get_admin_history_close(
+        club_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    try:
+        if await get_club_by_id(club_id, session) == "Club not found":
+            raise ValueError('404c')
+
+        join = user_x_product.join(product, user_x_product.c.product_id == product.c.id)
+        query = select(product, user_x_product).select_from(join).where(
+            (product.c.club_id == club_id) &
+            (user_x_product.c.status != 'request')).order_by(desc(user_x_product.c.date))
+        result = await session.execute(query)
+        data = result.mappings().all()
+
+        if not data:
+            return {
+                "status": "fail",
+                "data": None,
+                "details": None
+            }
+
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404c)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)

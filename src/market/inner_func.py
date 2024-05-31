@@ -1,5 +1,5 @@
 from fastapi import Depends, HTTPException
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.club.inner_func import get_club_by_id
@@ -10,11 +10,11 @@ from src.user_club.inner_func import get_user_balance
 
 
 async def get_product_by_id(
-        reward_id: int,
+        product_id: int,
         session: AsyncSession
 ):
     try:
-        query = select(product).where(product.c.id == reward_id)
+        query = select(product).where(product.c.id == product_id)
         result = await session.execute(query)
         data = result.mappings().first()
 
@@ -44,13 +44,13 @@ async def check_transaction_count(
 async def check_transaction_balance(
         user_id: int,
         product_id: int,
-        count: int,
+        # count: int,
         session: AsyncSession
 ):
     try:
         prod = await get_product_by_id(product_id, session)
         balance = await get_user_balance(user_id, prod['club_id'], session)
-        if balance < prod['price'] * count:
+        if balance < prod['price']:
             return False
 
         return True
@@ -64,6 +64,26 @@ async def get_user_x_product_by_id(
 ):
     try:
         query = select(user_x_product).where(user_x_product.c.id == user_x_product_id)
+        result = await session.execute(query)
+        data = result.mappings().first()
+
+        if not data:
+            return "Request not found"
+        return data
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+
+
+async def get_rec_market(
+        user_id: int,
+        product_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    try:
+        query = select(user_x_product).where(
+            (user_x_product.c.user_id == user_id) &
+            (user_x_product.c.product_id == product_id)
+        ).order_by(desc(user_x_product.c.date))
         result = await session.execute(query)
         data = result.mappings().first()
 
