@@ -5,10 +5,10 @@ from bot_instance import URL
 async def set_user(user_data):
     print(user_data)
     rq_user_data = {
-        "id": int(user_data["tg_id"]),  # ToDo падает если tg_id > 10^8
+        "id": int(user_data["tg_id"]),
         "username": str(user_data["username"]),
-        "name": str('_') if str(user_data["name"]) == 'None' else str(user_data["name"]),
-        "surname": str('_') if str(user_data["name"]) == 'None' else str(user_data["surname"]),
+        "name": str('') if str(user_data["name"]) == 'None' else str(user_data["name"]),
+        "surname": str('') if str(user_data["surname"]) == 'None' else str(user_data["surname"]),
         "mentor": False,
         "is_active": True,
         "is_superuser": False,
