@@ -8,7 +8,7 @@ from src.database import get_async_session
 from src.user_club.models import club_x_user
 from src.user_profile.models import user
 from src.club.models import club
-from src.user_club.schemas import UserJoin, UpdateRole, User, UpdateBalance
+from src.user_club.schemas import UserJoin, User, UpdateBalance
 from src.user_profile.inner_func import get_user_by_id, update_xp
 from src.club.inner_func import get_club_by_id
 from src.user_club.inner_func import get_role, get_rec_id, check_rec, get_users_by_dict, make_main, make_not_main, \
@@ -75,8 +75,6 @@ async def join_to_the_club(
             raise HTTPException(status_code=404, detail=error404u)
         elif str(e) == '404c':
             raise HTTPException(status_code=404, detail=error404c)
-        # else:
-        #     raise HTTPException(status_code=409, detail=error409)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
     finally:
@@ -91,7 +89,8 @@ async def get_balance(
 ):
     """ Возвращает баланс пользователя в клубе
 
-           :param
+           :param user_id: int
+           :param club_id: int
            :return:
                200 + success, если все хорошо.
                404 + error404uc, если пользователь не состоит в клубе.
@@ -185,8 +184,7 @@ async def disjoin_club(
             raise HTTPException(status_code=404, detail=error404u)
         else:
             raise HTTPException(status_code=404, detail=error404c)
-    except Exception as e:
-        print(e)
+    except Exception:
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()
@@ -200,7 +198,8 @@ async def role_update(
 ):
     """ Обновляет роль пользователя в клубе
 
-       :param new_role: джейсон вида UpdateRole
+       :param user_id: int
+       :param club_id: int
        :return:
            200 + success, если все хорошо.
            404 + error404uc, если пользователь не состоит в клубе.
@@ -349,6 +348,7 @@ async def get_users_in_club(
     except Exception:
         raise HTTPException(status_code=500, detail=error)
 
+
 @router.get("/get_users_with_role")
 async def get_users_with_role(
         club_id: int,
@@ -357,8 +357,8 @@ async def get_users_with_role(
 ):
     """ Возвращает список пользователей в клубе с определенной ролью
 
-        :param club_id:
-        :param role:
+        :param club_id: int
+        :param role: str
         :return:
             200 + джейсон со cписком всех пользователей с этой ролью, если все хорошо.
             404 + error404c, если клуб не найден.
@@ -402,7 +402,7 @@ async def get_clubs_by_user(
 ):
     """ Возвращает список клубов, в которых состоит пользователь
 
-        :param user_id
+        :param user_id: int
         :return:
             200 + джейсон со cписком всех клубой, в которых состоит пользователь, если все хорошо.
             404 + error404u, если пользователь не найден.
@@ -459,8 +459,8 @@ async def new_main(
 ):
     """ Делает клуб главным
 
-               :param user_id
-               :param club_id
+               :param user_id: int
+               :param club_id: int
                :return:
                    200 + success
                    404 + error404u, если пользователь не найден.
@@ -503,7 +503,7 @@ async def get_main_club(
 ):
     """ Возвращает главный клуб пользователя
 
-           :param user_id
+           :param user_id: int
            :return:
                200 + джейсон с главным клубом
                404 + error404u, если пользователь не найден.

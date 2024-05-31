@@ -1,10 +1,5 @@
-from datetime import datetime
-
-from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
-from sqlalchemy import Table, Column, Integer, String, TIMESTAMP, ForeignKey, JSON, Boolean, Text, Date
-
-from src.user_profile.models import user
-from src.database import Base, metadata
+from sqlalchemy import Table, Column, Integer, String, TIMESTAMP, ForeignKey, Text, Date
+from src.database import metadata
 
 club = Table(
     'club', metadata,

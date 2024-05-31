@@ -1,7 +1,5 @@
-from datetime import datetime, date
-
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select, insert, update
+from fastapi import Depends, HTTPException
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
@@ -41,8 +39,8 @@ async def update_xp(
         session: AsyncSession = Depends(get_async_session)):
     """Обновляет xp пользователя
 
-        :param user_id:
-        :param update_xp: на сколько надо изменить xp
+        :param user_id: int
+        :param update_xp: (на сколько надо изменить xp) int
         :return:
             200 + джейсон со всеми данными, если все хорошо.
             404 если такого юзера нет.
@@ -80,7 +78,7 @@ async def get_user_attr(
     """Получает данные пользователя по его id и атрибуту
 
         :param user_id:
-        :param col:
+        :param col: str
         :return:
             200 + джейсон со всеми данными, если все хорошо.
             404 если такого юзера нет.

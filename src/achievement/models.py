@@ -1,10 +1,6 @@
-from datetime import datetime
+from sqlalchemy import Table, Column, Integer, String, TIMESTAMP, ForeignKey, Text, BIGINT
 
-from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
-from sqlalchemy import Table, Column, Integer, String, TIMESTAMP, ForeignKey, JSON, Boolean, Text, BIGINT
-
-from src.user_profile.models import user
-from src.database import Base, metadata
+from src.database import metadata
 
 achievement = Table(
     'achievement', metadata,
