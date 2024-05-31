@@ -3,10 +3,16 @@ import os
 
 load_dotenv()
 
-DB_HOST = os.environ.get("DB_HOST")
-DB_PORT = os.environ.get("DB_PORT")
-DB_NAME = os.environ.get("DB_NAME")
-DB_USER = os.environ.get("DB_USER")
-DB_PASS = os.environ.get("DB_PASS")
+DB_HOST="localhost"
+DB_PORT="5432"
+DB_NAME="postgres"
+DB_USER="postgres"
+DB_PASS="112643"
+
+DB_HOST_TEST="localhost"
+DB_PORT_TEST="5432"
+DB_NAME_TEST="postgres"
+DB_USER_TEST="postgres"
+DB_PASS_TEST="112643"
 
 SECRET_AUTH = os.environ.get("SECRET_AUTH")

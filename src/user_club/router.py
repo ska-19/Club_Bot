@@ -377,9 +377,7 @@ async def get_users_with_role(
 
         if not data:
             raise ValueError('404s')
-        print('here')
         data = await get_users_by_dict(data, session)
-        print(data)
         return {
             "status": "success",
             "data": data,
