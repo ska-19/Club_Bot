@@ -67,9 +67,41 @@
 </div>
 
 {% endfor %}
-{% for product in user_closed_products %}
-
-{% endfor %}
+<button class="card" id="BtnHistory" onclick="checkHist()"
+        style="margin-top: 30px;left: 50px;height: 50px; width: 290px; justify-content: center;display: flex">
+    <h1 style="font-size: 19px; position: relative; z-index: 2">ЗАВЕРШЕННЫЕ ПОКУПКИ</h1>
+</button>
+<div id="History" style="display: none">
+    {% for hist_product in user_closed_products %}
+    <div class="form-container" id="form" style="margin-top: 30px">
+        <form class="form">
+            <div style="display: flex">
+                <div class="form-group" style="width: 60%">
+                    <label>Товар</label>
+                    <input required="" name="NameProduct" id="NameProduct_{{hist_product.id}}" type="text"
+                           style="width: 115px"
+                           value="{{ hist_product.name }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Цена</label>
+                    <input required="" name="PriceProduct" id="PriceProduct_{{hist_product.id}}" type="text"
+                           style="width: 85px"
+                           value="{{ hist_product.price }}" readonly>
+                </div>
+            </div>
+            <div style="display: flex;justify-content: center">
+                <div class="form-group">
+                    <label>Статус</label>
+                    <input required="" name="PriceProduct" id="PriceProduct_{{hist_product.id}}" type="text"
+                           style="width: 85px"
+                           value="{{ hist_product.status }}" readonly>
+                </div>
+            </div>
+            <!-- У админов/владельца кнопки для редактирования и завершения события -->
+        </form>
+    </div>
+    {% endfor %}
+</div>
 {% else %}
 {% for product in admin_active_products %}
 <div class="form-container" id="form" style="margin-top: 30px">
@@ -104,8 +136,43 @@
     </form>
 </div>
 {% endfor %}
-{% for product in admin_closed_products %}
+<button class="card" id="BtnHistory" onclick="checkHist()"
+        style="margin-top: 30px;left: 50px;height: 50px; width: 290px; justify-content: center;display: flex">
+    <h1 style="font-size: 19px; position: relative; z-index: 2">ЗАВЕРШЕННЫЕ ПОКУПКИ</h1>
+</button>
+<div id="History" style="display: none">
+    {% for hist_product in admin_closed_products %}
+    <div class="form-container" id="form" style="margin-top: 30px">
+        <form class="form">
+            <div style="display: flex">
+                <div class="form-group" style="width: 30%">
+                    <label>Товар</label>
+                    <input required="" name="NameProduct" id="NameProduct_{{hist_product.id}}" type="text"
+                           style="width: 60px"
+                           value="{{ hist_product.name }}" readonly>
+                </div>
+                <div class="form-group"style="width: 30%">
+                    <label>Цена</label>
+                    <input required="" name="PriceProduct" id="PriceProduct_{{hist_product.id}}" type="text"
+                           style="width: 60px"
+                           value="{{ hist_product.price }}" readonly>
+                </div>
+                <div class="form-group" style="width: 30%">
+                    <label>Покупатель</label>
+                    <input required="" name="BuyerProduct" id="BuyerProduct_{{hist_product.id}}" type="text"
+                           value="{{ hist_product.user_id }}" readonly>
+                </div>
 
-{% endfor %}
+            </div>
+            <div style="display: flex;justify-content: center">
+                <div class="form-group">
+                    <label style="margin-top: 5px;font-size: 20px">Статус: {{ hist_product.status }}</label>
+                </div>
+            </div>
+            <!-- У админов/владельца кнопки для редактирования и завершения события -->
+        </form>
+    </div>
+    {% endfor %}
+</div>
 {% endif %}
 {% endblock %}

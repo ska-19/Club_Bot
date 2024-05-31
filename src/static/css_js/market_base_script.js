@@ -142,6 +142,7 @@ function Buy(productId) {
         description: "",
         quantity: 0
     }
+    console.log(BuyProduct);
     fetch(`/pages/market_user/${userId}/2`, {
         method: 'POST', headers: {
             'Content-Type': 'application/json',

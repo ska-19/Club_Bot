@@ -96,3 +96,8 @@ function reject_admin(productId) {
             console.error('Error:', error);
         });
 }
+
+function checkHist(){
+    document.getElementById(`History`).style.display = 'block';
+    document.getElementById(`BtnHistory`).style.display = 'none';
+}
