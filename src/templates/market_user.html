@@ -113,9 +113,8 @@
                        value="{{product.quantity}}" readonly>
             </div>
         </div>
-        <!-- У админов/владельца кнопки для редактирования и завершения события -->
+        <!-- У админов/владельца кнопки для редактирования и удаления товара -->
         <div style="display: flex; justify-content: center">
-            <!-- "Изменить" -->
             <div class="block5" style="width: 50%; text-align: center">
                 <button type="button" class="EditProduct" id="EditProduct_{{ product.id }}"
                         onclick="Edit('{{product.id}}')">Изменить
@@ -124,7 +123,6 @@
                         onclick="Save('{{product.id}}')">Сохранить
                 </button>
             </div>
-            <!-- "Завершить событие" -->
             <div class="block6" style="width: 50%; text-align: center;">
                 <button type="button" class="EndProduct" id="EndProduct_{{ product.id }}"
                         onclick="End('{{product.id}}')">Удалить
@@ -135,6 +133,7 @@
 </div>
 {% endif %}
 {% endfor %}
+<!-- Если в магазине участник, то он может покупать товары клуба -->
 {% elif user_info.role == "member" %}
 <div class="card"
      style="left: 50px;height: 50px; width: 290px; justify-content: center;display: flex">
@@ -178,7 +177,7 @@
         {% else %}
         <h1 style="font-size: 20px;position: relative; z-index: 2; text-align: center">ТОВАР ЗАКОНЧИЛСЯ</h1>
         {% endif %}
-        <!-- У админов/владельца кнопки для редактирования и завершения события -->
+        <!-- Свои покупки пользователь сможет посмотреть во вкладке "История" -->
     </form>
 </div>
 {% endif %}
