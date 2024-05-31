@@ -69,7 +69,48 @@ nav {
     width: 33%;
 }
 
+.Promote {
+    display: inline-block;
+    padding: 10px 20px;
+    border: none;
+    background: rgba(85, 255, 112, 0.62);
+    border-radius: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    transition: background .2s linear;
+}
 
+.Promote:hover {
+    background: rgb(85, 255, 112);
+}
+
+.Demote {
+    padding: 10px 20px;
+    border: none;
+    background: rgba(255, 85, 85, 0.62);
+    border-radius: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    transition: background .2s linear;
+}
+
+.Demote:hover {
+    background: rgb(255, 85, 85);
+}
+
+.Kick {
+    padding: 10px 20px;
+    border: none;
+    background: rgba(255, 85, 85, 0.62);
+    border-radius: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    transition: background .2s linear;
+}
+
+.Kick:hover {
+    background: rgb(255, 85, 85);
+}
 
 .btn_GoToTheClub {
     margin-left: 55px;

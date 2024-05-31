@@ -7,10 +7,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database import get_async_session
 from src.club.models import club
 from src.club.schemas import ClubUpdate, ClubCreate
-from src.user_profile.inner_func import get_user_by_id
-from src.user_club.router import join_to_the_club, get_users_in_club, disjoin_club
+from src.user_profile.inner_func import get_user_by_id, update_xp, get_user_attr
+from src.user_club.router import join_to_the_club, new_main, get_users_in_club
 from src.user_club.schemas import UserJoin, User
-from src.club.inner_func import get_club_by_id, check_leg_name
+from src.club.inner_func import get_club_by_id, check_leg_name, get_club_by_uid
 
 router = APIRouter(
     prefix="/club",
@@ -60,6 +60,10 @@ async def create_club(
             raise ValueError('409')
 
         club_dict['date_joined'] = datetime.utcnow()
+        club_dict['links'] = ""
+        club_dict['comfort_time'] = ""
+        club_dict['photo'] = ""
+        club_dict['uid'] = '0'
         owner = club_dict["owner"]
         stmt = insert(club).values(**club_dict).returning(club.c.id)
         result = await session.execute(stmt)
@@ -68,10 +72,18 @@ async def create_club(
         id = result.fetchone()[0]
         userjoin = UserJoin(club_id=id, user_id=owner, role='owner')
         await join_to_the_club(userjoin, session)
-        club_dict['id'] = id
+        await new_main(owner, id, session)
+        uid = 'CL' + str(id) + '0' + str(owner) + 'N'
+
+        stmt = update(club).where(club.c.id == id).values(uid=uid)
+        await session.execute(stmt)
+        await session.commit()
+
+        await update_xp(owner, 200, session)
+
         return {
             "status": "success",
-            "data": club_dict,  # TODO: how return ClubRead schemas
+            "data": club_dict,
             "details": None
         }
     except ValueError as e:
@@ -82,7 +94,7 @@ async def create_club(
                 "status": "error",
                 "data": "User not found",
                 "details": None
-                 })
+            })
     except Exception:
         raise HTTPException(status_code=500, detail=error)
     finally:
@@ -105,17 +117,18 @@ async def get_club(
     try:
         data = await get_club_by_id(club_id, session)
         if data == "Club not found":
-            raise ValueError
+            return {
+                "status": "fail",
+                "data": data,
+                "details": None
+            }
         return {
             "status": "success",
             "data": data,
             "details": None
         }
-    except ValueError:
-        raise HTTPException(status_code=404, detail=error404)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
-
 
 @router.get("/get_channel_link")
 async def get_club_link(
@@ -200,7 +213,6 @@ async def update_club(
         await session.rollback()
 
 
-
 @router.post("/delete_club")
 async def delete_club(
         club_id: int,
@@ -239,3 +251,63 @@ async def delete_club(
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()
+
+        
+@router.get('/search')
+async def search(
+        club_uid: str,
+        session: AsyncSession = Depends(get_async_session)
+):
+    """ ищет клуб по его uid
+
+           :param club_uid:
+           :return:
+               200 + success
+               404 если такого клуба нет.
+               500 если внутрення ошибка сервера.
+
+       """
+    try:
+        data = await get_club_by_uid(club_uid, session)
+        if data == "Club not found":
+            return {
+                "status": "success",
+                "data": {"id": -1},
+                "details": None
+            }
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+
+
+@router.get('/get_club_xp')
+async def get_club_xp(
+        club_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    try:
+        data = await get_club_by_id(club_id, session)
+        if data == "Club not found":
+            raise ValueError("404")
+        users = await get_users_in_club(club_id, session)
+        summ = 0
+        for user in users['data']:
+            xp = await get_user_attr(user['id'], 'xp', session)
+            summ += int(xp['data'])
+        return {
+            "status": "success",
+            "data": summ,
+            "details": None
+        }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404)
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail=error)
+        

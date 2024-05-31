@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select, insert, update, delete
+from sqlalchemy import select, case, insert, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
@@ -9,26 +9,15 @@ from src.user_club.models import club_x_user
 from src.user_profile.models import user
 from src.club.models import club
 from src.user_club.schemas import UserJoin, UpdateRole, User, UpdateBalance
-from src.user_profile.inner_func import get_user_by_id
+from src.user_profile.inner_func import get_user_by_id, update_xp
 from src.club.inner_func import get_club_by_id
-from src.user_club.inner_func import get_rec_id, check_rec, get_users_by_dict
+from src.user_club.inner_func import get_role, get_rec_id, check_rec, get_users_by_dict, make_main, make_not_main, \
+    error, error404u, error404c, error404uc, success
 
 router = APIRouter(
     prefix="/join",
     tags=["join"]
 )
-
-error = {
-    "status": "error",
-    "data": None,
-    "details": None
-}
-
-error404u = {
-    "status": "error",
-    "data": "User not found",
-    "details": None
-}
 
 error404s = {
     "status": "error",
@@ -36,27 +25,9 @@ error404s = {
     "details": None
 }
 
-error404c = {
-    "status": "error",
-    "data": "Club not found",
-    "details": None
-}
-
-error404uc = {
-    "status": "error",
-    "data": "This user not in this club",
-    "details": None
-}
-
 error409 = {
     "status": "error",
     "data": "This user already in this club",
-    "details": None
-}
-
-success = {
-    "status": "success",
-    "data": None,
     "details": None
 }
 
@@ -90,13 +61,15 @@ async def join_to_the_club(
             raise ValueError('404c')
 
         if not await check_rec(join_dict['user_id'], join_dict['club_id'], session):
-            print('c')
             raise ValueError('409')
 
         join_dict['date_joined'] = datetime.utcnow()
+        join_dict['is_main'] = False
         stmt = insert(club_x_user).values(**join_dict)
         await session.execute(stmt)
         await session.commit()
+
+        await update_xp(join_dict['user_id'], 25, session)
 
         return success
     except ValueError as e:
@@ -104,8 +77,8 @@ async def join_to_the_club(
             raise HTTPException(status_code=404, detail=error404u)
         elif str(e) == '404c':
             raise HTTPException(status_code=404, detail=error404c)
-        else:
-            raise HTTPException(status_code=409, detail=error409)
+        # else:
+        #     raise HTTPException(status_code=409, detail=error409)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
     finally:
@@ -159,7 +132,6 @@ async def get_balance(
         else:
             raise HTTPException(status_code=404, detail=error404c)
     except Exception as e:
-        print(e)
         raise HTTPException(status_code=500, detail=error)
 
 
@@ -181,18 +153,30 @@ async def disjoin_club(
     """
     try:
         data_dict = data.dict()
-        if await get_user_by_id(data_dict['user_id'], session) == "User not found": #TODO: вот здесь падает
+        if await get_user_by_id(data_dict['user_id'], session) == "User not found":
             raise ValueError('404u')
         if await get_club_by_id(data_dict['club_id'], session) == "Club not found":
             raise ValueError('404c')
-
         if await check_rec(data_dict['user_id'], data_dict['club_id'], session):
             raise ValueError('404')
+        if await get_role(data_dict['user_id'], data_dict['club_id'], session) == 'owner':
+            return {
+                'status': 'fail',
+                'data': None,
+                'detail': None
+            }
+        main = await get_main_club(data_dict['user_id'], session)
+        if main['status'] == 'success' and main['data']['id'] == data_dict['club_id']:
+            data = await get_clubs_by_user(data_dict['user_id'], session)
+            if data['status'] == 'success':
+                await new_main(data_dict['user_id'], int(data['data'][0]['id']), session)
 
         rec_id = await get_rec_id(data_dict['user_id'], data_dict['club_id'], session)
         stmt = delete(club_x_user).where(club_x_user.c.id == rec_id)
         await session.execute(stmt)
         await session.commit()
+
+        await update_xp(data_dict['user_id'], -25, session)
 
         return success
     except ValueError as e:
@@ -202,15 +186,17 @@ async def disjoin_club(
             raise HTTPException(status_code=404, detail=error404u)
         else:
             raise HTTPException(status_code=404, detail=error404c)
-    except Exception:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()
 
 
 @router.post("/role_update")
-async def role_update( #бросает 404 я не понимаю почему
-        new_role: UpdateRole,
+async def role_update(
+        user_id: int,
+        club_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
     """ Обновляет роль пользователя в клубе
@@ -225,23 +211,25 @@ async def role_update( #бросает 404 я не понимаю почему
 
     """
     try:
-        #print('zxc')
-        new_role_dict = new_role.dict()
-        if await get_user_by_id(new_role_dict['user_id'], session) == "User not found":
-            #print('a')
+        if await get_user_by_id(user_id, session) == "User not found":
             raise ValueError('404u')
 
-        if await get_club_by_id(new_role_dict['club_id'], session) == "Club not found":
-            #print('b')
+        if await get_club_by_id(club_id, session) == "Club not found":
             raise ValueError('404c')
 
-        if await check_rec(new_role_dict['user_id'], new_role_dict['club_id'], session):
-            #print('c')
+        if await check_rec(user_id, club_id, session):
             raise ValueError('404uc')
-        #print('here')
-        rec_id = await get_rec_id(new_role_dict['user_id'], new_role_dict['club_id'], session)
-        #print('here')
-        stmt = update(club_x_user).where(club_x_user.c.id == rec_id).values(role=new_role.role) #TODO: вот это не работает
+        rec_id = await get_rec_id(user_id, club_id, session)
+
+        role = await get_role(user_id, club_id, session)
+
+        if role == 'admin':
+            await update_xp(user_id, -50, session)
+            stmt = update(club_x_user).where(club_x_user.c.id == rec_id).values(role='member')
+        elif role == 'member':
+            await update_xp(user_id, 50, session)
+            stmt = update(club_x_user).where(club_x_user.c.id == rec_id).values(role='admin')
+            
         await session.execute(stmt)
         await session.commit()
 
@@ -308,8 +296,7 @@ async def update_balance(
             raise HTTPException(status_code=404, detail=error404u)
         else:
             raise HTTPException(status_code=404, detail=error404c)
-    except Exception as e:
-        print(e)
+    except Exception:
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()
@@ -331,12 +318,18 @@ async def get_users_in_club(
 
     """
     try:
+        role_order = case(
+            (club_x_user.c.role == 'owner', 1),
+            (club_x_user.c.role == 'admin', 2),
+            (club_x_user.c.role == 'member', 3),
+        )
+
         if await get_club_by_id(club_id, session) == "Club not found":
             raise ValueError('404c')
 
         join = club_x_user.join(user, club_x_user.c.user_id == user.c.id)
-        query = select(user.c.username,user.c.id, club_x_user.c.role, club_x_user.c.date_joined).select_from(join).where(
-            club_x_user.c.club_id == club_id)
+        query = select(user.c.id, user.c.username, user.c.name, user.c.surname, club_x_user.c.role, club_x_user.c.date_joined).select_from(join).where(
+            club_x_user.c.club_id == club_id).order_by(role_order, user.c.xp)
 
         result = await session.execute(query)
         data = result.mappings().all()
@@ -355,7 +348,6 @@ async def get_users_in_club(
             raise HTTPException(status_code=404, detail=error404c)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
-
 
 @router.get("/get_users_with_role")
 async def get_users_with_role(
@@ -426,10 +418,10 @@ async def get_clubs_by_user(
         result = await session.execute(query)
         data = result.mappings().all()
 
-        if not data:  #TODO: юзер может не быть ни в одном клубе зачем здесь еррор
+        if not data:
             return {
-                "status": "success",
-                "data": [],
+                "status": "fail",
+                "data": "Clubs not found",
                 "details": None
             }
 
@@ -455,5 +447,104 @@ async def get_clubs_by_user(
             })
         else:
             raise HTTPException(status_code=404, detail=error404u)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+
+
+@router.post('/new_main')
+async def new_main(
+        user_id: int,
+        club_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    """ Делает клуб главным
+
+               :param user_id
+               :param club_id
+               :return:
+                   200 + success
+                   404 + error404u, если пользователь не найден.
+                   404 + error404c, если клубов у пользователя нет.
+                   404 + error404uc, если пользователя нет в этом клубе
+                   500 если внутрення ошибка сервера.
+
+           """
+    try:
+        if await get_user_by_id(user_id, session) == "User not found":
+            raise ValueError('404u')
+        if await get_club_by_id(club_id, session) == "Club not found":
+            raise ValueError('404c')
+        if await check_rec(user_id, club_id, session):
+            raise ValueError('404uc')
+
+        data = await get_clubs_by_user(user_id, session)
+        clubs = data['data']
+        for club in clubs:
+            await make_not_main(user_id, club['id'], session)
+
+        await make_main(user_id, club_id, session)
+
+        return success
+    except ValueError as e:
+        if str(e) == '404uc':
+            raise HTTPException(status_code=404, detail=error404uc)
+        elif str(e) == '404u':
+            raise HTTPException(status_code=404, detail=error404u)
+        else:
+            raise HTTPException(status_code=404, detail=error404c)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+
+
+@router.post('/get_main')
+async def get_main_club(
+        user_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    """ Возвращает главный клуб пользователя
+
+           :param user_id
+           :return:
+               200 + джейсон с главным клубом
+               404 + error404u, если пользователь не найден.
+               404 + error404c, если клубов у пользователя нет.
+               500 если внутрення ошибка сервера.
+
+       """
+    try:
+        if await get_user_by_id(user_id, session) == "User not found":
+            raise ValueError('404u')
+
+        join = club_x_user.join(club, club_x_user.c.club_id == club.c.id)
+        query = select(club).select_from(join).where(
+            (club_x_user.c.user_id == user_id) &
+            (club_x_user.c.is_main == True)
+        )
+
+        result = await session.execute(query)
+        data = result.mappings().all()
+
+        if not data:
+            query = select(club_x_user).where(club_x_user.c.user_id == user_id)
+            result = await session.execute(query)
+            data = result.mappings().all()
+
+        if not data:
+            return {
+                "status": "fail",
+                "data": "Club not found",
+                "details": None
+            }
+
+        return {
+            "status": "success",
+            "data": data[0],
+            "details": None
+        }
+    except ValueError as e:
+        if str(e) == '404u':
+            raise HTTPException(status_code=404, detail=error404u)
+        else:
+            raise HTTPException(status_code=404, detail=error404c)
     except Exception:
         raise HTTPException(status_code=500, detail=error)

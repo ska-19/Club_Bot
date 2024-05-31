@@ -19,6 +19,7 @@ from src.user_club.models import *
 from src.events.models import *
 from src.mentorship.models import *
 from src.achievement.models import *
+from src.market.models import *
 
 
 # this is the Alembic Config object, which provides

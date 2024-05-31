@@ -37,6 +37,7 @@ app.mount("/css_js", StaticFiles(directory="src/static/css_js"), name="css_js")
 
 app.include_router(router_user_profile)
 app.include_router(router_events)
+app.include_router(router_statistics)
 # app.include_router(router_randomcofee)
 # app.include_router(router_quetionnaire)
 app.include_router(router_mentorship)

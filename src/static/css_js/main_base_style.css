@@ -86,7 +86,15 @@ nav {
     width: 33%;
 }
 
-.JoinEvent {
+.block5 {
+    width: 50%;
+}
+
+.block6 {
+    width: 50%;
+}
+
+.RegEvent {
     display: inline-block;
     padding: 10px 20px;
     border: none;
@@ -97,14 +105,70 @@ nav {
     transition: background .2s linear;
 }
 
-.JoinEvent:hover {
+.RegEvent:hover {
     background: rgb(85, 255, 112);
+}
+
+.DisregEvent {
+    padding: 10px 20px;
+    border: none;
+    background: rgba(255, 85, 85, 0.62);
+    border-radius: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    transition: background .2s linear;
+}
+
+.DisregEvent:hover {
+    background: rgb(255, 85, 85);
+}
+
+.EditEvent {
+    padding: 10px 20px;
+    border: none;
+    background: rgba(117, 203, 255, 0.62);
+    border-radius: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    transition: background .2s linear;
+}
+
+.EditEvent:hover {
+    background: rgb(117, 203, 255);
+}
+
+.SaveEvent {
+    padding: 10px 20px;
+    border: none;
+    background: rgba(117, 203, 255, 0.62);
+    border-radius: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    transition: background .2s linear;
+}
+
+.SaveEvent:hover {
+    background: rgb(117, 203, 255);
+}
+
+.EndEvent {
+    padding: 10px 20px;
+    border: none;
+    background: rgba(145, 56, 0, 0.62);
+    border-radius: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    transition: background .2s linear;
+}
+
+.EndEvent:hover {
+    background: rgb(145, 56, 0);
 }
 
 .form-container {
     margin-left: 10px;
     width: 370px;
-    height: 250px;
+    height: 290px;
     background: #ffffff;
     border: 2px solid transparent;
     padding: 6px 18px;
@@ -165,4 +229,58 @@ nav {
 .form-container .form-group textarea:focus {
     outline: none;
     border-color: rgba(135, 29, 255, 0.72);
+}
+
+.BeginEvent{
+    font-size: 16px;
+    margin-top: 5px;
+    vertical-align: center;
+    display: inline-block;
+    height: 40px;
+    padding: 10px 20px;
+    border: none;
+    background: rgba(85, 255, 112, 0.62);
+    border-radius: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    transition: background .2s linear;
+}
+
+.BeginEvent:hover {
+    background: rgb(85, 255, 112);
+}
+
+.CloseEvent{
+    font-size: 16px;
+    margin-top: 5px;
+    vertical-align: center;
+    display: inline-block;
+    height: 40px;
+    padding: 10px 20px;
+    border: none;
+    background: rgba(255, 85, 85, 0.62);
+    border-radius: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    transition: background .2s linear;
+}
+
+.CloseEvent:hover {
+    background: rgb(255, 85, 85);
+
+}
+
+.CreateEvent{
+    display: inline-block;
+    padding: 10px 20px;
+    border: none;
+    background: rgba(117, 203, 255, 0.62);
+    border-radius: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    transition: background .2s linear;
+}
+
+.CreateEvent:hover {
+    background: rgb(117, 203, 255);
 }

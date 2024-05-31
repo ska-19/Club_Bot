@@ -17,7 +17,7 @@ body {
     filter: drop-shadow(0px 0px 20px rgba(223, 185, 255, 0.68));
 }
 
-.experience-level { /* Текст у лвла */
+.experience-level { /* Текст у опыта */
     position: absolute;
     top: 50%;
     left: 50%;
@@ -30,7 +30,6 @@ body {
     height: 100%;
     border-radius: 10px;
     background-color: #756bbc;
-    width: 30%;
 }
 
 .container {
@@ -282,13 +281,14 @@ strong {
 }
 
 .card {
-    position: relative;
+    position: absolute;
     width: 190px;
     height: 160px;
     border-radius: 30px;
     background-color: #ffffff;
     animation: gradient 5s ease infinite;
     filter: drop-shadow(0px 0px 20px rgba(223, 185, 255, 0.68));
+    z-index: 1;
 }
 
 .block1 {
@@ -310,6 +310,7 @@ strong {
     box-sizing: border-box;
     border-radius: 30px;
     animation: gradient 5s ease infinite;
+    content: '';
     filter: drop-shadow(0px 0px 20px rgba(223, 185, 255, 0.68));
 }
 
