@@ -3,7 +3,6 @@ from bot_instance import URL
 
 
 async def set_user(user_data):
-    print(user_data)
     rq_user_data = {
         "id": int(user_data["tg_id"]),
         "username": str(user_data["username"]),
@@ -21,14 +20,11 @@ async def set_user(user_data):
     url = f'{str(URL)}/user_profile/create_user'
 
     response = requests.post(url=url, json=rq_user_data, headers=headers)
-    print(response)
-    print(rq_user_data)
     if response.status_code == 409:
         response = requests.post(url=f'{str(URL)}/user_profile/update_create_user',
                                  json=rq_user_data,
                                  headers=headers,)
-    print(response)
-    print(rq_user_data)
+    # logging.debug(f"User {user_id}: {response}")
     return response
 
 

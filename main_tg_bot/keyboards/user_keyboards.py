@@ -8,7 +8,7 @@ def get_main_ikb(user_data: dict = None, is_admin: bool = False) -> InlineKeyboa
     web_app = WebAppInfo(url=f'https://club-bot.onrender.com/pages/profile_user/{tg_id}')
     ikb = [
         [InlineKeyboardButton(text='ПРОФИЛЬ', web_app=web_app)],
-        [InlineKeyboardButton(text='Создать клуб', callback_data='create_club')] if is_admin
+        [InlineKeyboardButton(text='Создать клуб', callback_data='create_club')] if not is_admin
         else [InlineKeyboardButton(text='Выгрузить данные', callback_data='download_clu_data')],
         [InlineKeyboardButton(text='Случайное знакомство', url='https://t.me/test_1_questionnaire_bot')],
     ]
