@@ -8,7 +8,7 @@ from src.database import get_async_session
 from src.club.models import club
 from src.club.schemas import ClubUpdate, ClubCreate
 from src.user_profile.inner_func import get_user_by_id, update_xp, get_user_attr
-from src.user_club.router import join_to_the_club, new_main, get_users_in_club
+from src.user_club.router import join_to_the_club, new_main, get_users_in_club, disjoin_club
 from src.user_club.schemas import UserJoin, User
 from src.club.inner_func import get_club_by_id, check_leg_name, get_club_by_uid
 
@@ -74,7 +74,7 @@ async def create_club(
         await join_to_the_club(userjoin, session)
         await new_main(owner, id, session)
         uid = 'CL' + str(id) + '0' + str(owner) + 'N'
-
+        club_dict['id'] = id
         stmt = update(club).where(club.c.id == id).values(uid=uid)
         await session.execute(stmt)
         await session.commit()
@@ -117,16 +117,14 @@ async def get_club(
     try:
         data = await get_club_by_id(club_id, session)
         if data == "Club not found":
-            return {
-                "status": "fail",
-                "data": data,
-                "details": None
-            }
+            raise ValueError('404')
         return {
             "status": "success",
             "data": data,
             "details": None
         }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
 
@@ -233,11 +231,12 @@ async def delete_club(
             raise ValueError("404")
         usrs = await get_users_in_club(club_id, session)
         usrs = usrs['data']
+        print(usrs)
         for u in usrs:
             user = User(user_id=u['user_id'], club_id=club_id)
+            print('here')
             await disjoin_club(user, session)
         query = delete(club).where(club.c.id == club_id)
-
         await session.execute(query)
         await session.commit()
         return {

@@ -13,6 +13,7 @@ from src.user_club.inner_func import check_rec, get_role
 from src.user_profile.inner_func import get_user_by_id
 from src.club.inner_func import get_club_by_id
 from src.user_club.models import club_x_user
+from src.user_profile.models import user
 
 router = APIRouter(
     prefix="/market",
@@ -671,3 +672,133 @@ async def get_admin_history_close(
         raise HTTPException(status_code=404, detail=error404c)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
+
+
+@router.post("/delete_row_history")
+async def delete_row_history(
+        user_id: int,
+        product_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    """ Удаляет строку истории пользователя
+
+       :param user_id: int
+       :param product_id: int
+       :return:
+           200 + success, если все хорошо.
+           404 + error404u, если пользователь не найден.
+           404 + error404pr, если товар не найден
+           500 если внутрення ошибка сервера.
+    """
+    try:
+        if await get_user_by_id(user_id, session) == "User not found":
+            raise ValueError('404u')
+        if await get_product_by_id(product_id, session) == "Product not found":
+            raise ValueError('404pr')
+
+        stmt = user_x_product.delete().where(
+            (user_x_product.c.user_id == user_id) &
+            (user_x_product.c.product_id == product_id))
+        await session.execute(stmt)
+        await session.commit()
+    except ValueError as e:
+        if str(e) == '404u':
+            raise HTTPException(status_code=404, detail=error404u)
+        if str(e) == '404pr':
+            raise HTTPException(status_code=404, detail=error404pr)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+    finally:
+        await session.rollback()
+
+
+@router.get("/get_all_user_products")
+async def get_all_user_products(
+        user_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    try:
+        if await get_user_by_id(user_id, session) == "User not found":
+            raise ValueError('404u')
+
+        join = user_x_product.join(product, user_x_product.c.product_id == product.c.id)
+        query = select(product, user_x_product).select_from(join).where(
+            user_x_product.c.user_id == user_id)
+        result = await session.execute(query)
+        data = result.mappings().all()
+
+        if not data:
+            return {
+                "status": "error",
+                "data": None,
+                "details": None
+            }
+
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404u)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+
+
+@router.get("/get_all_user_by_product")
+async def get_all_user_by_product(
+        product_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    try:
+        if await get_product_by_id(product_id, session) == "Product not found":
+            raise ValueError('404pr')
+
+        join = user_x_product.join(user, user_x_product.c.user_id == user.c.id)
+        query = select(user, user_x_product).select_from(join).where(
+            user_x_product.c.product_id == product_id)
+        result = await session.execute(query)
+        data = result.mappings().all()
+
+        if not data:
+            return {
+                "status": "error",
+                "data": None,
+                "details": None
+            }
+
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404pr)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+
+
+@router.post("/delete_product")
+async def delete_item(
+        product_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    try:
+        if await get_product_by_id(product_id, session) == "Product not found":
+            raise ValueError('404pr')
+
+        usrs = await get_all_user_by_product(product_id, session)
+        usrs = usrs['data']
+
+        for u in usrs:
+            await delete_row_history(u['user_id'], product_id, session)
+
+        query = product.delete().where(product.c.id == product_id)
+        await session.execute(query)
+        await session.commit()
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404pr)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+    finally:
+        await session.rollback()

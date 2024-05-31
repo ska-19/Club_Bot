@@ -6,231 +6,86 @@ from sqlalchemy import insert, select
 from src.user_profile.models import user
 from conftest import client, async_session_maker_test, ac
 
-def test_init():
-    data = {
-        "id": 50,
-        "username": "test",
-        "mentor": False,
-        "email": "string",
-        "name": "string",
-        "surname": "string",
-        "dob": "2021-08-16",
-        "tel": "string",
-        "photo": "string",
-        "comfort_time": "string",
-        "course": "string",
-        "faculty": "string",
-        "links": "string",
-        "bio": "string",
-        "is_active": True,
-        "is_superuser": False,
-        "is_verified": False,
-        "xp": 0,
-        "city": "string",
-        "education": "string",
-        "achievments": "string",
-    }
+def create(a, b):
+    for i in range(1, a+1):
+        data = {
+            "id": i,
+            "username": "test",
+            "mentor": False,
+            "email": "string",
+            "name": "string",
+            "surname": "string",
+            "is_active": True,
+            "is_superuser": False,
+            "is_verified": False,
+        }
 
-    data2 = {
-        "id": 58,
-        "username": "test",
-        "mentor": False,
-        "email": "string",
-        "name": "string",
-        "surname": "string",
-        "dob": "2021-08-16",
-        "tel": "string",
-        "photo": "string",
-        "comfort_time": "string",
-        "course": "string",
-        "faculty": "string",
-        "links": "string",
-        "bio": "string",
-        "is_active": True,
-        "is_superuser": False,
-        "is_verified": False,
-        "xp": 0,
-        "city": "string",
-        "education": "string",
-        "achievments": "string",
-    }
+        response = client.post("/user_profile/create_user", json=data)
+        assert response.status_code == 200
 
-    data3 = {
-        "id": 59,
-        "username": "test",
-        "mentor": False,
-        "email": "string",
-        "name": "string",
-        "surname": "string",
-        "dob": "2021-08-16",
-        "tel": "string",
-        "photo": "string",
-        "comfort_time": "string",
-        "course": "string",
-        "faculty": "string",
-        "links": "string",
-        "bio": "string",
-        "is_active": True,
-        "is_superuser": False,
-        "is_verified": False,
-        "xp": 0,
-        "city": "string",
-        "education": "string",
-        "achievments": "string",
-    }
+    clubs = []
+    for i in range(1, b+1):
+        data = {
+            "owner": 1,
+            "name": "test_club",
+            "dest": "string",
+            "photo": "string",
+            "bio": "string",
+            "links": "string",
+            "channel_link": "string",
+            "comfort_time": "string",
+            "date_created": "2021-01-01"
+        }
 
-    data4 = {
-        "id": 52,
-        "username": "test",
-        "mentor": False,
-        "email": "string",
-        "name": "string",
-        "surname": "string",
-        "dob": "2021-08-16",
-        "tel": "string",
-        "photo": "string",
-        "comfort_time": "string",
-        "course": "string",
-        "faculty": "string",
-        "links": "string",
-        "bio": "string",
-        "is_active": True,
-        "is_superuser": False,
-        "is_verified": False,
-        "xp": 0,
-        "city": "string",
-        "education": "string",
-        "achievments": "string",
-    }
+        response = client.post("/club/create_club", json=data)
+        assert response.status_code == 200
+        clubs.append(response.json()['data']['id'])
 
-    data5 = {
-        "id": 53,
-        "username": "test",
-        "mentor": False,
-        "email": "string",
-        "name": "string",
-        "surname": "string",
-        "dob": "2021-08-16",
-        "tel": "string",
-        "photo": "string",
-        "comfort_time": "string",
-        "course": "string",
-        "faculty": "string",
-        "links": "string",
-        "bio": "string",
-        "is_active": True,
-        "is_superuser": False,
-        "is_verified": False,
-        "xp": 0,
-        "city": "string",
-        "education": "string",
-        "achievments": "string",
-    }
+    return clubs
 
-    data6 = {
-        "id": 54,
-        "username": "test",
-        "mentor": False,
-        "email": "string",
-        "name": "string",
-        "surname": "string",
-        "dob": "2021-08-16",
-        "tel": "string",
-        "photo": "string",
-        "comfort_time": "string",
-        "course": "string",
-        "faculty": "string",
-        "links": "string",
-        "bio": "string",
-        "is_active": True,
-        "is_superuser": False,
-        "is_verified": False,
-        "xp": 0,
-        "city": "string",
-        "education": "string",
-        "achievments": "string",
-    }
 
-    response = client.post("/user_profile/create_user", json=data)
-    response2 = client.post("/user_profile/create_user", json=data2)
-    response3 = client.post("/user_profile/create_user", json=data3)
-    response4 = client.post("/user_profile/create_user", json=data4)
-    response4 = client.post("/user_profile/create_user", json=data5)
-    response4 = client.post("/user_profile/create_user", json=data6)
+def delete(a, clubs_id):
+    for i in clubs_id:
+        response = client.delete("/club/delete_club/", params={"club_id": i})
+        assert response.status_code == 200
+    for i in range(1, a+1):
+        response = client.delete("/user_profile/delete_user/", params={"user_id": i})
+        assert response.status_code == 200
 
-    data = {
-        "owner": 50,
-        "name": "test_club",
-        "dest": "string",
-        "photo": "string",
-        "bio": "string",
-        "links": "string",
-        "channel_link": "string",
-        "comfort_time": "string",
-        "date_created": '2021-01-01'
-    }
-    response = client.post("/club/create_club", json=data)
 
-    data2 = {
-        "owner": 58,
-        "name": "test_club2",
-        "dest": "string",
-        "photo": "string",
-        "bio": "string",
-        "links": "string",
-        "channel_link": "string",
-        "comfort_time": "string",
-        "date_created": '2021-01-01'
-    }
 
-    response = client.post("/club/create_club", json=data2)
-
-    data = {
-        "club_id": 1,
-        "user_id": 59,
-        "role": "member",
-        "balance": 0
-    }
-    response = client.post("/join/join_club", json=data)
-
-    data = {
-        "club_id": 2,
-        "user_id": 52,
-        "role": "member",
-        "balance": 0
-    }
-    response = client.post("/join/join_club", json=data)
-
-    data = {
-        "club_id": 1,
-        "user_id": 53,
-        "role": "member",
-        "balance": 0
-    }
-    response = client.post("/join/join_club", json=data)
-
-    data = {
-        "club_id": 2,
-        "user_id": 54,
-        "role": "member",
-        "balance": 0
-    }
-    response = client.post("/join/join_club", json=data)
 
 
 
 def test_add_product_good():
+    clubs_id = create(1,1)
+    club_id = clubs_id[0]
     data = {
         "name": "test_product",
-        "price": 100,
+        "price": 993,
+        "user_id": 1,
         "description": "string",
-        "photo": "string",
-        "quantity": 10,
-        "rating": 5,
-        "admin_id": 50,
-        "club_id": 1
+        "quantity": 1,
+        "club_id": club_id
     }
 
     response = client.post("/market/add_product", json=data)
     assert response.status_code == 200
+    assert response.json()['data']['name'] == "test_product"
+
+    product_id = response.json()['data']['id']
+
+    response = client.get("/market/get_product", params={"product_id": product_id})
+    assert response.status_code == 200
+
+    delete(1, clubs_id)
+
+
+
+
+
+
+
+
+
 
