@@ -1,11 +1,7 @@
 from aiogram import Router, F
-from aiogram.filters import Command, StateFilter
-from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, ReplyKeyboardRemove
 
 from keyboards.simple_kb import make_colum_keyboard
-from database import requests as rq
 
 router = Router()
 
@@ -59,8 +55,10 @@ class User_rc_pair:
     def clear(self):
         self.user_rc_pair.clear()
 
+
 users_rc_ready = Users_rc_ready()
 user_rc_pair = User_rc_pair()
+
 
 class Take_part_state:
     def __init__(self):

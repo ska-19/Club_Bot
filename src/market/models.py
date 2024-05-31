@@ -12,9 +12,7 @@ product = Table(
     Column('name', String(255), nullable=False),
     Column('price', Integer, nullable=False),
     Column('description', Text),
-    # Column('photo', Text),
     Column('quantity', Integer, nullable=False),
-    # Column('rating', Integer, nullable=False),
     Column('club_id', Integer, ForeignKey('club.id'), nullable=False),
 )
 
@@ -23,8 +21,6 @@ user_x_product = Table(
     Column('id', Integer, primary_key=True),
     Column('user_id', BIGINT, ForeignKey('user.id'), nullable=False),
     Column('product_id', Integer, ForeignKey('product.id'), nullable=False),
-    # Column('club_id', Integer, ForeignKey('club.id'), nullable=False),
     Column('date', TIMESTAMP, nullable=False),
-    # Column('count', Integer, nullable=False),
     Column('status', Text, nullable=False, default='request'),
 )

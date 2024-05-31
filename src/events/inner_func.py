@@ -102,8 +102,11 @@ async def adm_boost(
         club_id = await get_club_id_by_event_id(event_id, session)
         admin = await get_users_with_role(club_id, 'admin', session)
         owner = await get_users_with_role(club_id, 'owner', session)
-        admins = [admin['data'],
-                  owner['data']]
+        if admin['status'] == 'success':
+            admins = [admin['data'],
+                      owner['data']]
+        else:
+            admins = [owner['data']]
         for admin in admins:
             updatebalance = UpdateBalance(club_id=club_id, user_id=admin[0]['id'], plus_balance=reward)
             await update_balance(updatebalance, session)

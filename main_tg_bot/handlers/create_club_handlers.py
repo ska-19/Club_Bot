@@ -1,15 +1,11 @@
+import io
 from aiogram import Router, F
-from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery, BufferedInputFile
-import requests
+from aiogram.types import Message, CallbackQuery, BufferedInputFile
+
 from bot_instance import bot
-import io
-
-from keyboards.simple_kb import make_colum_keyboard
 from keyboards.user_keyboards import get_main_ikb, get_back_button
-
 from database import request as rq
 
 router = Router()
@@ -121,8 +117,21 @@ async def cmd_download_clu_data(callback: CallbackQuery):
         file = BufferedInputFile(file_bytes.read(), filename=filename)
         await bot.send_document(chat_id=callback.from_user.id, document=file)
     else:
+        print(response)
         await callback.message.answer(
             text="Ошибка при загрузке статистки событий клуба",
             reply_markup=get_main_ikb({'tg_id': callback.from_user.id}, is_admin=True)
         )
+    response = await rq.club_data_links(callback.from_user.id, club_id, 'items_data')
+    if response.status_code == 200:
+        filename = response.headers.get('content-disposition').split('filename=')[1].strip('""')
+        file_bytes = io.BytesIO(response.content)
+        file = BufferedInputFile(file_bytes.read(), filename=filename)
+        await bot.send_document(chat_id=callback.from_user.id, document=file)
+    else:
+        await callback.message.answer(
+            text="Ошибка при загрузке данных о предметах клуба",
+            reply_markup=get_main_ikb({'tg_id': callback.from_user.id}, is_admin=True)
+        )
+
     await callback.message.delete()

@@ -1,0 +1,189 @@
+{% extends "history_base.html" %}
+
+
+{% block nav %}
+<nav style="justify-content: center">
+    <!-- Кнопка "Назад" -->
+    <button class="button" style="flex-basis: 14%" onclick="href_main('{{user_info.id}}')">
+        <div class="button-box">
+    <span class="button-elem">
+      <svg viewBox="0 0 46 40" xmlns="http://www.w3.org/2000/svg">
+        <path
+                d="M46 20.038c0-.7-.3-1.5-.8-2.1l-16-17c-1.1-1-3.2-1.4-4.4-.3-1.2 1.1-1.2 3.3 0 4.4l11.3 11.9H3c-1.7 0-3 1.3-3 3s1.3 3 3 3h33.1l-11.3 11.9c-1 1-1.2 3.3 0 4.4 1.2 1.1 3.3.8 4.4-.3l16-17c.5-.5.8-1.1.8-1.9z"
+        ></path>
+      </svg>
+    </span>
+            <span class="button-elem">
+      <svg viewBox="0 0 46 40">
+        <path
+                d="M46 20.038c0-.7-.3-1.5-.8-2.1l-16-17c-1.1-1-3.2-1.4-4.4-.3-1.2 1.1-1.2 3.3 0 4.4l11.3 11.9H3c-1.7 0-3 1.3-3 3s1.3 3 3 3h33.1l-11.3 11.9c-1 1-1.2 3.3 0 4.4 1.2 1.1 3.3.8 4.4-.3l16-17c.5-.5.8-1.1.8-1.9z"
+        ></path>
+      </svg>
+    </span>
+        </div>
+        <!-- Кнопка "Магазин" -->
+    </button>
+    <a href="/pages/market_user/{{user_info.id}}" style="text-decoration: none; color: #000000; flex-basis: 43%">
+        <div class="logo-container">
+            <span class="site-name">Магазин</span>
+        </div>
+    </a>
+    <!-- Кнопка "История" -->
+    <a style="text-decoration: none; color: #000000;flex-basis: 43%">
+        <div class="logo-container1">
+            <span class="site-name">История</span>
+        </div>
+    </a>
+</nav>
+{% endblock %}
+
+
+{% block hist %}
+<!-- "История покупок" -->
+<div class="card"
+     style="left: 50px;height: 50px; width: 290px; justify-content: center;display: flex">
+    <h1 style="font-size: 19px; position: relative; z-index: 2">ИСТОРИЯ ПОКУПОК</h1>
+</div>
+<!-- Если историю открыл обычный пользователь, то он ждёт подтверждения своих покупок от админа -->
+<!-- Ему доступна информация о текущих покупках, также он может отменить каждую из них -->
+{% if user_info.role == "member" %}
+{% for product in user_active_products %}
+<div class="form-container" id="form" style="margin-top: 30px">
+    <form class="form">
+        <div style="display: flex">
+            <div class="form-group" style="width: 60%">
+                <label>Товар</label>
+                <input required="" name="NameProduct" id="NameProduct_{{product.id_1}}" type="text" style="width: 115px"
+                       value="{{ product.name }}" readonly>
+            </div>
+            <div class="form-group">
+                <label>Цена</label>
+                <input required="" name="PriceProduct" id="PriceProduct_{{product.id_1}}" type="text"
+                       style="width: 85px"
+                       value="{{ product.price }}" readonly>
+            </div>
+        </div>
+        <!-- Кнопка отмены покупки -->
+        <div style="display: flex;justify-content: center">
+            <button type="button" class="RejUserProduct" id="RejUserProduct_{{ product.id_1 }}"
+                    style="margin-top: 10px;width: 200px"
+                    onclick="reject_user('{{product.id_1}}')">Отменить покупку
+            </button>
+        </div>
+    </form>
+</div>
+<!-- Далее история его предыдущих покупок, а также их статус (состоялась покупка или нет) -->
+{% endfor %}
+<!-- Чтобы посмотреть историю предыдущих покупок, нужно нажать кнопочку -->
+<button class="card" id="BtnHistory" onclick="checkHist()"
+        style="margin-top: 30px;left: 50px;height: 50px; width: 290px; justify-content: center;display: flex">
+    <h1 style="font-size: 19px; position: relative; z-index: 2">ЗАВЕРШЕННЫЕ ПОКУПКИ</h1>
+</button>
+<div id="History" style="display: none">
+    {% for hist_product in user_closed_products %}
+    <div class="form-container" id="form" style="margin-top: 30px">
+        <form class="form">
+            <div style="display: flex">
+                <div class="form-group" style="width: 60%">
+                    <label>Товар</label>
+                    <input required="" name="NameProduct" id="NameProduct_{{hist_product.id}}" type="text"
+                           style="width: 115px"
+                           value="{{ hist_product.name }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Цена</label>
+                    <input required="" name="PriceProduct" id="PriceProduct_{{hist_product.id}}" type="text"
+                           style="width: 85px"
+                           value="{{ hist_product.price }}" readonly>
+                </div>
+            </div>
+            <div style="display: flex;justify-content: center">
+                <div class="form-group">
+                    <label>Статус</label>
+                    <input required="" name="PriceProduct" id="PriceProduct_{{hist_product.id}}" type="text"
+                           style="width: 85px"
+                           value="{{ hist_product.status }}" readonly>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+<!-- Если историю открыл админ, то он видит все покупки участников клуба -->
+<!-- Он может подтверждать покупки или же отклонять их -->
+{% else %}
+{% for product in admin_active_products %}
+<div class="form-container" id="form" style="margin-top: 30px">
+    <form class="form">
+        <div style="display: flex">
+            <div class="form-group" style="width: 60px">
+                <label>Товар</label>
+                <input required="" name="NameProduct" id="NameProduct_{{product.id_1}}" type="text"
+                       value="{{ product.name }}" readonly>
+            </div>
+            <div class="form-group" style="margin-left: 30px;width: 60px">
+                <label>Цена</label>
+                <input required="" name="PriceProduct" id="PriceProduct_{{product.id_1}}" type="text"
+                       value="{{ product.price }}" readonly>
+            </div>
+            <div class="form-group" style="margin-left: 80px;width: 60px">
+                <label>Покупатель</label>
+                <input required="" name="BuyerProduct" id="BuyerProduct_{{product.id_1}}" type="text"
+                       value="{{ product.user_id }}" readonly>
+            </div>
+        </div>
+        <div style="display: flex">
+            <!-- Кнопка отмены покупки админом -->
+            <button type="button" class="RejAdminProduct" id="RejAdminProduct_{{ product.id_1 }}"
+                    style="flex-basis: 45%" onclick="reject_admin('{{product.id_1}}')">Отменить
+            </button>
+            <!-- Кнопка подтверждения покупки админом -->
+            <div style="flex-basis: 10%"></div>
+            <button type="button" class="AcceptProduct" id="AcceptProduct_{{ product.id_1 }}"
+                    style="flex-basis: 45%" onclick="accept('{{product.id_1}}')">Подтвердить
+            </button>
+        </div>
+    </form>
+</div>
+<!-- Также админ может посмотреть историю всех покупок в клубе -->
+{% endfor %}
+<!-- Чтобы посмотреть историю предыдущих покупок, нужно нажать кнопочку -->
+<button class="card" id="BtnHistory" onclick="checkHist()"
+        style="margin-top: 30px;left: 50px;height: 50px; width: 290px; justify-content: center;display: flex">
+    <h1 style="font-size: 19px; position: relative; z-index: 2">ЗАВЕРШЕННЫЕ ПОКУПКИ</h1>
+</button>
+<div id="History" style="display: none">
+    {% for hist_product in admin_closed_products %}
+    <div class="form-container" id="form" style="margin-top: 30px">
+        <form class="form">
+            <div style="display: flex">
+                <div class="form-group" style="width: 30%">
+                    <label>Товар</label>
+                    <input required="" name="NameProduct" id="NameProduct_{{hist_product.id}}" type="text"
+                           style="width: 60px"
+                           value="{{ hist_product.name }}" readonly>
+                </div>
+                <div class="form-group" style="width: 30%">
+                    <label>Цена</label>
+                    <input required="" name="PriceProduct" id="PriceProduct_{{hist_product.id}}" type="text"
+                           style="width: 60px"
+                           value="{{ hist_product.price }}" readonly>
+                </div>
+                <div class="form-group" style="width: 30%">
+                    <label>Покупатель</label>
+                    <input required="" name="BuyerProduct" id="BuyerProduct_{{hist_product.id}}" type="text"
+                           value="{{ hist_product.user_id }}" readonly>
+                </div>
+
+            </div>
+            <div style="display: flex;justify-content: center">
+                <div class="form-group">
+                    <label style="margin-top: 5px;font-size: 20px">Статус: {{ hist_product.status }}</label>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from sqlalchemy import select, insert, update, delete
+from sqlalchemy import insert, update
 
 from datetime import datetime
 
@@ -9,8 +9,8 @@ from src.events.schemas import EventCreate, EventUpdate, EventReg, Data
 from src.user_club.inner_func import check_rec, get_role
 from src.events.inner_func import *
 from src.user_profile.inner_func import get_user_by_id
-# from src.user_club.schemas import UpdateBalance
-# from src.user_club.router import update_balance, get_users_with_role
+from src.user_club.schemas import UpdateBalance
+from src.user_club.router import update_balance
 from src.user_profile.models import user
 
 
@@ -38,7 +38,6 @@ async def get_check_rec(
         return True
     except Exception:
         raise HTTPException(status_code=500, detail=error)
-
 
 
 @router.post("/create_event")
@@ -99,19 +98,13 @@ async def create_event(
         await session.rollback()
 
 
-# принимает event_id
-# 200 + джейсон со всеми данными, если все хорошо
-# 404 если события с таким id нет
-# 500 если внутрення ошибка сервера
-
-
 @router.get("/get_event")
 async def get_event(
         event_id: int,
         session: AsyncSession = Depends(get_async_session)):
     """ выдает данные о событии по id
 
-               :param event_id
+               :param event_id: int
                :return:
                    принимает event_id
                    200 + джейсон со всеми данными, если все хорошо
@@ -141,9 +134,8 @@ async def update_event(
         session: AsyncSession = Depends(get_async_session)):
     """ Изменяет событие
 
-                :param
-                    event_id
-                    update_data: джейсон вида EventUpdate
+                :param event_id: int
+                :param update_data: джейсон вида EventUpdate
                 :return:
                     200 + джейсон со всеми данными, если все хорошо.
                     404 + error404u если owner (=user_id) не существует.
@@ -190,9 +182,6 @@ async def update_event(
         await session.rollback()
 
 
-# принимает json вида EventReg
-# 200 - успешно создано, возвращает json со всеми данными
-# 500 - ошибка сервера
 @router.post("/event_reg")
 async def reg_event(
         data: EventReg,
@@ -251,7 +240,7 @@ async def get_event_club(
         session: AsyncSession = Depends(get_async_session)):
     """ выдает данные о событиях в клубе по id
 
-               :param event_id
+               :param club_id: int
                :return:
                    200 + джейсон со всеми данными, если все хорошо.
                    404 + error404с если клуб не найден
@@ -282,9 +271,8 @@ async def event_disreg(
         session: AsyncSession = Depends(get_async_session)):
     """ отменяет регистрацию пользователя на событие
 
-               :param
-                  user_id
-                  event_id
+               :param user_id: int
+               :param event_id: int
                :return:
                   200 + джейсон со всеми данными, если все хорошо.
                   404 + error404u если owner (=user_id) не существует.
@@ -331,13 +319,14 @@ async def event_disreg(
         await session.rollback()
 
 
+
 @router.post("/delete_event")
 async def delete_event(
         event_id: int,
         session: AsyncSession = Depends(get_async_session)):
     """ удаляет событие
 
-              :param event_id
+              :param event_id: int
               :return:
                  200 + джейсон со всеми данными, если все хорошо.
                  404 + error404e если события с таким id нет
@@ -380,8 +369,8 @@ async def end_event(
     """ завершает событие. выдает опыт и монеты участникам, которые пришли и админ составу, очищает event_reg и удаляет событие
         список пользователлей должен поступать в формате json (смотри схему Data, на самом деле json в jsone с ключем k), где ключ - стинговое значение user_id, а значение - 0/1 в зависимости от посещения
 
-                 :param event_id
-                 :param data: json
+                 :param event_id: int
+                 :param data: Data
                  :return:
                     200 + джейсон со всеми данными, если все хорошо.
                     404 + error404e если события с таким id нет
@@ -421,17 +410,27 @@ async def get_users_by_event(
             raise ValueError('404e')
 
         join = event_reg.join(user, event_reg.c.user_id == user.c.id)
-        query = select(user.c.id, user.c.username, user.c.name, user.c.surname, event_reg.c.reg_date).select_from(join).where(event_reg.c.event_id == event_id).order_by(user.c.surname)
+        query = (select(user.c.id, user.c.username, user.c.name, user.c.surname, event_reg.c.reg_date)
+                 .select_from(join)
+                 .where(event_reg.c.event_id == event_id)
+                 .order_by(user.c.surname))
 
         result = await session.execute(query)
         data = result.mappings().all()
+
+        club_id = await get_club_id_by_event_id(event_id, session)
+
+        res_data = []
+        for us in data:
+            if await get_role(us['id'], club_id, session) not in ['admin', 'owner']:
+                res_data.append(us)
 
         if not data:
             raise ValueError('404s')
 
         return {
             "status": "success",
-            "data": data,
+            "data": res_data,
             "details": None
         }
     except ValueError as e:

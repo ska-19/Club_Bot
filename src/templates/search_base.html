@@ -7,16 +7,12 @@
     <title></title>
 </head>
 <body>
-
 <div class="container">
 
 
-    <!-- Поиск поле -->
+    <!-- Поиск поле + "Найти" -->
     <input id="input_search" type="text" placeholder="Введите тэг клуба" class="text-xl">
-
-
-    <!-- кнопка "искать" -->
-    <button onclick= "searchClub()" class="SearchClub">Найти</button>
+    <button onclick="searchClub()" class="SearchClub">Найти</button>
 
 
     <!-- Найденный клуб + "Вступить" -->
@@ -33,6 +29,8 @@
 
     <!-- "Другие клубы" + Club_names + "перейти" + ссылка в main_user -->
     {% block clubs_info %}{% endblock %}
+
+
 </div>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="/css_js/search_base_script.js"></script>

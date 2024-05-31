@@ -46,6 +46,7 @@ function ChangeMainClub(ClubId) {
         .then(data => {
             console.log('Success:', data);
             window.location.reload();
+            window.location.href = `/pages/main_user/${userId}`;
         })
         .catch(error => {
             console.error('Error:', error);

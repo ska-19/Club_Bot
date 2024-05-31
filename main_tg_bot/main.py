@@ -1,10 +1,8 @@
 import asyncio
-import os
 import logging
 
-from aiogram import Bot, Dispatcher, types
+from aiogram import Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.fsm.strategy import FSMStrategy
 
 from bot_instance import bot
 from handlers import user_handlers, create_club_handlers
@@ -30,7 +28,14 @@ async def main() -> None:
 
     config = BotConfig(
         admin_ids=[52786051],
-        welcome_message="Привет! Я бот-анкета, собирающий данные для умного старшего брата. \n\n <b>Давай начнем!</b>"
+        welcome_message="<b>Привет! Я бот для активного участия в клубах по интересам.</b> \n\n"
+                        "В данный момент у меня есть следующие команды: \n"
+                        "/dice - кинуть кубик 🎲 \n"
+                        "/info - подробности \n"
+                        "/help - помощь \n"
+                        "/start - начало работы с ботом, также перезапишет ваше имя и фамилию в случае изменения,"
+                        " без потери данных \n\n"
+                        "В данный момент происходит создание вашего профиля, пожалуйста подождите."
     )
     dp = Dispatcher(storage=MemoryStorage())
     dp["config"] = config

@@ -19,7 +19,7 @@
 
 {% block achivements %}
 <h1 id="achivements" style="font-size: 15px; position: relative; z-index: 2">
-    <!--пока заглушка, TODO скрипт, подсвечивает достижения, которые есть {{ user_info.achievement }}--> Нет достижений
+    Нет достижений
 </h1>
 {% endblock %}
 
@@ -72,6 +72,7 @@
         </div>
     </button>
 </a>
+<!-- Если у участника нет клуба, то он отправляется не на Главную страницу, а на страницу Поиска клуба -->
 {% else %}
 <a href="/pages/search_user/{{user_info.id}}" style="text-decoration: none">
     <button class="btn_GoToTheClub" type="button" style="margin-top: 25px">
