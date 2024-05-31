@@ -1,12 +1,4 @@
-import datetime
-
-import pytest
-from sqlalchemy import insert, select
-
-from src.user_profile.models import user
-from src.user_profile.inner_func import get_user_by_id
-from conftest import client, async_session_maker_test, ac
-from datetime import date, datetime
+from tests.conftest import client, ac
 
 
 def test_create_user_good():

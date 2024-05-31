@@ -1,11 +1,6 @@
-import datetime
 from typing import List, AsyncGenerator
 
-import pytest
-from sqlalchemy import insert, select
-
-from src.user_profile.models import user
-from conftest import client, async_session_maker_test, ac
+from tests.conftest import client, ac
 
 
 def create(a: int, b: int):

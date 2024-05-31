@@ -1,10 +1,4 @@
-import datetime
-
-import pytest
-from sqlalchemy import insert, select
-
-from src.user_profile.models import user
-from conftest import client, async_session_maker_test, ac
+from tests.conftest import client, ac
 
 
 def test_create_club_good():

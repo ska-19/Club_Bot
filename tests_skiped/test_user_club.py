@@ -1,10 +1,4 @@
-import datetime
-
-import pytest
-from sqlalchemy import insert, select
-
-from src.user_profile.models import user
-from conftest import client, async_session_maker_test, ac
+from tests.conftest import client, ac
 
 
 
@@ -2924,7 +2918,6 @@ def test_get_usert_with_role_good():
     assert response.status_code == 200
 
     response = client.get("/join/get_users_with_role", params={"club_id": club_id, "role": "member"})
-
     assert response.status_code == 200
     print(response.json())
     assert response.json()['data'][0]['id'] == 2
