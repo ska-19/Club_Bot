@@ -47,19 +47,20 @@
         <div style="display: flex">
             <div class="form-group" style="width: 60%">
                 <label>Товар</label>
-                <input required="" name="NameProduct" id="NameProduct_{{product.id}}" type="text" style="width: 115px"
+                <input required="" name="NameProduct" id="NameProduct_{{product.id_1}}" type="text" style="width: 115px"
                        value="{{ product.name }}" readonly>
             </div>
             <div class="form-group">
                 <label>Цена</label>
-                <input required="" name="PriceProduct" id="PriceProduct_{{product.id}}" type="text" style="width: 85px"
+                <input required="" name="PriceProduct" id="PriceProduct_{{product.id_1}}" type="text"
+                       style="width: 85px"
                        value="{{ product.price }}" readonly>
             </div>
         </div>
         <div style="display: flex;justify-content: center">
-            <button type="button" class="RejUserProduct" id="RejUserProduct_{{ product.id }}"
+            <button type="button" class="RejUserProduct" id="RejUserProduct_{{ product.id_1 }}"
                     style="margin-top: 10px;width: 200px"
-                    onclick="reject_user('{{product.id}}')">Отменить покупку
+                    onclick="reject_user('{{product.id_1}}')">Отменить покупку
             </button>
         </div>
         <!-- У админов/владельца кнопки для редактирования и завершения события -->
@@ -109,27 +110,27 @@
         <div style="display: flex">
             <div class="form-group" style="width: 60px">
                 <label>Товар</label>
-                <input required="" name="NameProduct" id="NameProduct_{{product.id}}" type="text"
+                <input required="" name="NameProduct" id="NameProduct_{{product.id_1}}" type="text"
                        value="{{ product.name }}" readonly>
             </div>
             <div class="form-group" style="margin-left: 30px;width: 60px">
                 <label>Цена</label>
-                <input required="" name="PriceProduct" id="PriceProduct_{{product.id}}" type="text"
+                <input required="" name="PriceProduct" id="PriceProduct_{{product.id_1}}" type="text"
                        value="{{ product.price }}" readonly>
             </div>
             <div class="form-group" style="margin-left: 80px;width: 60px">
                 <label>Покупатель</label>
-                <input required="" name="BuyerProduct" id="BuyerProduct_{{product.id}}" type="text"
+                <input required="" name="BuyerProduct" id="BuyerProduct_{{product.id_1}}" type="text"
                        value="{{ product.user_id }}" readonly>
             </div>
         </div>
         <div style="display: flex">
-            <button type="button" class="RejAdminProduct" id="RejAdminProduct_{{ product.id }}"
-                    style="flex-basis: 45%" onclick="reject_admin('{{product.id}}')">Отменить
+            <button type="button" class="RejAdminProduct" id="RejAdminProduct_{{ product.id_1 }}"
+                    style="flex-basis: 45%" onclick="reject_admin('{{product.id_1}}')">Отменить
             </button>
             <div style="flex-basis: 10%"></div>
-            <button type="button" class="AcceptProduct" id="AcceptProduct_{{ product.id }}"
-                    style="flex-basis: 45%" onclick="accept('{{product.id}}')">Подтвердить
+            <button type="button" class="AcceptProduct" id="AcceptProduct_{{ product.id_1 }}"
+                    style="flex-basis: 45%" onclick="accept('{{product.id_1}}')">Подтвердить
             </button>
         </div>
         <!-- У админов/владельца кнопки для редактирования и завершения события -->
@@ -151,7 +152,7 @@
                            style="width: 60px"
                            value="{{ hist_product.name }}" readonly>
                 </div>
-                <div class="form-group"style="width: 30%">
+                <div class="form-group" style="width: 30%">
                     <label>Цена</label>
                     <input required="" name="PriceProduct" id="PriceProduct_{{hist_product.id}}" type="text"
                            style="width: 60px"

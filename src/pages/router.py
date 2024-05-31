@@ -446,6 +446,7 @@ async def get_history_user(
     ad_hist_active_data = ad_hist_active['data']
     ad_hist_close = await get_admin_history_close(club_data['id'], session)
     ad_hist_close_data = ad_hist_close['data']
+    print(ad_hist_close_data)
     if us_hist_active_data is None:
         us_hist_active_data = []
     if ad_hist_active_data is None:
@@ -467,36 +468,26 @@ async def get_history_user(
 
 @router.post("/history_user/{user_id}")
 async def confirm_purchase(
-        user_id: int,
         prod: UpdateProduct,
         session: AsyncSession = Depends(get_async_session)
 ):
-    prod_id = prod.id
-    adm_id = user_id
-    acc_user_id = prod.user_id
-    accept = await accept_request(adm_id, acc_user_id, prod_id, session)
+    accept = await accept_request(prod.id, session)
     return {"message": "Event Reg successfully", "Accept request for user!": accept}
 
 
 @router.delete("/history_user/{user_id}/1")
 async def admin_cancel_purchase(
-        user_id: int,
         prod: UpdateProduct,
         session: AsyncSession = Depends(get_async_session)
 ):
-    prod_id = prod.id
-    adm_id = user_id
-    rej_user_id = prod.user_id
-    rej_admin = await reject_request_admin(adm_id, rej_user_id, prod_id, session)
+    rej_admin = await reject_request_admin(prod.id, session)
     return {"message": "Event Reg successfully", "Rejected request from admin!": rej_admin}
 
 
 @router.delete("/history_user/{user_id}/2")
 async def member_cancel_purchase(
-        user_id: int,
         prod: UpdateProduct,
         session: AsyncSession = Depends(get_async_session)
 ):
-    prod_id = prod.id
-    rej_user = await reject_request_user(user_id, prod_id, session)
+    rej_user = await reject_request_user(prod.id, session)
     return {"message": "Event Reg successfully", "Rejected request for user!": rej_user}

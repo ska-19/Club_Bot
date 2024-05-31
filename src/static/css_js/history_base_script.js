@@ -34,12 +34,11 @@ function reject_user(productId) {
 }
 
 function accept(productId) {
-    const user_rej_id = document.getElementById(`BuyerProduct_${productId}`).value;
     const urlParts = window.location.href.split('/');
     const userId = urlParts[urlParts.length - 1];
     const AccProduct = {
         id: productId,
-        user_id: user_rej_id,
+        user_id: 0,
         name: "",
         price: 0,
         description: "",
@@ -68,10 +67,9 @@ function accept(productId) {
 function reject_admin(productId) {
     const urlParts = window.location.href.split('/');
     const userId = urlParts[urlParts.length - 1];
-    const user_rej_id = document.getElementById(`BuyerProduct_${productId}`).value;
     const RejProduct = {
         id: productId,
-        user_id: user_rej_id,
+        user_id: 0,
         name: "",
         price: 0,
         description: "",
