@@ -47,39 +47,45 @@
   display: flex;
   justify-content: center;
   align-items: center;">
-    <h1 style="font-size: 14px; color: #7a9a8a;flex-basis: 50%;display: flex;justify-content: center;align-items: center;position: relative; z-index: 2">
-        {{ user.username }} {{ user.role }}
+    <h1 style="font-size: 12px; color: #7a9a8a;flex-basis: 35%;display: flex;justify-content: center;align-items: center;position: relative; z-index: 2">
+        {{ user.username }}
+    </h1>
+    <h1 style="font-size: 12px; color: #7a9a8a;flex-basis: 20%;display: flex;justify-content: center;align-items: center;position: relative; z-index: 2">
+        {{ user.role }}
     </h1>
 
     {% if user_info.role == "admin" and user.role == "member" %}
-    <h1 style="flex-basis: 25%"></h1>
+    <h1 style="flex-basis: 20%"></h1>
     <button type="button" class="Kick" id="Kick_{{ user.user_id }}"
-            style="height: 20px; width: 80px;  flex-basis: 25%;display: flex;justify-content: center;align-items: center"
+            style="font-size: 10px;height: 20px; width: 60px;  flex-basis: 20%;display: flex;justify-content: center;align-items: center"
             onclick="Kick('{{user.user_id}}')">Выгнать
     </button>
+    <h1 style="flex-basis: 5%"></h1>
 
     {% elif user_info.role == "owner" and user.role == "member" %}
     <button type="button" class="Promote" id="Update_{{ user.user_id }}"
-            style="font-size: 10px;height: 20px; width: 80px;  flex-basis: 25%;display: flex;justify-content: center;align-items: center;"
+            style="font-size: 10px;height: 20px; width: 60px;  flex-basis: 20%;display: flex;justify-content: center;align-items: center;"
             onclick="Update('{{user.user_id}}')">Повысить
     </button>
     <button type="button" class="Kick" id="Kick_{{ user.user_id }}"
-            style="height: 20px; width: 80px;  flex-basis: 25%;display: flex;justify-content: center;align-items: center;"
+            style="font-size: 10px;height: 20px; width: 60px;  flex-basis: 20%;display: flex;justify-content: center;align-items: center;"
             onclick="Kick('{{user.user_id}}')">Выгнать
     </button>
+    <h1 style="flex-basis: 5%"></h1>
 
     {% elif user_info.role == "owner" and user.role == "admin" %}
     <button type="button" class="Demote" id="Update_{{ user.user_id }}"
-            style="height: 20px; width: 80px;  flex-basis: 25%;display: flex;justify-content: center;align-items: center;"
+            style="font-size: 10px;height: 20px; width: 60px;  flex-basis: 20%;display: flex;justify-content: center;align-items: center;"
             onclick="Update('{{user.user_id}}')">Понизить
     </button>
     <button type="button" class="Kick" id="Kick_{{ user.user_id }}"
-            style="height: 20px; width: 80px;  flex-basis: 25%;display: flex;justify-content: center;align-items: center;"
+            style="font-size: 10px;height: 20px; width: 60px;  flex-basis: 20%;display: flex;justify-content: center;align-items: center;"
             onclick="Kick('{{user.user_id}}')">Выгнать
     </button>
+    <h1 style="flex-basis: 5%"></h1>
+
     {% else %}
-    <h1 style="flex-basis: 25%"></h1>
-    <h1 style="flex-basis: 25%"></h1>
+    <h1 style="flex-basis: 45%"></h1>
 
     {% endif %}
 </div>

@@ -157,7 +157,6 @@ async def disjoin_club(
             raise ValueError('404c')
         if await check_rec(data_dict['user_id'], data_dict['club_id'], session):
             raise ValueError('404')
-
         if await get_role(data_dict['user_id'], data_dict['club_id'], session) == 'owner':
             return {
                 'status': 'fail',
