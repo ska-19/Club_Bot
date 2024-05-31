@@ -121,8 +121,21 @@ async def cmd_download_clu_data(callback: CallbackQuery):
         file = BufferedInputFile(file_bytes.read(), filename=filename)
         await bot.send_document(chat_id=callback.from_user.id, document=file)
     else:
+        print(response)
         await callback.message.answer(
             text="Ошибка при загрузке статистки событий клуба",
             reply_markup=get_main_ikb({'tg_id': callback.from_user.id}, is_admin=True)
         )
+    response = await rq.club_data_links(callback.from_user.id, club_id, 'items_data')
+    if response.status_code == 200:
+        filename = response.headers.get('content-disposition').split('filename=')[1].strip('""')
+        file_bytes = io.BytesIO(response.content)
+        file = BufferedInputFile(file_bytes.read(), filename=filename)
+        await bot.send_document(chat_id=callback.from_user.id, document=file)
+    else:
+        await callback.message.answer(
+            text="Ошибка при загрузке данных о предметах клуба",
+            reply_markup=get_main_ikb({'tg_id': callback.from_user.id}, is_admin=True)
+        )
+
     await callback.message.delete()

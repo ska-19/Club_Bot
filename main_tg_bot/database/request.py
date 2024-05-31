@@ -77,6 +77,8 @@ async def club_data_links(tg_id, club_id, data_type):
         url = f'{str(URL)}/statitics/get_club_statistics?user_id={str(tg_id)}&club_id={str(club_id)}'
     elif data_type == 'events_data':
         url = f'{str(URL)}/statitics/get_events_statistics?user_id={str(tg_id)}&club_id={str(club_id)}'
+    elif data_type == 'items_data':
+        url = f'{str(URL)}/statitics/get_items_statistics?user_id={str(tg_id)}&club_id={str(club_id)}'
 
     response = requests.get(url=url, headers=headers)
     return response
