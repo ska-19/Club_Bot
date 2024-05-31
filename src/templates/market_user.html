@@ -47,7 +47,7 @@
         Отмена
     </button>
 </div>
-<div class="form-container" id="CreateEventForm" style="margin-top: 30px; display: none">
+<div class="form-container" id="CreateProductForm" style="margin-top: 30px; display: none">
     <form class="form">
         <div style="display: flex">
             <div class="form-group" style="width: 60%">
@@ -82,29 +82,32 @@
     </form>
 </div>
 {% for product in products %}
-<div class="form-container" id="CreateEventForm_{{product.id}}" style="margin-top: 30px; display: none">
+{% if product.quantity != -1 %}
+<div class="form-container" id="CreateProductForm_{{product.id}}" style="margin-top: 30px;">
     <form class="form">
         <div style="display: flex">
             <div class="form-group" style="width: 60%">
                 <label>Товар</label>
                 <input required="" name="NameProduct" id="NameProduct_{{product.id}}" type="text" style="width: 115px"
-                       value="{{ product.name }}">
+                       value="{{ product.name }}" readonly>
             </div>
             <div class="form-group">
                 <label>Цена</label>
                 <input required="" name="PriceProduct" id="PriceProduct_{{product.id}}" type="text" style="width: 125px"
-                       value="{{ product.price }}">
+                       value="{{ product.price }}" readonly>
             </div>
         </div>
         <div class="form-group">
             <label>Описание</label>
             <textarea required="" cols="50" rows="10" name="textarea" id="DescriptionProduct_{{product.id}}"
-                      style="width: 280px; height: 80px">{{ product.description }}</textarea>
+                      style="width: 280px; height: 80px" readonly>{{ product.description }}</textarea>
         </div>
         <div style="display: flex">
             <div class="form-group" style="width: 60%">
                 <label>Товара осталось:</label>
-                <input required="" name="QuantityNewProduct" id="QuantityNewProduct" type="text" style="width: 115px" value="{{product.quantity}}">
+                <input required="" name="QuantityProduct" id="QuantityProduct_{{product.id}}" type="text"
+                       style="width: 115px"
+                       value="{{product.quantity}}" readonly>
             </div>
         </div>
         <!-- У админов/владельца кнопки для редактирования и завершения события -->
@@ -127,7 +130,7 @@
         </div>
     </form>
 </div>
-
+{% endif %}
 {% endfor %}
 {% elif user_info.role == "member" %}
 <div class="card"
@@ -136,7 +139,45 @@
 </div>
 
 {% for product in products %}
-
+{% if product.quantity != -1 %}
+<div class="form-container" id="form" style="margin-top: 30px">
+    <form class="form">
+        <div style="display: flex">
+            <div class="form-group" style="width: 60%">
+                <label>Товар</label>
+                <input required="" name="NameProduct" id="NameProduct_{{product.id}}" type="text" style="width: 115px"
+                       value="{{ product.name }}" readonly>
+            </div>
+            <div class="form-group">
+                <label>Цена</label>
+                <input required="" name="PriceProduct" id="PriceProduct_{{product.id}}" type="text" style="width: 125px"
+                       value="{{ product.price }}" readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Описание</label>
+            <textarea required="" cols="50" rows="10" name="textarea" id="DescriptionProduct_{{product.id}}"
+                      style="width: 280px; height: 80px" readonly>{{ product.description }}</textarea>
+        </div>
+        {% if product.quantity > 0 %}
+        <div style="display: flex">
+            <div class="form-group" style="width: 60%">
+                <label>Товара осталось:</label>
+                <input required="" name="QuantityProduct" id="QuantityProduct_{{product.id}}" type="text"
+                       style="width: 115px"
+                       value="{{product.quantity}}" readonly>
+            </div>
+            <button type="button" class="BuyProduct" id="BuyProduct_{{ product.id }}" style="margin-top: 10px;width: 200px"
+                    onclick="Buy('{{product.id}}')">Купить
+            </button>
+        </div>
+        {% else %}
+        <h1 style="font-size: 20px;position: relative; z-index: 2; text-align: center">ТОВАР ЗАКОНЧИЛСЯ</h1>
+        {% endif %}
+        <!-- У админов/владельца кнопки для редактирования и завершения события -->
+    </form>
+</div>
+{% endif %}
 {% endfor %}
 {% endif %}
 {% endblock %}

@@ -290,3 +290,18 @@ nav {
 .EndProduct:hover {
     background: rgb(145, 56, 0);
 }
+
+.BuyProduct {
+    display: inline-block;
+    padding: 10px 20px;
+    border: none;
+    background: rgba(85, 255, 112, 0.62);
+    border-radius: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    transition: background .2s linear;
+}
+
+.BuyProduct:hover {
+    background: rgb(85, 255, 112);
+}

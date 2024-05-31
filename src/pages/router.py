@@ -440,9 +440,9 @@ async def get_history_user(
     us_hist_active_data = us_hist_active['data']
     us_hist_close = await get_user_history_close(user_id, session)
     us_hist_close_data = us_hist_close['data']
-    ad_hist_active = await get_ad_history_active(user_id, session)
+    ad_hist_active = await get_admin_history_active(user_id, session)
     ad_hist_active_data = ad_hist_active['data']
-    ad_hist_close = await get_ad_history_close(user_id, session)
+    ad_hist_close = await get_admin_history_close(user_id, session)
     ad_hist_close_data = ad_hist_close['data']
     return templates.TemplateResponse("history_user.html", {
         "request": request,
