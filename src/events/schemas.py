@@ -11,7 +11,7 @@ class EventCreate(BaseModel):
     sinopsis: str
     contact: str
     speaker: str
-    reward: int
+    reward: int = -1
 
 
 class EventUpdate(BaseModel):
@@ -22,7 +22,7 @@ class EventUpdate(BaseModel):
     sinopsis: str
     contact: str
     speaker: str
-    reward: int
+    reward: int = -1
 
 
 class EventReg(BaseModel):

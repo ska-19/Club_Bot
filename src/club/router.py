@@ -211,7 +211,7 @@ async def update_club(
         await session.rollback()
 
 
-@router.post("/delete_club")
+@router.post("/clear_club")
 async def delete_club(
         club_id: int,
         session: AsyncSession = Depends(get_async_session)):
@@ -231,12 +231,11 @@ async def delete_club(
             raise ValueError("404")
         usrs = await get_users_in_club(club_id, session)
         usrs = usrs['data']
-        print(usrs)
         for u in usrs:
             user = User(user_id=u['user_id'], club_id=club_id)
-            print('here')
             await disjoin_club(user, session)
         query = delete(club).where(club.c.id == club_id)
+
         await session.execute(query)
         await session.commit()
         return {
@@ -309,4 +308,45 @@ async def get_club_xp(
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail=error)
+
+
+@router.post("/delete_club")
+async def clear_club(
+        club_id: int,
+        session: AsyncSession = Depends(get_async_session)):
+    """ Удаляет клуб по его id
+
+        :param club_id:
+        :return:
+            200 + джейсон со всеми данными, если все хорошо.
+            404 если такого клуба нет.
+            500 если внутрення ошибка сервера.
+
+    """
+    try:
+        print(club_id)
+        data = await get_club_by_id(club_id, session)
+        if data == "Club not found":
+            raise ValueError("404")
+        usrs = await get_users_in_club(club_id, session)
+        usrs = usrs['data']
+        print(usrs)
+        for u in usrs:
+            user = User(user_id=u['user_id'], club_id=club_id)
+            print('here')
+            await disjoin_club(user, session)
+        query = delete(club).where(club.c.id == club_id)
+        await session.execute(query)
+        await session.commit()
+        return {
+            "status": "success",
+            "data": data,
+            "details": None
+        }
+    except ValueError:
+        raise HTTPException(status_code=404, detail=error404)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
+    finally:
+        await session.rollback()
         
