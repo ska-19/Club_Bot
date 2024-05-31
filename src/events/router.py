@@ -402,17 +402,27 @@ async def get_users_by_event(
             raise ValueError('404e')
 
         join = event_reg.join(user, event_reg.c.user_id == user.c.id)
-        query = select(user.c.id, user.c.username, user.c.name, user.c.surname, event_reg.c.reg_date).select_from(join).where(event_reg.c.event_id == event_id).order_by(user.c.surname)
+        query = (select(user.c.id, user.c.username, user.c.name, user.c.surname, event_reg.c.reg_date)
+                 .select_from(join)
+                 .where(event_reg.c.event_id == event_id)
+                 .order_by(user.c.surname))
 
         result = await session.execute(query)
         data = result.mappings().all()
+
+        club_id = await get_club_id_by_event_id(event_id, session)
+
+        res_data = []
+        for us in data:
+            if await get_role(us['id'], club_id, session) not in ['admin', 'owner']:
+                res_data.append(us)
 
         if not data:
             raise ValueError('404s')
 
         return {
             "status": "success",
-            "data": data,
+            "data": res_data,
             "details": None
         }
     except ValueError as e:
