@@ -68,3 +68,9 @@ python3 main.py
 ```bash
 docker-compose up --build
 ``` 
+
+### Тесты
+```bash
+## Находясь в корне проекта
+pytest tests/ -v --disable-pytest-warnings
+```
