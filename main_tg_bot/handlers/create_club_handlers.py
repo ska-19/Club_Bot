@@ -1,15 +1,11 @@
+import io
 from aiogram import Router, F
-from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery, BufferedInputFile
-import requests
+from aiogram.types import Message, CallbackQuery, BufferedInputFile
+
 from bot_instance import bot
-import io
-
-from keyboards.simple_kb import make_colum_keyboard
 from keyboards.user_keyboards import get_main_ikb, get_back_button
-
 from database import request as rq
 
 router = Router()
