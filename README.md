@@ -73,4 +73,5 @@ docker-compose up --build
 ```bash
 ## Находясь в корне проекта
 pytest tests/ -v --disable-pytest-warnings
+## добабив в .env переменные: DB_HOST_TEST, DB_NAME_TEST, DB_PASS_TEST, DB_PORT_TEST, DB_USER_TEST
 ```
