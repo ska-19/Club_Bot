@@ -53,13 +53,15 @@ async def join_to_the_club(
     try:
         join_dict = join_data.dict()
         if await get_user_by_id(join_dict['user_id'], session) == "User not found":
+            print('a')
             raise ValueError('404u')
 
         if await get_club_by_id(join_dict['club_id'], session) == "Club not found":
+            print('b')
             raise ValueError('404c')
 
         if not await check_rec(join_dict['user_id'], join_dict['club_id'], session):
-            return
+            raise ValueError('409')
 
         join_dict['date_joined'] = datetime.utcnow()
         join_dict['is_main'] = False
@@ -227,7 +229,7 @@ async def role_update(
         elif role == 'member':
             await update_xp(user_id, 50, session)
             stmt = update(club_x_user).where(club_x_user.c.id == rec_id).values(role='admin')
-
+            
         await session.execute(stmt)
         await session.commit()
 
@@ -333,8 +335,7 @@ async def get_users_in_club(
         data = result.mappings().all()
 
         if not data:
-            raise ValueError('404s')
-
+            raise ValueError('404s') # в теории же в клубе всегда хотя бы владелец есть, иначе овер странно
         return {
             "status": "success",
             "data": data,

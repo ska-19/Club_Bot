@@ -9,7 +9,7 @@ from src.club.models import club
 from src.club.schemas import ClubUpdate, ClubCreate
 from src.user_profile.inner_func import get_user_by_id, update_xp, get_user_attr
 from src.user_club.router import join_to_the_club, new_main, get_users_in_club
-from src.user_club.schemas import UserJoin
+from src.user_club.schemas import UserJoin, User
 from src.club.inner_func import get_club_by_id, check_leg_name, get_club_by_uid
 
 router = APIRouter(
@@ -227,12 +227,18 @@ async def delete_club(
 
     """
     try:
+        print(club_id)
         data = await get_club_by_id(club_id, session)
         if data == "Club not found":
             raise ValueError("404")
+        usrs = await get_users_in_club(club_id, session)
+        usrs = usrs['data']
+        for u in usrs:
+            user = User(user_id=u['user_id'], club_id=club_id)
+            await disjoin_club(user, session)
         query = delete(club).where(club.c.id == club_id)
+
         await session.execute(query)
-        print('here')
         await session.commit()
         return {
             "status": "success",
