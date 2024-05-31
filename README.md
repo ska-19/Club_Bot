@@ -68,8 +68,3 @@ python3 main.py
 ```bash
 docker-compose up --build
 ``` 
-
-
-
-
-

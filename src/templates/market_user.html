@@ -1,0 +1,183 @@
+{% extends "market_base.html" %}
+
+
+{% block nav %}
+<nav style="justify-content: center">
+    <button class="button" style="flex-basis: 14%" onclick="href_main('{{user_info.id}}')">
+        <div class="button-box">
+    <span class="button-elem">
+      <svg viewBox="0 0 46 40" xmlns="http://www.w3.org/2000/svg">
+        <path
+                d="M46 20.038c0-.7-.3-1.5-.8-2.1l-16-17c-1.1-1-3.2-1.4-4.4-.3-1.2 1.1-1.2 3.3 0 4.4l11.3 11.9H3c-1.7 0-3 1.3-3 3s1.3 3 3 3h33.1l-11.3 11.9c-1 1-1.2 3.3 0 4.4 1.2 1.1 3.3.8 4.4-.3l16-17c.5-.5.8-1.1.8-1.9z"
+        ></path>
+      </svg>
+    </span>
+            <span class="button-elem">
+      <svg viewBox="0 0 46 40">
+        <path
+                d="M46 20.038c0-.7-.3-1.5-.8-2.1l-16-17c-1.1-1-3.2-1.4-4.4-.3-1.2 1.1-1.2 3.3 0 4.4l11.3 11.9H3c-1.7 0-3 1.3-3 3s1.3 3 3 3h33.1l-11.3 11.9c-1 1-1.2 3.3 0 4.4 1.2 1.1 3.3.8 4.4-.3l16-17c.5-.5.8-1.1.8-1.9z"
+        ></path>
+      </svg>
+    </span>
+        </div>
+    </button>
+    <a style="text-decoration: none; color: #000000; flex-basis: 43%">
+        <div class="logo-container1">
+            <span class="site-name">Магазин</span>
+        </div>
+    </a>
+
+    <a href="/pages/history_user/{{user_info.id}}" style="text-decoration: none; color: #000000;flex-basis: 43%">
+        <div class="logo-container">
+            <span class="site-name">История</span>
+        </div>
+    </a>
+</nav>
+{% endblock %}
+
+
+{% block products %}
+{% if user_info.role != "member" %}
+<div class="card"
+     style="left: 50px;height: 50px; width: 290px; justify-content: center;display: flex">
+    <button type="button" class="BeginProduct" id="BeginProduct" onclick=Begin()>
+        Создать товар
+    </button>
+    <button type="button" class="CloseProduct" id="CloseProduct" onclick=Close() style="display: none">
+        Отмена
+    </button>
+</div>
+<div class="form-container" id="CreateProductForm" style="margin-top: 30px; display: none">
+    <form class="form">
+        <div style="display: flex">
+            <div class="form-group" style="width: 60%">
+                <label>Товар</label>
+                <input required="" name="Name" id="NameNewProduct" type="text" style="width: 115px">
+            </div>
+            <div class="form-group">
+                <label>Цена</label>
+                <input required="" name="PriceNewProduct" id="PriceNewProduct" type="text" style="width: 125px">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Описание</label>
+            <textarea required="" cols="50" rows="10" name="textarea" id="DescriptionNewProduct"
+                      style="width: 280px; height: 80px"></textarea>
+        </div>
+        <div style="display: flex">
+            <div class="form-group" style="width: 60%">
+                <label>Количество товара</label>
+                <input required="" name="QuantityNewProduct" id="QuantityNewProduct" type="text" style="width: 115px">
+            </div>
+        </div>
+        <!-- У админов/владельца кнопки для редактирования и завершения события -->
+        <div style="display: flex; justify-content: center">
+            <!-- "Создать событие" -->
+            <div style="width: 70%; text-align: center">
+                <button type="button" class="CreateProduct"
+                        onclick="CreateProduct()">Создать событие
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% for product in products %}
+{% if product.quantity != -1 %}
+<div class="form-container" id="CreateProductForm_{{product.id}}" style="margin-top: 30px;">
+    <form class="form">
+        <div style="display: flex">
+            <div class="form-group" style="width: 60%">
+                <label>Товар</label>
+                <input required="" name="NameProduct" id="NameProduct_{{product.id}}" type="text" style="width: 115px"
+                       value="{{ product.name }}" readonly>
+            </div>
+            <div class="form-group">
+                <label>Цена</label>
+                <input required="" name="PriceProduct" id="PriceProduct_{{product.id}}" type="text" style="width: 125px"
+                       value="{{ product.price }}" readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Описание</label>
+            <textarea required="" cols="50" rows="10" name="textarea" id="DescriptionProduct_{{product.id}}"
+                      style="width: 280px; height: 80px" readonly>{{ product.description }}</textarea>
+        </div>
+        <div style="display: flex">
+            <div class="form-group" style="width: 60%">
+                <label>Товара осталось:</label>
+                <input required="" name="QuantityProduct" id="QuantityProduct_{{product.id}}" type="text"
+                       style="width: 115px"
+                       value="{{product.quantity}}" readonly>
+            </div>
+        </div>
+        <!-- У админов/владельца кнопки для редактирования и завершения события -->
+        <div style="display: flex; justify-content: center">
+            <!-- "Изменить" -->
+            <div class="block5" style="width: 50%; text-align: center">
+                <button type="button" class="EditProduct" id="EditProduct_{{ product.id }}"
+                        onclick="Edit('{{product.id}}')">Изменить
+                </button>
+                <button type="button" class="SaveProduct" id="SaveProduct_{{ product.id }}" style="display: none"
+                        onclick="Save('{{product.id}}')">Сохранить
+                </button>
+            </div>
+            <!-- "Завершить событие" -->
+            <div class="block6" style="width: 50%; text-align: center;">
+                <button type="button" class="EndProduct" id="EndProduct_{{ product.id }}"
+                        onclick="End('{{product.id}}')">Удалить
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endif %}
+{% endfor %}
+{% elif user_info.role == "member" %}
+<div class="card"
+     style="left: 50px;height: 50px; width: 290px; justify-content: center;display: flex">
+    <h1 style="font-size: 19px; position: relative; z-index: 2">ТОВАРЫ</h1>
+</div>
+
+{% for product in products %}
+{% if product.quantity != -1 %}
+<div class="form-container" id="form" style="margin-top: 30px">
+    <form class="form">
+        <div style="display: flex">
+            <div class="form-group" style="width: 60%">
+                <label>Товар</label>
+                <input required="" name="NameProduct" id="NameProduct_{{product.id}}" type="text" style="width: 115px"
+                       value="{{ product.name }}" readonly>
+            </div>
+            <div class="form-group">
+                <label>Цена</label>
+                <input required="" name="PriceProduct" id="PriceProduct_{{product.id}}" type="text" style="width: 125px"
+                       value="{{ product.price }}" readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Описание</label>
+            <textarea required="" cols="50" rows="10" name="textarea" id="DescriptionProduct_{{product.id}}"
+                      style="width: 280px; height: 80px" readonly>{{ product.description }}</textarea>
+        </div>
+        {% if product.quantity > 0 %}
+        <div style="display: flex">
+            <div class="form-group" style="width: 60%">
+                <label>Товара осталось:</label>
+                <input required="" name="QuantityProduct" id="QuantityProduct_{{product.id}}" type="text"
+                       style="width: 115px"
+                       value="{{product.quantity}}" readonly>
+            </div>
+            <button type="button" class="BuyProduct" id="BuyProduct_{{ product.id }}" style="margin-top: 10px;width: 200px"
+                    onclick="Buy('{{product.id}}')">Купить
+            </button>
+        </div>
+        {% else %}
+        <h1 style="font-size: 20px;position: relative; z-index: 2; text-align: center">ТОВАР ЗАКОНЧИЛСЯ</h1>
+        {% endif %}
+        <!-- У админов/владельца кнопки для редактирования и завершения события -->
+    </form>
+</div>
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endblock %}

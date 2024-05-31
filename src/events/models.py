@@ -1,11 +1,5 @@
-from datetime import datetime
-
-from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
-from sqlalchemy import Table, Column, Integer, String, TIMESTAMP, ForeignKey, JSON, Boolean, Text, Date
-
-from src.user_profile.models import user
-from src.club.models import club
-from src.database import Base, metadata
+from sqlalchemy import Table, Column, Integer, String, TIMESTAMP, ForeignKey, Boolean, Text, Date, BIGINT
+from src.database import metadata
 
 event = Table(
     'event', metadata,
@@ -23,9 +17,8 @@ event = Table(
 event_reg = Table(
     'event_reg', metadata,
     Column('id', Integer, primary_key=True),
-    Column('user_id', Integer, ForeignKey('user.id'), nullable=False),
+    Column('user_id', BIGINT, ForeignKey('user.id'), nullable=False),
     Column('event_id', Integer, ForeignKey('event.id'), nullable=False),
-    # Column('confirm', Boolean, nullable=False, default=False),
     Column('reg_date', TIMESTAMP, nullable=False),
     Column('status', Boolean, nullable=False, default=True),
     Column('was', Boolean, nullable=False, default=False)

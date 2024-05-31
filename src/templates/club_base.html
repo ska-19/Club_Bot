@@ -25,37 +25,18 @@
     </nav>
 
 
-    <div style="margin-top: 20px">
-    </div>
+    <!-- Тэг (uid) клуба-->
+    {% block uid_club %}{% endblock %}
 
 
-    <div style="display: flex; margin-top: 5px">
-
-
-        <!-- Описание клуба-->
-        <div class="block1" style="margin-top: 20px">
-            <div class="card" style="height: 260px; width: 260px; justify-content: center; vertical-align: center">
-                <div class="card-content" style="text-align: center; padding-top: 80px">
-                    <h1 id="achivements" style=" font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
-                        {% block bio_club %}{% endblock %}
-                    </h1>
-                </div>
+    <!-- Описание клуба-->
+    <div style="display: flex; justify-content: center; margin-top: 25px">
+        <div class="card" style=" height: 180px; width: 300px; justify-content: center; vertical-align: center">
+            <div class="card-content" style="text-align: center; padding-top: 80px">
+                <h1 id="achivements" style=" font-size: 15px; color: #7a9a8a;position: relative; z-index: 2">
+                    {% block bio_club %}{% endblock %}
+                </h1>
             </div>
-        </div>
-
-
-        <!-- Поле с кнопками "Пригласить друга" и другие-->
-        <div class="block2" style="margin-top: 20px">
-            <button class="card"
-                    style="top: 30px;height: 60px; width: 100px; justify-content: center; vertical-align: center">
-                <h1 style="bottom: 5px;font-size: 12px; color: #7a9a8a;position: relative; z-index: 2">
-                    Пригласить друга</h1>
-            </button>
-            <button class="card"
-                    style="top: 80px;height: 60px; width: 100px; justify-content: center; vertical-align: center">
-                <h1 style="bottom: 5px;font-size: 12px; color: #7a9a8a;position: relative; z-index: 2">
-                    Предложить новость</h1>
-            </button>
         </div>
     </div>
 
@@ -64,13 +45,9 @@
     {% block href_main %}{% endblock %}
 
 
-    <div style="margin-top: 40px">
-    </div>
-
-
     <!-- "Участники" надпись -->
     <div class="card"
-         style="left: 20px;height: 50px; width: 350px; justify-content: center;display: flex">
+         style="margin-top: 40px;left: 20px;height: 50px; width: 350px; justify-content: center; display: flex">
         <h1 style="font-size: 20px;position: relative; z-index: 2">Участники</h1>
     </div>
 

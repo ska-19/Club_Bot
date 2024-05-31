@@ -1,0 +1,196 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    background: #ededed;
+    max-width: 390px;
+}
+
+nav {
+    background: linear-gradient(to bottom, lightgray, #ededed);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.button {
+  display: block;
+  position: relative;
+  width: 56px;
+  height: 56px;
+  margin: 0;
+  overflow: hidden;
+  outline: none;
+  background-color: transparent;
+  cursor: pointer;
+  border: 0;
+}
+
+.button:before,
+.button:after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  inset: 7px;
+}
+
+.button:before {
+  border: 4px solid #f0eeef;
+  transition: opacity 0.4s cubic-bezier(0.77, 0, 0.175, 1) 80ms,
+    transform 0.5s cubic-bezier(0.455, 0.03, 0.515, 0.955) 80ms;
+}
+
+.button:after {
+  border: 4px solid #c496f0;
+  transform: scale(1.3);
+  transition: opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+    transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  opacity: 0;
+}
+
+.button:hover:before,
+.button:focus:before {
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+    transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.button:hover:after,
+.button:focus:after {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.4s cubic-bezier(0.77, 0, 0.175, 1) 80ms,
+    transform 0.5s cubic-bezier(0.455, 0.03, 0.515, 0.955) 80ms;
+}
+
+.button-box {
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.button-elem {
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin: 17px 18px 0 18px;
+  transform: rotate(180deg);
+  fill: #c496f0;
+}
+
+.button:hover .button-box,
+.button:focus .button-box {
+  transition: 0.4s;
+  transform: translateX(-56px);
+}
+
+.logo-container {
+    width: 150px;
+    background-color: lightgray;
+    padding: 5px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+}
+
+.logo-container:hover{
+    background-color: #c3c3c3;
+}
+
+.logo-container1 {
+    width: 150px;
+    background-color: #c496f0;
+    padding: 5px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+}
+
+.logo-container1:hover{
+    background-color: #a760ec;
+}
+
+.logo-container span, .site-name {
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.card {
+    position: relative;
+    border-radius: 20px;
+    background-color: #ffffff;
+    animation: gradient 5s ease infinite;
+    filter: drop-shadow(0px 0px 20px rgba(223, 185, 255, 0.68));
+}
+
+.form-container {
+    margin-left: 10px;
+    width: 370px;
+    height: 90px;
+    background: #ffffff;
+    border: 2px solid transparent;
+    padding: 6px 18px;
+    font-size: 9px;
+    color: #7a9a8a;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    border-radius: 30px;
+    animation: gradient 5s ease infinite;
+    filter: drop-shadow(0px 0px 20px rgba(223, 185, 255, 0.68));
+}
+
+.form-container .form {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.form-container .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-container .form-group label {
+    display: block;
+    margin-bottom: 2px;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.form-container .form-group input {
+    width: 100%;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-family: inherit;
+    background-color: transparent;
+    border: 1px solid #7c7c7c;
+}
+
+.form-container .form-group textarea {
+    width: 100%;
+    padding: 2px 24px;
+    border-radius: 8px;
+    resize: none;
+    border: 1px solid #7c7c7c;
+    background-color: transparent;
+    font-family: inherit;
+}
+
+.form-container .form-group input:focus {
+    outline: none;
+    border-color: rgba(135, 29, 255, 0.72);
+}
+
+.form-container .form-group textarea:focus {
+    outline: none;
+    border-color: rgba(135, 29, 255, 0.72);
+}

@@ -7,38 +7,24 @@ from src.user_profile.models import user
 from conftest import client, async_session_maker_test, ac
 
 
-def test_create_user():
+def test_create_club_good():
     data = {
-        "id": 10,
+        "id": 1,
         "username": "test",
         "mentor": False,
         "email": "string",
         "name": "string",
         "surname": "string",
-        "dob": "2021-08-16",
-        "tel": "string",
-        "photo": "string",
-        "comfort_time": "string",
-        "course": "string",
-        "faculty": "string",
-        "links": "string",
-        "bio": "string",
         "is_active": True,
         "is_superuser": False,
         "is_verified": False,
-        "xp": 0,
-        "city": "string",
-        "education": "string",
-        "achievments": "string",
     }
 
     response = client.post("/user_profile/create_user", json=data)
     assert response.status_code == 200
 
-
-def test_create_club_good():  # TODO: оч сильно не хватает метода delete_user
     data = {
-        "owner": 10,
+        "owner": 1,
         "name": "test_club",
         "dest": "string",
         "photo": "string",
@@ -46,15 +32,52 @@ def test_create_club_good():  # TODO: оч сильно не хватает ме
         "links": "string",
         "channel_link": "string",
         "comfort_time": "string",
-        "date_created": '2021-01-01'
+        "date_created": "2021-01-01"
     }
+
     response = client.post("/club/create_club", json=data)
     assert response.status_code == 200
+    assert response.json()['data']['owner'] == 1
+    assert response.json()['data']['name'] == "test_club"
+    assert response.json()['data']['dest'] == "string"
+    assert response.json()['data']['photo'] == "string"
+    assert response.json()['data']['bio'] == "string"
+    assert response.json()['data']['links'] == "string"
+    assert response.json()['data']['channel_link'] == "string"
+    assert response.json()['data']['comfort_time'] == "string"
+    assert response.json()['data']['date_created'] == "2021-01-01"
+
+    response = client.post("/club/delete_club", params={"club_id": 1})
+    assert response.status_code == 200
+    response = client.get("/club/get_club", params={"club_id": 1})
+    assert response.status_code == 404
+
+    response = client.post("/user_profile/delete_user", params={"user_id": 1})
+    assert response.status_code == 200
+
+    response = client.get("/user_profile/get_user", params={"user_id": 1})
+    assert response.status_code == 404
+
 
 
 async def test_create_club_good_async(ac):
     data = {
-        "owner": 10,
+        "id": 1,
+        "username": "test",
+        "mentor": False,
+        "email": "string",
+        "name": "string",
+        "surname": "string",
+        "is_active": True,
+        "is_superuser": False,
+        "is_verified": False,
+    }
+
+    response = await ac.post("/user_profile/create_user", json=data)
+    assert response.status_code == 200
+
+    data = {
+        "owner": 1,
         "name": "test_club_async",
         "dest": "string",
         "photo": "string",
@@ -62,15 +85,54 @@ async def test_create_club_good_async(ac):
         "links": "string",
         "channel_link": "string",
         "comfort_time": "string",
-        "date_created": '2021-01-01'
+        "date_created": "2021-01-01"
     }
+
     response = await ac.post("/club/create_club", json=data)
     assert response.status_code == 200
+    assert response.json()['data']['owner'] == 1
+    assert response.json()['data']['name'] == "test_club_async"
+    assert response.json()['data']['dest'] == "string"
+    assert response.json()['data']['photo'] == "string"
+    assert response.json()['data']['bio'] == "string"
+    assert response.json()['data']['links'] == "string"
+    assert response.json()['data']['channel_link'] == "string"
+    assert response.json()['data']['comfort_time'] == "string"
+    assert response.json()['data']['date_created'] == "2021-01-01"
+
+    club_id = response.json()['data']['id'] # Из - за асинхронности иногда клуб может не успеть удалиться а новый уже добвиться, поэтому id предсказать невозможно
+
+    response = await ac.post("/club/delete_club", params={"club_id": club_id})
+    assert response.status_code == 200
+    response = await ac.get("/club/get_club", params={"club_id": club_id})
+    assert response.status_code == 404
+
+    response = await ac.post("/user_profile/delete_user", params={"user_id": 1})
+    assert response.status_code == 200
+
+    response = await ac.get("/user_profile/get_user", params={"user_id": 1})
+    assert response.status_code == 404
 
 
-def test_crate_club_same_name():
+
+def test_create_club_same_name():
     data = {
-        "owner": 10,
+        "id": 1,
+        "username": "test",
+        "mentor": False,
+        "email": "string",
+        "name": "string",
+        "surname": "string",
+        "is_active": True,
+        "is_superuser": False,
+        "is_verified": False,
+    }
+
+    response = client.post("/user_profile/create_user", json=data)
+    assert response.status_code == 200
+
+    data = {
+        "owner": 1,
         "name": "test_club",
         "dest": "string",
         "photo": "string",
@@ -78,30 +140,88 @@ def test_crate_club_same_name():
         "links": "string",
         "channel_link": "string",
         "comfort_time": "string",
-        "date_created": '2021-01-01'
+        "date_created": "2021-01-01"
     }
+
+    response = client.post("/club/create_club", json=data)
+    assert response.status_code == 200
+
+    club_id = response.json()['data']['id']
+
     response = client.post("/club/create_club", json=data)
     assert response.status_code == 409
+
+    response = client.post("/club/delete_club", params={"club_id": club_id})
+    assert response.status_code == 200
+    response = client.get("/club/get_club", params={"club_id": club_id})
+    assert response.status_code == 404
+
+    response = client.post("/user_profile/delete_user", params={"user_id": 1})
+    assert response.status_code == 200
+
+    response = client.get("/user_profile/get_user", params={"user_id": 1})
+    assert response.status_code == 404
+
+    response = client.post("/user_profile/delete_user", params={"user_id": 2})
+    assert response.status_code == 200
+
+    response = client.get("/user_profile/get_user", params={"user_id": 2})
+    assert response.status_code == 404
 
 
 async def test_create_club_same_name_async(ac):
     data = {
-        "owner": 10,
-        "name": "test_club_async",
+        "id": 1,
+        "username": "test",
+        "mentor": False,
+        "email": "string",
+        "name": "string",
+        "surname": "string",
+        "is_active": True,
+        "is_superuser": False,
+        "is_verified": False,
+    }
+
+    response = await ac.post("/user_profile/create_user", json=data)
+    assert response.status_code == 200
+
+    data = {
+        "owner": 1,
+        "name": "test_club",
         "dest": "string",
         "photo": "string",
         "bio": "string",
         "links": "string",
         "channel_link": "string",
         "comfort_time": "string",
-        "date_created": '2021-01-01'
+        "date_created": "2021-01-01"
     }
+
+    response = await ac.post("/club/create_club", json=data)
+    assert response.status_code == 200
+
+    club_id = response.json()['data']['id']
+
     response = await ac.post("/club/create_club", json=data)
     assert response.status_code == 409
 
-def test_create_club_owner_not_exist():
+    response = await ac.post("/club/delete_club", params={"club_id": club_id})
+    assert response.status_code == 200
+    response = await ac.get("/club/get_club", params={"club_id": club_id})
+    assert response.status_code == 404
+
+    response = await ac.post("/user_profile/delete_user", params={"user_id": 1})
+    assert response.status_code == 200
+
+    response = await ac.get("/user_profile/get_user", params={"user_id": 1})
+    assert response.status_code == 404
+
+
+
+
+def test_create_club_user_no_exist():
     data = {
-        "owner": 11,
+        "owner": 1,
         "name": "test_club",
         "dest": "string",
         "photo": "string",
@@ -109,60 +229,17 @@ def test_create_club_owner_not_exist():
         "links": "string",
         "channel_link": "string",
         "comfort_time": "string",
-        "date_created": '2021-01-01'
+        "date_created": "2021-01-01"
     }
+
     response = client.post("/club/create_club", json=data)
     assert response.status_code == 404
 
 
-async def test_create_club_owner_not_exist_async(ac):
+
+async def test_create_club_user_no_exist_async(ac):
     data = {
-        "owner": 11,
-        "name": "test_club_async",
-        "dest": "string",
-        "photo": "string",
-        "bio": "string",
-        "links": "string",
-        "channel_link": "string",
-        "comfort_time": "string",
-        "date_created": '2021-01-01'
-    }
-    response = await ac.post("/club/create_club", json=data)
-    assert response.status_code == 404
-
-
-def test_create_club_without_name():
-    data = {
-        "owner": 10,
-        "dest": "string",
-        "photo": "string",
-        "bio": "string",
-        "links": "string",
-        "channel_link": "string",
-        "comfort_time": "string",
-        "date_created": '2021-01-01'
-    }
-    response = client.post("/club/create_club", json=data)
-    assert response.status_code == 422
-
-
-async def test_create_club_without_name_async(ac):
-    data = {
-        "owner": 10,
-        "dest": "string",
-        "photo": "string",
-        "bio": "string",
-        "links": "string",
-        "channel_link": "string",
-        "comfort_time": "string",
-        "date_created": '2021-01-01'
-    }
-    response = await ac.post("/club/create_club", json=data)
-    assert response.status_code == 422
-
-
-def test_create_club_without_owner():
-    data = {
+        "owner": 1,
         "name": "test_club",
         "dest": "string",
         "photo": "string",
@@ -170,237 +247,286 @@ def test_create_club_without_owner():
         "links": "string",
         "channel_link": "string",
         "comfort_time": "string",
-        "date_created": '2021-01-01'
+        "date_created": "2021-01-01"
     }
-    response = client.post("/club/create_club", json=data)
-    assert response.status_code == 422
 
-
-async def test_create_club_without_owner_async(ac):
-    data = {
-        "name": "test_club_async",
-        "dest": "string",
-        "photo": "string",
-        "bio": "string",
-        "links": "string",
-        "channel_link": "string",
-        "comfort_time": "string",
-        "date_created": '2021-01-01'
-    }
     response = await ac.post("/club/create_club", json=data)
-    assert response.status_code == 422
+    assert response.status_code == 404
 
 
-def test_get_club_good():
+
+def test_get_club_id_no_exist():
     response = client.get("/club/get_club", params={"club_id": 1})
-    assert response.status_code == 200
+    assert response.status_code == 404
 
-
-async def test_get_club_good_async(ac):
+async def test_get_club_id_no_exist(ac):
     response = await ac.get("/club/get_club", params={"club_id": 1})
+    assert response.status_code == 404
+
+
+
+def test_get_club_link_good():
+    data = {
+        "id": 1,
+        "username": "test",
+        "mentor": False,
+        "email": "string",
+        "name": "string",
+        "surname": "string",
+        "is_active": True,
+        "is_superuser": False,
+        "is_verified": False,
+    }
+
+    response = client.post("/user_profile/create_user", json=data)
     assert response.status_code == 200
 
+    data = {
+        "owner": 1,
+        "name": "test_club",
+        "dest": "string",
+        "photo": "string",
+        "bio": "string",
+        "links": "string",
+        "channel_link": "string",
+        "comfort_time": "string",
+        "date_created": "2021-01-01"
+    }
 
-def test_get_club_not_exist():
-    response = client.get("/club/get_club", params={"club_id": 1000})
+    response = client.post("/club/create_club", json=data)
+    assert response.status_code == 200
+
+    club_id = response.json()['data']['id']
+
+    response = client.get("/club/get_channel_link", params={"club_id": club_id})
+    assert response.status_code == 200
+
+    response = client.post("/club/delete_club", params={"club_id": club_id})
+    assert response.status_code == 200
+    response = client.get("/club/get_club", params={"club_id": club_id})
+    assert response.status_code == 404
+
+    response = client.post("/user_profile/delete_user", params={"user_id": 1})
+    assert response.status_code == 200
+
+    response = client.get("/user_profile/get_user", params={"user_id": 1})
     assert response.status_code == 404
 
 
-async def test_get_club_not_exist_async(ac):
-    response = await ac.get("/club/get_club", params={"club_id": 1000})
+async def test_get_club_link_good_async(ac):
+    data = {
+        "id": 1,
+        "username": "test",
+        "mentor": False,
+        "email": "string",
+        "name": "string",
+        "surname": "string",
+        "is_active": True,
+        "is_superuser": False,
+        "is_verified": False,
+    }
+
+    response = await ac.post("/user_profile/create_user", json=data)
+    assert response.status_code == 200
+
+    data = {
+        "owner": 1,
+        "name": "test_club",
+        "dest": "string",
+        "photo": "string",
+        "bio": "string",
+        "links": "string",
+        "channel_link": "string",
+        "comfort_time": "string",
+        "date_created": "2021-01-01"
+    }
+
+    response = await ac.post("/club/create_club", json=data)
+    assert response.status_code == 200
+
+    club_id = response.json()['data']['id']
+
+    response = await ac.get("/club/get_channel_link", params={"club_id": club_id})
+    assert response.status_code == 200
+
+    response = await ac.post("/club/delete_club", params={"club_id": club_id})
+    assert response.status_code == 200
+    response = await ac.get("/club/get_club", params={"club_id": club_id})
+    assert response.status_code == 404
+
+    response = await ac.post("/user_profile/delete_user", params={"user_id": 1})
+    assert response.status_code == 200
+
+    response = await ac.get("/user_profile/get_user", params={"user_id": 1})
     assert response.status_code == 404
 
 
-def test_get_club_without_id():
-    response = client.get("/club/get_club", params={})
-    assert response.status_code == 422
+def test_get_club_no_exist():
+    response = client.get("/club/get_channel_link", params={"club_id": 1})
+    assert response.status_code == 404
 
 
-async def test_get_club_without_id_async(ac):
-    response = await ac.get("/club/get_club", params={})
-    assert response.status_code == 422
 
+async def test_get_club_no_exist_async(ac):
+    response = await ac.get("/club/get_channel_link", params={"club_id": 1})
+    assert response.status_code == 404
 
 
 def test_update_club_good():
     data = {
-        "name": "test_club_updated",
+        "id": 1,
+        "username": "test",
+        "mentor": False,
+        "email": "string",
+        "name": "string",
+        "surname": "string",
+        "is_active": True,
+        "is_superuser": False,
+        "is_verified": False,
+    }
+
+    response = client.post("/user_profile/create_user", json=data)
+    assert response.status_code == 200
+
+    data = {
+        "owner": 1,
+        "name": "test_club",
         "dest": "string",
         "photo": "string",
         "bio": "string",
         "links": "string",
         "channel_link": "string",
         "comfort_time": "string",
-        "date_created": '2021-01-01'
+        "date_created": "2021-01-01"
     }
-    response = client.post("/club/update_club", params={"club_id": 1}, json=data)
+
+    response = client.post("/club/create_club", json=data)
     assert response.status_code == 200
 
+    club_id = response.json()['data']['id']
+
+    data = {
+        "name": "test_club_update",
+        "dest": "string",
+        "photo": "string",
+        "bio": "string",
+        "links": "string",
+        "channel_link": "string",
+        "comfort_time": "string",
+        "date_created": "2021-01-01"
+    }
+
+    response = client.post("/club/update_club", params={"club_id": club_id}, json=data)
+    assert response.status_code == 200
+    assert response.json()['data']['name'] == "test_club_update"
+
+    response = client.post("/club/delete_club", params={"club_id": club_id})
+    assert response.status_code == 200
+    response = client.get("/club/get_club", params={"club_id": club_id})
+    assert response.status_code == 404
+
+    response = client.post("/user_profile/delete_user", params={"user_id": 1})
+    assert response.status_code == 200
+
+    response = client.get("/user_profile/get_user", params={"user_id": 1})
+    assert response.status_code == 404
 
 
 async def test_update_club_good_async(ac):
     data = {
-        "name": "test_club_updated_async",
-        "dest": "string",
-        "photo": "string",
-        "bio": "string",
-        "links": "string",
-        "channel_link": "string",
-        "comfort_time": "string",
-        "date_created": '2021-01-01'
+        "id": 1,
+        "username": "test",
+        "mentor": False,
+        "email": "string",
+        "name": "string",
+        "surname": "string",
+        "is_active": True,
+        "is_superuser": False,
+        "is_verified": False,
     }
-    response = await ac.post("/club/update_club", params={"club_id": 2}, json=data)
+
+    response = await ac.post("/user_profile/create_user", json=data)
     assert response.status_code == 200
 
-
-def test_update_club_not_exist():
     data = {
-        "name": "test_club_updated",
+        "owner": 1,
+        "name": "test_club",
         "dest": "string",
         "photo": "string",
         "bio": "string",
         "links": "string",
         "channel_link": "string",
         "comfort_time": "string",
-        "date_created": '2021-01-01'
+        "date_created": "2021-01-01"
     }
-    response = client.post("/club/update_club", params={"club_id": 1000}, json=data)
+
+    response = await ac.post("/club/create_club", json=data)
+    assert response.status_code == 200
+
+    club_id = response.json()['data']['id']
+
+    data = {
+        "name": "test_club_update",
+        "dest": "string",
+        "photo": "string",
+        "bio": "string",
+        "links": "string",
+        "channel_link": "string",
+        "comfort_time": "string",
+        "date_created": "2021-01-01"
+    }
+
+    response = await ac.post("/club/update_club", params={"club_id": club_id}, json=data)
+    assert response.status_code == 200
+    assert response.json()['data']['name'] == "test_club_update"
+
+    response = await ac.post("/club/delete_club", params={"club_id": club_id})
+    assert response.status_code == 200
+    response = await ac.get("/club/get_club", params={"club_id": club_id})
+    assert response.status_code == 404
+
+    response = await ac.post("/user_profile/delete_user", params={"user_id": 1})
+    assert response.status_code == 200
+
+    response = await ac.get("/user_profile/get_user", params={"user_id": 1})
     assert response.status_code == 404
 
 
 
-async def test_update_club_not_exist_async(ac):
+def test_update_club_no_exist():
     data = {
-        "name": "test_club_updated_async",
+        "name": "test_club_update",
         "dest": "string",
         "photo": "string",
         "bio": "string",
         "links": "string",
         "channel_link": "string",
         "comfort_time": "string",
-        "date_created": '2021-01-01'
+        "date_created": "2021-01-01"
     }
-    response = await ac.post("/club/update_club", params={"club_id": 1000}, json=data)
-    assert response.status_code == 404
 
-
-
-def test_update_club_without_name():
-    data = {
-        "dest": "string",
-        "photo": "string",
-        "bio": "string",
-        "links": "string",
-        "channel_link": "string",
-        "comfort_time": "string",
-        "date_created": '2021-01-01'
-    }
     response = client.post("/club/update_club", params={"club_id": 1}, json=data)
-    assert response.status_code == 422
+    assert response.status_code == 404
 
 
-async def test_update_club_without_name_async(ac):
+
+async def test_update_club_no_exist_async(ac):
     data = {
+        "name": "test_club_update",
         "dest": "string",
         "photo": "string",
         "bio": "string",
         "links": "string",
         "channel_link": "string",
         "comfort_time": "string",
-        "date_created": '2021-01-01'
+        "date_created": "2021-01-01"
     }
+
     response = await ac.post("/club/update_club", params={"club_id": 1}, json=data)
-    assert response.status_code == 422
+    assert response.status_code == 404
 
 
-def test_update_club_without_id():
-    data = {
-        "name": "test_club_updated",
-        "dest": "string",
-        "photo": "string",
-        "bio": "string",
-        "links": "string",
-        "channel_link": "string",
-        "comfort_time": "string",
-        "date_created": '2021-01-01'
-    }
-    response = client.post("/club/update_club", params={}, json=data)
-    assert response.status_code == 422
 
-
-async def test_update_club_without_id_async(ac):
-    data = {
-        "name": "test_club_updated",
-        "dest": "string",
-        "photo": "string",
-        "bio": "string",
-        "links": "string",
-        "channel_link": "string",
-        "comfort_time": "string",
-        "date_created": '2021-01-01'
-    }
-    response = await ac.post("/club/update_club", params={}, json=data)
-    assert response.status_code == 422
-
-
-def test_update_club_same_name_was(): #TODO: такое наверное хотим пофиксить
-    data = {
-        "name": "test_club_updated",
-        "dest": "string",
-        "photo": "string",
-        "bio": "string",
-        "links": "string",
-        "channel_link": "string",
-        "comfort_time": "string",
-        "date_created": '2021-01-01'
-    }
-    response = client.post("/club/update_club", params={"club_id": 1}, json=data)
-    assert response.status_code == 200
-
-
-async def test_update_club_same_name_was_async(ac):
-    data = {
-        "name": "test_club_updated_async",
-        "dest": "string",
-        "photo": "string",
-        "bio": "string",
-        "links": "string",
-        "channel_link": "string",
-        "comfort_time": "string",
-        "date_created": '2021-01-01'
-    }
-    response = await ac.post("/club/update_club", params={"club_id": 2}, json=data)
-    assert response.status_code == 200
-
-
-def test_update_club_same_name():
-    data = {
-        "name": "test_club_updated_async",
-        "dest": "string",
-        "photo": "string",
-        "bio": "string",
-        "links": "string",
-        "channel_link": "string",
-        "comfort_time": "string",
-        "date_created": '2021-01-01'
-    }
-    response = client.post("/club/update_club", params={"club_id": 1}, json=data)
-    assert response.status_code == 409
-
-
-async def test_update_club_same_name_async(ac):
-    data = {
-        "name": "test_club_updated",
-        "dest": "string",
-        "photo": "string",
-        "bio": "string",
-        "links": "string",
-        "channel_link": "string",
-        "comfort_time": "string",
-        "date_created": '2021-01-01'
-    }
-    response = await ac.post("/club/update_club", params={"club_id": 2}, json=data)
-    assert response.status_code == 409
 
 
 
