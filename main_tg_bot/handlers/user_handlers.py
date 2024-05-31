@@ -27,7 +27,7 @@ async def cmd_start(message: types.Message, config: BotConfig, state: FSMContext
         text=config.welcome_message,
     )
     await rq.set_user(user_data)
-    is_admin = (await rq.is_user_club_admin(message.from_user.id) == -1)
+    is_admin = (await rq.is_user_club_admin(message.from_user.id) != -1)
     await message.answer(
         text='Готово!\n'
              'Вы можете посмотреть свой профиль по кнопке ниже',
