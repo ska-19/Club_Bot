@@ -151,7 +151,7 @@ async def disjoin_club(
     """
     try:
         data_dict = data.dict()
-        if await get_user_by_id(data_dict['user_id'], session) == "User not found": #TODO: вот здесь падает
+        if await get_user_by_id(data_dict['user_id'], session) == "User not found":
             raise ValueError('404u')
         if await get_club_by_id(data_dict['club_id'], session) == "Club not found":
             raise ValueError('404c')
@@ -159,10 +159,16 @@ async def disjoin_club(
             raise ValueError('404')
 
         if await get_role(data_dict['user_id'], data_dict['club_id'], session) == 'owner':
-            return
+            return {
+                'status': 'fail',
+                'data': None,
+                'detail': None
+            }
         main = await get_main_club(data_dict['user_id'], session)
         if main['status'] == 'success' and main['data']['id'] == data_dict['club_id']:
-            return
+            data = await get_clubs_by_user(data_dict['user_id'], session)
+            if data['status'] == 'success':
+                await new_main(data_dict['user_id'], int(data['data'][0]['id']), session)
 
         rec_id = await get_rec_id(data_dict['user_id'], data_dict['club_id'], session)
         stmt = delete(club_x_user).where(club_x_user.c.id == rec_id)
@@ -179,7 +185,8 @@ async def disjoin_club(
             raise HTTPException(status_code=404, detail=error404u)
         else:
             raise HTTPException(status_code=404, detail=error404c)
-    except Exception:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()
