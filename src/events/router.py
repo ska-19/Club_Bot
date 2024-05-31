@@ -4,6 +4,7 @@ from sqlalchemy import insert, update
 from datetime import datetime
 
 from src.club.inner_func import get_club_by_id
+from src.club.router import error409
 from src.events.schemas import EventCreate, EventUpdate, EventReg, Data
 from src.user_club.inner_func import check_rec, get_role
 from src.events.inner_func import *
@@ -74,7 +75,7 @@ async def create_event(
             id = result.fetchone()[0]
             RegEvent = EventReg(user_id=new_event.host_id, event_id=id)
             await reg_event(RegEvent, session)
-
+            event_dict['id'] = id
             return {
                 "status": "success",
                 "data": event_dict,
@@ -318,7 +319,8 @@ async def event_disreg(
         await session.rollback()
 
 
-@router.post("/delete_event") #TODO: пофиксить удаление
+
+@router.post("/delete_event")
 async def delete_event(
         event_id: int,
         session: AsyncSession = Depends(get_async_session)):
@@ -332,12 +334,18 @@ async def delete_event(
 
        """
     try:
+        print('here')
         data = await get_event_by_id(event_id, session)
         if data == "Event not found":
             raise ValueError('404e')
+        usrs = await get_users_by_event(event_id, session)
+        usrs = usrs['data']
+        for u in usrs:
+            await event_disreg(u['id'], event_id, session)
         query = delete(event).where(event.c.id == event_id)
         await session.execute(query)
         await session.commit()
+        print(data)
         return {
             "status": "success",
             "data": data,

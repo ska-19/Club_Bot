@@ -257,7 +257,6 @@ async def delete_user(
         if data == "User not found":
             raise ValueError("404")
         clubs = await get_clubs_by_user(user_id, session)
-        print(clubs)
         clubs_data = clubs['data']
         for club in clubs_data:
             user_data = User(user_id=user_id, club_id=club['id'])

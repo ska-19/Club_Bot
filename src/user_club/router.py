@@ -158,12 +158,6 @@ async def disjoin_club(
             raise ValueError('404c')
         if await check_rec(data_dict['user_id'], data_dict['club_id'], session):
             raise ValueError('404')
-        if await get_role(data_dict['user_id'], data_dict['club_id'], session) == 'owner':
-            return {
-                'status': 'fail',
-                'data': None,
-                'detail': None
-            }
         main = await get_main_club(data_dict['user_id'], session)
         if main['status'] == 'success' and main['data']['id'] == data_dict['club_id']:
             data = await get_clubs_by_user(data_dict['user_id'], session)
@@ -210,18 +204,23 @@ async def role_update(
 
     """
     try:
+        print('now')
         if await get_user_by_id(user_id, session) == "User not found":
+            print('a')
             raise ValueError('404u')
 
         if await get_club_by_id(club_id, session) == "Club not found":
+            print('b')
             raise ValueError('404c')
 
         if await check_rec(user_id, club_id, session):
+            print('c')
             raise ValueError('404uc')
+        print('now')
         rec_id = await get_rec_id(user_id, club_id, session)
 
         role = await get_role(user_id, club_id, session)
-
+        print('now')
         if role == 'admin':
             await update_xp(user_id, -50, session)
             stmt = update(club_x_user).where(club_x_user.c.id == rec_id).values(role='member')
@@ -332,7 +331,7 @@ async def get_users_in_club(
 
         result = await session.execute(query)
         data = result.mappings().all()
-
+        print(data)
         if not data:
             raise ValueError('404s') # в теории же в клубе всегда хотя бы владелец есть, иначе овер странно
         return {
@@ -382,9 +381,7 @@ async def get_users_with_role(
                 "data": None,
                 "details": None
             }
-
         data = await get_users_by_dict(data, session)
-
         return {
             "status": "success",
             "data": data,
@@ -422,7 +419,7 @@ async def get_clubs_by_user(
         if not data:
             return {
                 "status": "fail",
-                "data": "Clubs not found",
+                "data": [],
                 "details": None
             }
 
