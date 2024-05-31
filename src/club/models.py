@@ -1,10 +1,10 @@
-from sqlalchemy import Table, Column, Integer, String, TIMESTAMP, ForeignKey, Text, Date
+from sqlalchemy import Table, Column, Integer, String, TIMESTAMP, BIGINT, ForeignKey, Text, Date
 from src.database import metadata
 
 club = Table(
     'club', metadata,
     Column('id', Integer, primary_key=True, autoincrement=True),
-    Column('owner', Integer, ForeignKey('user.id'), nullable=False),
+    Column('owner', BIGINT, ForeignKey('user.id'), nullable=False),
     Column('name', String(255), nullable=False),
     Column('dest', Text),
     Column('photo', Text),
