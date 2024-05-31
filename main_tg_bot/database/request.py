@@ -5,10 +5,10 @@ from bot_instance import URL
 async def set_user(user_data):
     print(user_data)
     rq_user_data = {
-        "id": int(user_data["tg_id"]),  # ToDo падает если tg_id > 10^8
+        "id": int(user_data["tg_id"]),
         "username": str(user_data["username"]),
-        "name": str('_') if str(user_data["name"]) == 'None' else str(user_data["name"]),
-        "surname": str('_') if str(user_data["name"]) == 'None' else str(user_data["surname"]),
+        "name": str('') if str(user_data["name"]) == 'None' else str(user_data["name"]),
+        "surname": str('') if str(user_data["surname"]) == 'None' else str(user_data["surname"]),
         "mentor": False,
         "is_active": True,
         "is_superuser": False,
@@ -77,6 +77,10 @@ async def club_data_links(tg_id, club_id, data_type):
         url = f'{str(URL)}/statitics/get_club_statistics?user_id={str(tg_id)}&club_id={str(club_id)}'
     elif data_type == 'events_data':
         url = f'{str(URL)}/statitics/get_events_statistics?user_id={str(tg_id)}&club_id={str(club_id)}'
+    elif data_type == 'items_data':
+        url = f'{str(URL)}/statitics/get_items_statistics?user_id={str(tg_id)}&club_id={str(club_id)}'
+    else:
+        return None
 
     response = requests.get(url=url, headers=headers)
     return response
