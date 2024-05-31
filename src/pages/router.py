@@ -32,16 +32,11 @@ router = APIRouter(
 templates = Jinja2Templates(directory="src/templates")
 
 
-# ------------------------------------------------
-# Запросы для взаимодействия со страницами профиля
-# ------------------------------------------------
-# GET запрос шаблона страницы профиля
 @router.get("/profile_base")
 def get_profile_base(request: Request):
     return templates.TemplateResponse("profile_base.html", {"request": request})
 
 
-# GET запрос страницы профиля, наследуется от шаблона
 @router.get("/profile_user/{user_id}")
 async def get_profile_user(
         request: Request,
@@ -55,19 +50,14 @@ async def get_profile_user(
                 (math.floor((-5 + math.sqrt(25 + 20 * x)) / 10)) + 1)))
     user_data['full_xp'] = calc_exp(user_data['xp'])[0]
     user_data['xp_percent'] = calc_exp(user_data['xp'])[1]
-    # achievements = await get_achievement_by_user(user_data['id'], session)
-    # user_data['achievement'] = achievements['data']
-    # user_data['exist_clubs'] = 0
     user_clubs = await get_main_club(user_data['id'], session)
     if user_clubs['status'] == "success":
         user_data['exist_clubs'] = 1
     else:
         user_data['exist_clubs'] = 0
-    print(user_data)
     return templates.TemplateResponse("profile_user.html", {"request": request, "user_info": user_data})
 
 
-# PUT запрос страницы профиля для изменения информации пользователя в профиле
 @router.put("/profile_user/{user_id}")
 async def update_profile_user(
         user_id: int,
@@ -78,16 +68,11 @@ async def update_profile_user(
     return {"message": "Profile updated successfully", "user": user}
 
 
-# --------------------------------------------------
-# Запросы для взаимодействия со страницами "Главное"
-# --------------------------------------------------
-# GET запрос шаблона страницы "Главное"
 @router.get("/main_base")
 def get_main_base(request: Request):
     return templates.TemplateResponse("main_base.html", {"request": request})
 
 
-# GET запрос страницы "Главное", наследуется от шаблона
 @router.get("/main_user/{user_id}")
 async def get_main_user(
         request: Request,
@@ -113,17 +98,19 @@ async def get_main_user(
         events = []
     club_xp = await get_club_xp(club_info['id'], session)
     club_info['xp'] = club_xp['data']
-    user_data['role'] = user_x_club_info_role
-    user_data['balance'] = user_x_club_info_balance['data']
+    user_x_club_info = {
+        'role': user_x_club_info_role,
+        'balance': user_x_club_info_balance['data']
+    }
     return templates.TemplateResponse("main_user.html", {
         "request": request,
         "user_info": user_data,
         "club_info": club_info,
+        "user_x_club_info": user_x_club_info,
         "events": events
     })
 
 
-# POST запрос страницы "Главное", позволяет пользователю зарегистрироваться на событие
 @router.post("/main_user/{user_id}/1")
 async def register_event(
         event_reg: EventReg,
@@ -133,7 +120,6 @@ async def register_event(
     return {"message": "Event Reg successfully", "reg_event": reg}
 
 
-# POST запрос страницы "Главное", позволяет админу создать событие
 @router.post("/main_user/{user_id}/2")
 async def create_new_event(
         event_cre: EventCreate,
@@ -141,12 +127,10 @@ async def create_new_event(
 ):
     club = await get_main_club(event_cre.host_id, session)
     event_cre.club_id = club['data']['id']
-    print(event_cre)
     create = await create_event(event_cre, session)
     return {"message": "Event Reg successfully", "New event!": create}
 
 
-# PUT запрос страницы "Главное", позволяет админу изменить информацию о событии
 @router.put("/main_user/{user_id}")
 async def update_main_event(
         user_id: int,
@@ -164,7 +148,6 @@ async def update_main_event(
     return {"message": "Event updated successfully", "event": event}
 
 
-# DELETE запрос страницы "Главное", позволяет пользователю отменить регистрацию на событие
 @router.delete("/main_user/{user_id}")
 async def deregister_event(
         event_reg: EventReg,
@@ -174,16 +157,11 @@ async def deregister_event(
     return {"message": "Event Disreg successfully", "disreg_event": disreg}
 
 
-# -------------------------------------------------
-# Запросы для взаимодействия со страницами "О клубе"
-# -------------------------------------------------
-# GET запрос шаблона страницы "О клубе"
 @router.get("/club_base")
 def get_club_base(request: Request):
     return templates.TemplateResponse("club_base.html", {"request": request})
 
 
-# GET запрос страницы "О клубе", наследуется от шаблона
 @router.get("/club_user/{user_id}")
 async def get_club_user(
         request: Request,
@@ -197,8 +175,7 @@ async def get_club_user(
     users = users_in_club['data']
     user_info_in_club = next((item for item in users if item['username'] == user_data['username']), None)
     user_data['role'] = user_info_in_club['role']
-    club_xp = await get_club_xp(club_info['id'], session)
-    club_info['xp'] = club_xp['data']
+    main_club['xp'] = 0
     return templates.TemplateResponse("club_user.html", {
         "request": request,
         "user_info": user_data,
@@ -207,7 +184,6 @@ async def get_club_user(
     })
 
 
-# PUT запрос страницы "О клубе", позволяет лидеру повышать и понижать участников клуба
 @router.put("/club_user/{user_id}")
 async def update_role(
         user_id: int,
@@ -221,7 +197,6 @@ async def update_role(
     return {"message": "Update role user successfully", "update_user": new_role_user}
 
 
-# DELETE запрос страницы "О клубе", позволяет лидеру выгонять участников клуба
 @router.delete("/club_user/{user_id}")
 async def kick_club_user(
         user_id: int,
@@ -235,19 +210,15 @@ async def kick_club_user(
     return {"message": "Kick user successfully", "kick_user": kicked_user}
 
 
-# -------------------------------------------------
-# Запросы для взаимодействия со страницами Поиска
-# -------------------------------------------------
-# GET запрос шаблона страницы Поиск
 @router.get("/search_base")
 def get_search_base(request: Request):
     return templates.TemplateResponse("search_base.html", {"request": request})
 
 
-# GET запрос страницы Поиск, наследуется от шаблона
 @router.get("/search_user/{user_id}")
 async def get_search_user(
         request: Request,
+        user_id: int,
         user_info=Depends(get_user),
         session: AsyncSession = Depends(get_async_session)
 ):
@@ -270,14 +241,7 @@ async def get_search_user(
             clubs_data = [club for club in clubs_data_with_main if club["name"] != main_club_data["name"]]
         else:
             clubs_data = [club for club in clubs_data_with_main]
-    # if user_clubs['status'] == 'success' and len(user_clubs['data']) > 1:
-    #     clubs_data_with_main = user_clubs['data']
-    #     user_data['exist_clubs'] = 1
-    #     clubs_data = [club for club in clubs_data_with_main if club["name"] != main_club_data["name"]]
-    # else:
-    #     clubs_data = []
-    #     user_data['exist_clubs'] = 0
-    uid_last_search = user_data['links']  # последний поисковой запрос данного юзера, изначально ""
+    uid_last_search = user_data['links']
     if uid_last_search == "":
         found_club_data = {"id": 0}
     else:
@@ -292,7 +256,6 @@ async def get_search_user(
     })
 
 
-# POST запрос страницы Поиск, позволяет пользователю присоединиться к найденному клубу
 @router.post("/search_user/{user_id}")
 async def join_club(
         join_data: UserJoin,
@@ -303,7 +266,6 @@ async def join_club(
     return {"message": "Event Reg successfully", "new join club": new_main_club}
 
 
-# PUT запрос страницы Поиск, позволяет пользователю найти клуб, если он ввёл корректный тэг клуба
 @router.put("/search_user/{user_id}/1")
 async def found_club(
         user_id: int,
@@ -314,7 +276,6 @@ async def found_club(
     return {"message": "Event updated successfully", "new last search": update_last_search}
 
 
-# PUT запрос страницы Поиск, позволяет пользователю сделать другой клуб основным
 @router.put("/search_user/{user_id}/2")
 async def change_main_club(
         changed_main_club: User,
@@ -324,7 +285,6 @@ async def change_main_club(
     return {"message": "Event updated successfully", "new main club": new_main_club}
 
 
-# DELETE запрос страницы Поиск, позволяет пользователю покинуть клуб
 @router.delete("/search_user/{user_id}")
 async def leave_club(
         user_club: User,
@@ -334,17 +294,11 @@ async def leave_club(
     return {"message": "Event Disreg successfully", "leave from club": disjoin}
 
 
-# ----------------------------------------------------------
-# Запросы для взаимодействия со страницами окончания событий
-# Страницы доступны только админам клубов
-# ----------------------------------------------------------
-# GET запрос шаблона страницы окончания событий
 @router.get("/endevent_base")
 def get_endevent_base(request: Request):
     return templates.TemplateResponse("endevent_base.html", {"request": request})
 
 
-# GET запрос страницы окончания событий, наследуется от шаблона
 @router.get("/endevent_user/{user_id}/{event_id}")
 async def get_endevent_user(
         request: Request,
@@ -362,8 +316,6 @@ async def get_endevent_user(
     })
 
 
-# PUT запрос страницы окончания событий, позволяет админу корректно выбрать пользователей,
-# которые участвовали в событии и выдать им вознаграждение
 @router.put("/endevent_user/{user_id}/{event_id}")
 async def final_endevent(
         event_id: int,
@@ -374,16 +326,11 @@ async def final_endevent(
     return {"message": "Event updated successfully", "End event": final_end_event}
 
 
-# --------------------------------------------------
-# Запросы для взаимодействия со страницами магазинов
-# --------------------------------------------------
-# GET запрос шаблона страницы магазина
 @router.get("/market_base")
 def get_market_base(request: Request):
     return templates.TemplateResponse("market_base.html", {"request": request})
 
 
-# GET запрос страницы магазина, наследуется от шаблона
 @router.get("/market_user/{user_id}")
 async def get_market_user(
         request: Request,
@@ -410,7 +357,6 @@ async def get_market_user(
     })
 
 
-# POST запрос страницы магазина, позволяет админу создать товар
 @router.post("/market_user/{user_id}/1")
 async def create_product(
         user_id: int,
@@ -424,7 +370,6 @@ async def create_product(
     return {"message": "Event Reg successfully", "New product!": new_product}
 
 
-# POST запрос страницы магазина, позволяет пользователю купить товар
 @router.post("/market_user/{user_id}/2")
 async def buy_product_user(
         user_id: int,
@@ -436,7 +381,6 @@ async def buy_product_user(
     return {"message": "Event Reg successfully", "Buy product!": buy}
 
 
-# PUT запрос страницы магазина, позволяет админу изменить информацию о товаре
 @router.put("/market_user/{user_id}")
 async def update_product_user(
         prod_update: UpdateProduct,
@@ -446,7 +390,6 @@ async def update_product_user(
     return {"message": "Event Reg successfully", "Product update!": updt}
 
 
-# DELETE запрос страницы магазина, позволяет админу удалить товар
 @router.delete("/market_user/{user_id}")
 async def delete_product_user(
         prod: UpdateProduct,
@@ -457,16 +400,11 @@ async def delete_product_user(
     return {"message": "Event Reg successfully", "Product update!": updt}
 
 
-# --------------------------------------------------------
-# Запросы для взаимодействия со страницами истории покупок
-# --------------------------------------------------------
-# GET запрос шаблона страницы истории покупок
 @router.get("/history_base")
 def get_history_base(request: Request):
     return templates.TemplateResponse("history_base.html", {"request": request})
 
 
-# GET запрос страницы истории покупок, наследуется от шаблона
 @router.get("/history_user/{user_id}")
 async def get_history_user(
         request: Request,
@@ -489,7 +427,6 @@ async def get_history_user(
     ad_hist_active_data = ad_hist_active['data']
     ad_hist_close = await get_admin_history_close(club_data['id'], session)
     ad_hist_close_data = ad_hist_close['data']
-    print(ad_hist_close_data)
     if us_hist_active_data is None:
         us_hist_active_data = []
     if ad_hist_active_data is None:
@@ -509,7 +446,6 @@ async def get_history_user(
     })
 
 
-# POST запрос страницы истории покупок, позволяет админу одобрить покупку пользователя
 @router.post("/history_user/{user_id}")
 async def confirm_purchase(
         prod: UpdateProduct,
@@ -519,7 +455,6 @@ async def confirm_purchase(
     return {"message": "Event Reg successfully", "Accept request for user!": accept}
 
 
-# DELETE запрос страницы истории покупок, позволяет админу отклонить покупку пользователя
 @router.delete("/history_user/{user_id}/1")
 async def admin_cancel_purchase(
         prod: UpdateProduct,
@@ -529,7 +464,6 @@ async def admin_cancel_purchase(
     return {"message": "Event Reg successfully", "Rejected request from admin!": rej_admin}
 
 
-# DELETE запрос страницы истории покупок, позволяет пользователю самому отказаться от покупки
 @router.delete("/history_user/{user_id}/2")
 async def member_cancel_purchase(
         prod: UpdateProduct,
