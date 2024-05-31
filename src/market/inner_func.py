@@ -1,8 +1,7 @@
 from fastapi import Depends, HTTPException
-from sqlalchemy import select, delete, desc
+from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.club.inner_func import get_club_by_id
 from src.market.models import product, user_x_product
 from src.database import get_async_session
 from src.errors import *
@@ -44,7 +43,6 @@ async def check_transaction_count(
 async def check_transaction_balance(
         user_id: int,
         product_id: int,
-        # count: int,
         session: AsyncSession
 ):
     try:

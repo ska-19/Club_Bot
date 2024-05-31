@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import insert, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -129,6 +128,7 @@ async def get_club(
         }
     except Exception:
         raise HTTPException(status_code=500, detail=error)
+
 
 @router.get("/get_channel_link")
 async def get_club_link(
@@ -307,7 +307,6 @@ async def get_club_xp(
         }
     except ValueError:
         raise HTTPException(status_code=404, detail=error404)
-    except Exception as e:
-        print(e)
+    except Exception:
         raise HTTPException(status_code=500, detail=error)
         

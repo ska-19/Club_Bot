@@ -1,13 +1,10 @@
 import os
-from datetime import datetime, date
-
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from fastapi.responses import FileResponse
-from sqlalchemy import select, insert, update
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 import pandas as pd
 import tempfile
-import openpyxl
 
 from src.database import get_async_session
 from src.market.models import product, user_x_product
@@ -16,7 +13,7 @@ from src.user_profile.models import user
 from src.events.models import event_reg, event
 from src.events.inner_func import get_event_by_id
 from src.club.inner_func import get_club_by_id
-from src.statistics.inner_func import error, error404uc, error404u, validation, check_event_valid
+from src.statistics.inner_func import error, error404u, validation, check_event_valid
 
 
 router = APIRouter(
@@ -206,7 +203,7 @@ async def get_items_in_club_xlsx(
         club_id: int,
         background_tasks: BackgroundTasks,
         session: AsyncSession = Depends(get_async_session)):
-    """ Возвращает статистику всех ивентов внутри клуба в формате xlsx
+    """ Возвращает статистику всех продаж внутри клуба в формате xlsx
 
          :param:
               user_id: int

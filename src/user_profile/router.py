@@ -1,13 +1,13 @@
 from datetime import datetime, date
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select, insert, update
+from sqlalchemy import insert, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
 from src.user_profile.models import user
-from src.user_profile.schemas import UserUpdate, UserCreate, UserCUpdate
-from src.user_profile.inner_func import get_user_by_id, error404, update_xp
+from src.user_profile.schemas import UserUpdate, UserCreate
+from src.user_profile.inner_func import get_user_by_id, error404
 from src.user_club.router import get_clubs_by_user, disjoin_club
 from src.user_club.schemas import User
 from src.club.schemas import FoundUid
@@ -64,19 +64,16 @@ async def create_user(
         user_dict['education'] = 'string'
         user_dict['city'] = 'string'
         user_dict['xp'] = 0
-        # user_dict['achievments'] = {'first': 0, 'second': 0, 'third': 0}
         user_dict['date_joined'] = datetime.utcnow()
         user_dict['dob'] = date.today()
 
-        # password = user_dict.pop("password")
-        # user_dict["hashed_password"] = password  # TODO: add hash password
         stmt = insert(user).values(**user_dict)
         await session.execute(stmt)
         await session.commit()
 
         return {
             "status": "success",
-            "data": user_dict,  # TODO: how return UserRead schemas
+            "data": user_dict,
             "details": None
         }
     except ValueError:
@@ -93,7 +90,7 @@ async def get_user(
         session: AsyncSession = Depends(get_async_session)):
     """ Получает данные пользователя по его id
 
-        :param user_id:
+        :param user_id: int
         :return:
             200 + джейсон со всеми данными, если все хорошо.
             404 если такого юзера нет.
@@ -121,8 +118,7 @@ async def update_create_profile(
         session: AsyncSession = Depends(get_async_session)):
     """Обновляет данные пользователя (для тг бота)
 
-       :param user_id:
-       :param update_data:
+       :param update_data: UserCreate
        :return:
            200 + джейсон со всеми данными, если все хорошо.
            404 если такого юзера нет.
@@ -152,8 +148,7 @@ async def update_create_profile(
         }
     except ValueError:
         raise HTTPException(status_code=404, detail=error404)
-    except Exception as e:
-        print(e)
+    except Exception:
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()
@@ -164,10 +159,10 @@ async def update_links_profile(
         user_id: int,
         update_data: FoundUid,
         session: AsyncSession = Depends(get_async_session)):
-    """Обновляет данные пользователя (ттолько линкс, пока костыль)
+    """Обновляет данные пользователя (только линкс)
 
-       :param user_id:
-       :param update_data:
+       :param user_id: int
+       :param update_data: FoundUid
        :return:
            200 + джейсон со всеми данными, если все хорошо.
            404 если такого юзера нет.
@@ -194,8 +189,7 @@ async def update_links_profile(
         }
     except ValueError:
         raise HTTPException(status_code=404, detail=error404)
-    except Exception as e:
-        print(e)
+    except Exception:
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()
@@ -208,8 +202,8 @@ async def update_profile(
         session: AsyncSession = Depends(get_async_session)):
     """Обновляет данные пользователя (для веб аппа)
 
-       :param user_id:
-       :param update_data:
+       :param user_id: int
+       :param update_data: UserUpdate
        :return:
            200 + джейсон со всеми данными, если все хорошо.
            404 если такого юзера нет.
@@ -221,15 +215,6 @@ async def update_profile(
         if data == "User not found":
             raise ValueError
         stmt = update(user).where(user.c.id == user_id).values(
-            # name=update_data.name,
-            # surname=update_data.surname,
-            # email=update_data.email,
-            # tel=update_data.tel,
-            # photo=update_data.photo,
-            # comfort_time=update_data.comfort_time,
-            # course=update_data.course,
-            # faculty=update_data.faculty,
-            # links=update_data.links,
             bio=update_data.bio,
             dob=update_data.dob,
             education=update_data.education,
@@ -254,56 +239,13 @@ async def update_profile(
         await session.rollback()
 
 
-# @router.post("/update_achievment")
-# async def update_achievment(
-#         user_id: int,
-#         achievment: str,
-#         session: AsyncSession = Depends(get_async_session)):
-#     """Обновляет достижение пользователя (не работает, вроде Кирилл взял на себя очивки)
-#
-#         :param user_id:
-#         :param achievment:
-#         :return:
-#             200 + джейсон со всеми данными, если все хорошо.
-#             404 если такого юзера нет.
-#             500 если внутрення ошибка сервера.
-#
-#     """
-#     try:
-#         data = await get_user_by_id(user_id, session)
-#         if data == "User not found":
-#             raise ValueError
-#         data['achievment'][achievment] = 1
-#         stmt = update(user).where(user.c.id == user_id).values(
-#             achievment=data['achievment']
-#         )
-#         await session.execute(stmt)
-#         await session.commit()
-#
-#         data = await get_user_by_id(user_id, session)
-#         if data == "User not found":
-#             raise ValueError
-#         return {
-#             "status": "success",
-#             "data": data,
-#             "details": None
-#         }
-#     except ValueError:
-#         raise HTTPException(status_code=404, detail=error404)
-#     except Exception as e:
-#         print(e)
-#         raise HTTPException(status_code=500, detail=error)
-#     finally:
-#         await session.rollback()
-
-
 @router.post("/delete_user")
 async def delete_user(
         user_id: int,
         session: AsyncSession = Depends(get_async_session)):
     """Удаляет пользователя
 
-        :param user_id:
+        :param user_id: int
         :return:
             200 + джейсон со всеми данными, если все хорошо.
             404 если такого юзера нет.
@@ -317,7 +259,6 @@ async def delete_user(
         clubs = await get_clubs_by_user(user_id, session)
         print(clubs)
         clubs_data = clubs['data']
-        # print(clubs_data)
         for club in clubs_data:
             user_data = User(user_id=user_id, club_id=club['id'])
             await disjoin_club(user_data, session)
@@ -331,8 +272,7 @@ async def delete_user(
         }
     except ValueError:
         raise HTTPException(status_code=404, detail=error404)
-    except Exception as e:
-        print(e)
+    except Exception:
         raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()

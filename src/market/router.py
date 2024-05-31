@@ -1,11 +1,7 @@
-from datetime import date, datetime
+from datetime import datetime
+from fastapi import APIRouter
+from sqlalchemy import insert, update
 
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select, insert, update
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from src.database import get_async_session
-from src.market.models import product, user_x_product
 from src.user_profile.inner_func import update_xp
 from src.market.schemas import AddProduct, UpdateProduct
 from src.market.inner_func import *
