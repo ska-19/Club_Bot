@@ -169,6 +169,9 @@ function End(eventId) {
 }
 
 function href_channel(link) {
-    console.log(link)
     window.location.href = link
+}
+
+function href_market(userId) {
+    window.location.href = `/pages/market_user/${userId}`
 }

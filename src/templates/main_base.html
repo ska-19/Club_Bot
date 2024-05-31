@@ -39,22 +39,14 @@
     </div>
 
 
-    <div style="margin-top: 40px">
-    </div>
-
-
     <!-- inline, 3 блока:-->
     <div class="card"
-         style="left: 10px;height: 120px; width: 370px; justify-content: center; vertical-align: center;display: flex">
+         style="margin-top: 40px;left: 10px;height: 120px; width: 370px; justify-content: center; vertical-align: center;display: flex">
 
 
         <!-- блок 1: магазин, картинка магаза, навожусь, там ссылка, надпись "магазин" (пока нерабочая)-->
         <div class="block2" style="margin-top: 20px; margin-left: 5px">
-            <button class="Btn"
-                    style="z-index: 2;height: 80px; width: 115px; justify-content: center; vertical-align: center">
-                <h1 style="bottom: 5px;font-size: 15px; position: relative; z-index: 2">
-                    Магазин</h1>
-            </button>
+            {% block market %}{% endblock %}
         </div>
 
 

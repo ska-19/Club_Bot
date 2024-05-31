@@ -44,6 +44,15 @@
 {% endblock %}
 
 
+{% block market %}
+<button class="Btn" onclick="href_market('{{user_info.id}}')"
+        style="z-index: 2;height: 80px; width: 115px; justify-content: center; vertical-align: center">
+    <h1 style="bottom: 5px;font-size: 15px; position: relative; z-index: 2">
+        Магазин</h1>
+</button>
+{% endblock %}
+
+
 {% block channel %}
 <button class="Btn" onclick="href_channel('{{club_info.channel_link}}')"
         style="z-index: 2;height: 80px; width: 115px; justify-content: center; vertical-align: center">
