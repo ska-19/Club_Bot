@@ -77,7 +77,7 @@ error404pc = {
     "details": None
 }
 
-error404pb = {
+error403pb = {
     "status": "error",
     "data": "User balance is not enough",
     "details": None

@@ -31,47 +31,48 @@ async def add_product(
         new_data: AddProduct,
         session: AsyncSession = Depends(get_async_session)
 ):
+    """ Создает товар в магазине
+
+       :param new_data: джейсон вида AddProduct
+       :return:
+           200 + success, если все хорошо.
+           404 + error404u, если пользователь не найден.
+           404 + error404c, если клуб не найден.
+           404 + error404uc, если пользователь не состоит в клубе.
+           500 если внутрення ошибка сервера.
+    """
     try:
-        print('a')
         if await get_user_by_id(new_data.user_id, session) == "User not found":
             raise ValueError('404u')
         if await get_club_by_id(new_data.club_id, session) == "Club not found":
             raise ValueError('404c')
         if await check_rec(new_data.user_id, new_data.club_id, session):
             raise ValueError('404uc')
-        role = await get_role(new_data.user_id, new_data.club_id, session)
-        if role == "admin" or role == "owner":
-            product_dict = new_data.model_dump()
+        product_dict = new_data.model_dump()
 
-            query = insert(product).values(
-                name=product_dict['name'],
-                price=product_dict['price'],
-                description=product_dict['description'],
-                quantity=product_dict['quantity'],
-                club_id=product_dict['club_id'])
-            await session.execute(query)
-            await session.commit()
+        query = insert(product).values(
+            name=product_dict['name'],
+            price=product_dict['price'],
+            description=product_dict['description'],
+            quantity=product_dict['quantity'],
+            club_id=product_dict['club_id'])
+        await session.execute(query)
+        await session.commit()
 
-            return {
-                "status": "success",
-                "data": product_dict,
-                "details": None
-            }
-        else:
-            raise ValueError('404p')
+        return {
+            "status": "success",
+            "data": product_dict,
+            "details": None
+        }
     except ValueError as e:
         if str(e) == '404u':
-            print('market/add_product 404u')
             raise HTTPException(status_code=404, detail=error404u)
         if str(e) == '404c':
-            print('market/add_product 404c')
             raise HTTPException(status_code=404, detail=error404c)
         if str(e) == '404uc':
-            print('market/add_product 404uc')
             raise HTTPException(status_code=404, detail=error404uc)
-        if str(e) == '404p':
-            print('market/add_product 404p')
-            raise HTTPException(status_code=404, detail=error404p)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()
 
@@ -81,6 +82,17 @@ async def update_product(
         new_data: UpdateProduct,
         session: AsyncSession = Depends(get_async_session)
 ):
+    """ Изменяет товар в магазине
+
+       :param new_data: джейсон вида UpdateProduct
+       :return:
+           200 + success, если все хорошо.
+           404 + error404u, если пользователь не найден.
+           404 + error404c, если клуб не найден.
+           404 + error404uc, если пользователь не состоит в клубе.
+           404 + error404pr, если товар не найден
+           500 если внутрення ошибка сервера.
+    """
     try:
         if await get_user_by_id(new_data.user_id, session) == "User not found":
             raise ValueError('404u')
@@ -91,25 +103,21 @@ async def update_product(
             raise ValueError('404uc')
         if await get_product_by_id(new_data.id, session) == "Product not found":
             raise ValueError('404pr')
-        role = await get_role(new_data.user_id, data['club_id'], session)
-        if role == "admin" or role == "owner":
-            product_dict = new_data.model_dump()
+        product_dict = new_data.model_dump()
 
-            query = update(product).where(product.c.id == product_dict['id']).values(
-                name=product_dict['name'],
-                price=product_dict['price'],
-                description=product_dict['description'],
-                quantity=product_dict['quantity'])
-            await session.execute(query)
-            await session.commit()
+        query = update(product).where(product.c.id == product_dict['id']).values(
+            name=product_dict['name'],
+            price=product_dict['price'],
+            description=product_dict['description'],
+            quantity=product_dict['quantity'])
+        await session.execute(query)
+        await session.commit()
 
-            return {
-                "status": "success",
-                "data": product_dict,
-                "details": None
-            }
-        else:
-            raise ValueError('404p')
+        return {
+            "status": "success",
+            "data": product_dict,
+            "details": None
+        }
     except ValueError as e:
         if str(e) == '404u':
             raise HTTPException(status_code=404, detail=error404u)
@@ -119,6 +127,8 @@ async def update_product(
             raise HTTPException(status_code=404, detail=error404uc)
         if str(e) == '404pr':
             raise HTTPException(status_code=404, detail=error404pr)
+    except Exception:
+        raise HTTPException(status_code=500, detail=error)
     finally:
         await session.rollback()
 
@@ -128,6 +138,14 @@ async def get_product(
         product_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
+    """ Возвращает товар по id
+
+       :param product_id: int
+       :return:
+           200 + success, если все хорошо.
+           404 + error404pr, если товар не найден
+           500 если внутрення ошибка сервера.
+    """
     try:
         data = await get_product_by_id(product_id, session)
         if data == "Product not found":
@@ -138,8 +156,7 @@ async def get_product(
             "details": None
         }
     except ValueError as e:
-        if str(e) == '404pr':
-            raise HTTPException(status_code=404, detail=error404pr)
+        raise HTTPException(status_code=404, detail=error404pr)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
 
@@ -150,6 +167,17 @@ async def buy_product(
         user_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
+    """ Создает заявку на покупку товара
+
+       :param user_id: int
+       :param product_id: int
+       :return:
+           200 + success, если все хорошо.
+           404 + error404u, если пользователь не найден.
+           404 + error404pr, если товар не найден
+           403 + error403pb, если недостаточно денег для покупки
+           500 если внутрення ошибка сервера.
+    """
     try:
         if await get_user_by_id(user_id, session) == "User not found":
             raise ValueError('404u')
@@ -157,7 +185,7 @@ async def buy_product(
             raise ValueError('404pr')
         prod = await get_product_by_id(product_id, session)
         if not await check_transaction_balance(user_id, product_id, session):
-            raise ValueError('404pb')
+            raise ValueError('403pb')
 
         stmt = insert(user_x_product).values(
             user_id=user_id,
@@ -190,8 +218,8 @@ async def buy_product(
             raise HTTPException(status_code=404, detail=error404u)
         if str(e) == '404pr':
             raise HTTPException(status_code=404, detail=error404pr)
-        if str(e) == '404pb':
-            raise HTTPException(status_code=404, detail=error404pb)
+        if str(e) == '403pb':
+            raise HTTPException(status_code=403, detail=error403pb)
     except Exception:
         raise HTTPException(status_code=500, detail=error)
     finally:
@@ -252,6 +280,18 @@ async def accept_request(
         product_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
+    """ Одобряет заявку на покупку товара
+
+       :param admin_id:
+       :param user_id: int
+       :param product_id: int
+       :return:
+           200 + success, если все хорошо.
+           404 + error404u, если пользователь не найден.
+           404 + error404req, если заявка не найдена
+           403 + error403, если заявка уже одобрена/отклонена
+           500 если внутрення ошибка сервера.
+    """
     try:
         if await get_user_by_id(admin_id, session) == "User not found":
             raise ValueError('404u')
@@ -286,6 +326,18 @@ async def reject_request_admin(
         product_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
+    """ Отклоняет заявку на покупку товара со стороны администрации
+
+       :param admin_id:
+       :param user_id: int
+       :param product_id: int
+       :return:
+           200 + success, если все хорошо.
+           404 + error404u, если пользователь не найден.
+           404 + error404req, если заявка не найдена
+           403 + error403, если заявка уже одобрена/отклонена
+           500 если внутрення ошибка сервера.
+    """
     try:
         if await get_user_by_id(admin_id, session) == "User not found":
             raise ValueError('404u')
@@ -334,6 +386,17 @@ async def reject_request_user(
         product_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
+    """ Отклоняет заявку на покупку товара со стороны пользователя
+
+       :param user_id: int
+       :param product_id: int
+       :return:
+           200 + success, если все хорошо.
+           404 + error404u, если пользователь не найден.
+           404 + error404req, если заявка не найдена
+           403 + error403, если заявка уже одобрена/отклонена
+           500 если внутрення ошибка сервера.
+        """
     try:
         if await get_user_by_id(user_id, session) == "User not found":
             raise ValueError('404u')
@@ -380,6 +443,14 @@ async def delete_product(
         product_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
+    """ Удаляет товар из магазина (лениво)
+
+       :param product_id: int
+       :return:
+           200 + success, если все хорошо.
+           404 + error404pr, если товар не найден
+           500 если внутрення ошибка сервера.
+    """
     try:
         if await get_product_by_id(product_id, session) == "Product not found":
             raise ValueError('404pr')
@@ -399,6 +470,15 @@ async def get_items_by_club(
         club_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
+    """ Возвращает все товары в клубе
+
+       :param club_id: int
+       :return:
+           200 + success, если все хорошо.
+           404 + error404pr, если товар не найден
+           404 + error404c, если клуб не найден.
+           500 если внутрення ошибка сервера.
+    """
     try:
         if await get_club_by_id(club_id, session) == "Club not found":
             raise ValueError('404c')
@@ -430,6 +510,14 @@ async def get_user_history_active(
         user_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
+    """ Возвращает активные заявки пользователя
+
+       :param user_id: int
+       :return:
+           200 + success, если все хорошо.
+           404 + error404u, если пользователь не найден.
+           500 если внутрення ошибка сервера.
+    """
     try:
         if await get_user_by_id(user_id, session) == "User not found":
             raise ValueError('404u')
@@ -464,6 +552,14 @@ async def get_user_history_close(
         user_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
+    """ Возвращает одобренные/отклоненные заявки пользователя
+
+       :param user_id: int
+       :return:
+           200 + success, если все хорошо.
+           404 + error404u, если пользователь не найден.
+           500 если внутрення ошибка сервера.
+    """
     try:
         if await get_user_by_id(user_id, session) == "User not found":
             raise ValueError('404u')
@@ -498,6 +594,14 @@ async def get_admin_history_active(
         club_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
+    """ Возвращает активные заявки пользователей клуба
+
+       :param club_id: int
+       :return:
+           200 + success, если все хорошо.
+           404 + error404c, если клуб не найден.
+           500 если внутрення ошибка сервера.
+    """
     try:
         if await get_club_by_id(club_id, session) == "Club not found":
             raise ValueError('404c')
@@ -532,6 +636,14 @@ async def get_admin_history_close(
         club_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
+    """ Возвращает одобренные/отклоненные заявки пользователей клуба
+
+       :param user_id: int
+       :return:
+           200 + success, если все хорошо.
+           404 + error404c, если клуб не найден.
+           500 если внутрення ошибка сервера.
+    """
     try:
         if await get_club_by_id(club_id, session) == "Club not found":
             raise ValueError('404c')
